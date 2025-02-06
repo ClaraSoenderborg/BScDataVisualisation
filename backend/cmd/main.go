@@ -1,11 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 var repoPath string
@@ -112,6 +113,19 @@ func parseToCSV(list [][]string){
 	}
 }
 
+func writeToCSVFile(list [][]string) {
+	var file, err = os.Create("/tmp/data.csv")
+	if err != nil {
+		fmt.Errorf("Could not create file :(")
+	} 
+
+	defer file.Close()
+
+	var writer = csv.NewWriter(file)
+	writer.WriteAll(list)
+
+}
+
 
 
 func main() {
@@ -120,7 +134,8 @@ func main() {
 
 	var rawData = callGitLog()
 	var res = parseGitLog(rawData)
-	parseToCSV(res)
+	//parseToCSV(res)
+	writeToCSVFile(res)
 	//fmt.Printf("%v", res)
 	//fmt.Print(rawData)
 }
