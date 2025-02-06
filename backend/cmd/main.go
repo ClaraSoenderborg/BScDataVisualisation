@@ -5,12 +5,13 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"regexp"
 )
 
-var repoPath string 
+var repoPath string
 
 func callGitLog() string{
-	var script = `git -C %s log --pretty=format:"%%h %%as %%ae %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges`
+	var script = `git -C %s log --pretty=format:"%%h %%as %%ae %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
 
 	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
 
@@ -41,7 +42,7 @@ func parseCoAuthors (author string) []string {
 	}
 	return listCoAuthor
 
-} 
+}
 
 func removeDuplicates(list []string) []string {
 	var keyMap = make(map[string]bool)
@@ -50,7 +51,7 @@ func removeDuplicates(list []string) []string {
 		var _, exists = keyMap[item]
 		if !exists {
 			keyMap[item] = true
-			result = append(list, item)
+			result = append(result, item)
 		}
 	}
 	return result
@@ -58,54 +59,68 @@ func removeDuplicates(list []string) []string {
 
 
 func parseGitLog (lines string) [][] string {
-	var commitSha, timestamp, author, fileName, lineAdd, lineRemove string 
-	var blockLineCount int 
+	var commitSha, timestamp, author, fileName, lineAdd, lineRemove string
+	var blockLineCount int
 	var result = [][]string{}
 	var authors = []string{}
 
 	for _, l := range strings.Split (lines, "\n") {
-		var lineContent = strings.TrimSpace(l) 
+		var lineContent = strings.TrimSpace(l)
 
 		if lineContent != "" {
 			if blockLineCount == 0 {
 				var fields = strings.Fields(lineContent)
 				commitSha, timestamp, author = fields[0], fields[1], fields[2]
+				authors = append(authors, author)
 				if len(fields) > 3 {
 					var coAuthors = strings.Join(fields[3:], " ")
-					authors = append(parseCoAuthors(coAuthors), author)
+					authors = append(authors, parseCoAuthors(coAuthors)...)
 					authors = removeDuplicates(authors)
 				}
 			} else {
 				var fields = strings.Fields(lineContent)
 				lineAdd, lineRemove, fileName =  fields[0], fields[1], fields[2]
-				for _, au := range authors {
+				if addFile(fileName){
+					for _, au := range authors {
 					result = append (result, []string{commitSha, timestamp, au, lineAdd, lineRemove, fileName})
+					}
 				}
 			}
-			blockLineCount++ 
+			blockLineCount++
 		}
-		
+
 
 		if lineContent == "" {
 			blockLineCount = 0
-
+			authors = nil
 		}
 	}
+	fmt.Println(len(result))
 	return result
-} 
+}
+
+func addFile(fileName string) bool{
+	var match, _ = regexp.MatchString("^.*(md|gitignore|png|pdf|drawio)$", fileName)
+
+	return !match
+}
 
 
-
+func parseToCSV(list [][]string){
+	for _, line := range list {
+		fmt.Println(strings.Join(line, ","))
+	}
+}
 
 
 
 func main() {
 	repoPath  = os.Args[1]
 
-	
-	var rawData = callGitLog()
-	parseGitLog(rawData)
 
+	var rawData = callGitLog()
+	var res = parseGitLog(rawData)
+	parseToCSV(res)
 	//fmt.Printf("%v", res)
 	//fmt.Print(rawData)
 }
