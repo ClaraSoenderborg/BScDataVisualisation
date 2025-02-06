@@ -119,10 +119,11 @@ func writeToCSVFile(list [][]string) {
 		fmt.Errorf("Could not create file :(")
 	} 
 
-	defer file.Close()
+	defer file.Close() 
 
 	var writer = csv.NewWriter(file)
-	writer.WriteAll(list)
+	writer.Write([]string {"commitSHA", "date", "author", "linesAdded", "linesDeleted", "fileName"})
+	writer.WriteAll(list) 
 
 }
 
