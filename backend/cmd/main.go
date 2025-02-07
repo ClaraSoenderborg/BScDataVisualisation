@@ -114,7 +114,8 @@ func parseToCSV(list [][]string){
 }
 
 func writeToCSVFile(list [][]string) {
-	var file, err = os.Create("/tmp/data.csv")
+	//var file, err = os.Create("/tmp/data.csv")
+	var file, err = os.Create("../../data/data.csv")
 	if err != nil {
 		fmt.Errorf("Could not create file :(")
 	} 
