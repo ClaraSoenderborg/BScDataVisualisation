@@ -21,21 +21,12 @@ var arc = d3.arc()
     .innerRadius(donutHole)
     .outerRadius(radius)
 
-var pie = d3.pie().sort(null).value((d) => d["lines"])
-
-const path = svg.datum(dummyData).selectAll("path")
-    .data(pie(dummyData))
-    .join("path")
-    .attr("fill", (d, i) => color(i))
-    .attr("d", arc)
-    .each(function (d) { this._current = d; }); // store the initial angles
-
-
 svg.append("text")
     .attr("text-anchor", "middle")
     .text("cheep.cs")
     .attr("font-size", "8px")
-/*
+
+
 d3.csv("../../data/data.csv", d => {
     return {
         commitSHA: d.commitSHA,
@@ -43,6 +34,7 @@ d3.csv("../../data/data.csv", d => {
         author: d.author,
         linesAdded: +d.linesAdded,
         linesDeleted: +d.linesDeleted,
+        linesChanged: +d.linesChanged,
         fileName: d.fileName
     };
 }).then(data => {
@@ -60,5 +52,26 @@ d3.csv("../../data/data.csv", d => {
 
 
 const createVis = (data) => {
-    
-}*/
+    const testGroup = d3.rollup(data, (D) => d3.sum(D, d => d.linesChanged),(d) => d.fileName, (d) => d.author)
+    var cheep = testGroup.get("src/Chirp.Infrastructure/Cheep.cs")
+    var program = testGroup.get("src/Chirp.Web/Program.cs")
+
+
+    const result = Array.from(program, ([author, linesChanged]) => ({
+        author,
+        linesChanged
+    }))
+
+    console.log(program)
+
+
+    var pie = d3.pie().sort(null).value((d) => d["linesChanged"])
+
+    const path = svg.datum(result).selectAll("path")
+    .data(pie(result))
+    .join("path")
+    .attr("fill", (d, i) => color(i))
+    .attr("d", arc)
+    .each(function (d) { this._current = d; }); // store the initial angles
+
+}

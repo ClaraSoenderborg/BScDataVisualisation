@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -82,8 +83,10 @@ func parseGitLog (lines string) [][] string {
 				var fields = strings.Fields(lineContent)
 				lineAdd, lineRemove, fileName =  fields[0], fields[1], fields[2]
 				if addFile(fileName){
+					var lineAddInt, _ = strconv.Atoi(lineAdd)
+					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					for _, au := range authors {
-					result = append (result, []string{commitSha, timestamp, au, lineAdd, lineRemove, fileName})
+					result = append (result, []string{commitSha, timestamp, au, lineAdd, lineRemove, strconv.Itoa(lineAddInt+lineRemoveInt), fileName})
 					}
 				}
 			}
@@ -123,7 +126,7 @@ func writeToCSVFile(list [][]string) {
 	defer file.Close() 
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string {"commitSHA", "date", "author", "linesAdded", "linesDeleted", "fileName"})
+	writer.Write([]string {"commitSHA", "date", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
 	writer.WriteAll(list) 
 
 }
