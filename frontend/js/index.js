@@ -11,20 +11,11 @@ var dummyData = d3.csvParse(`author,lines
     astrid,8
     sarah,3`, d3.autoType)
 
-var svg = d3.select("#vis")
-    .append("svg")
-    .attr("viewBox", [-width / 2, -height / 2, width, height])
-    .attr("height", 600)
-    .style("border", "1px solid black")
-
 var arc = d3.arc()
     .innerRadius(donutHole)
     .outerRadius(radius)
 
-svg.append("text")
-    .attr("text-anchor", "middle")
-    .text("cheep.cs")
-    .attr("font-size", "8px")
+
 
 
 d3.csv("../../data/data.csv", d => {
@@ -53,28 +44,30 @@ d3.csv("../../data/data.csv", d => {
 
 
 const createVis = (data) => {
-    const primaryGroup = d3.rollup(data, 
-        (D) => d3.sum(D, d => d.linesChanged), 
-        (w) => w.week, 
-        (d) => d.fileName, 
+    const primaryGroup = d3.rollup(data,
+        (D) => d3.sum(D, d => d.linesChanged),
+        (w) => w.week,
+        (d) => d.fileName,
         (d) => d.author)
 
     primaryGroup.forEach((fileMap, week) => {
         const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
             const totalLinesChanged = d3.sum(authorMap.values())
-            return { week, fileName, totalLinesChanged}; 
+            return { week, fileName, totalLinesChanged };
         })
-        fileArray.sort((a,b) => b.totalLinesChanged - a.totalLinesChanged)  
-        const sortedFiles = fileArray.slice(0,10)  
+        fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
+        const sortedFiles = fileArray.slice(0, 10)
         //console.log(sortedFiles)    
 
         sortedFiles.forEach((item) => {
             const authorMap = fileMap.get(item.fileName)
             //console.log(authorMap)
             //const authorArray = Array.from(authorMap, ([key, value]) => ({key, value}))
-            
-            buildDonut(authorMap)
+
+            buildDonut(item.fileName, authorMap)
         })
+
+
 
     })
 
@@ -82,13 +75,32 @@ const createVis = (data) => {
 
 }
 
-const buildDonut = (data) => {
-    var pie = d3.pie().sort(null).value((d) => d["value"])
+const buildDonut = (fileName ,data) => {
+    //var pie = d3.pie().sort(null).value((d) => d["value"])
+    var pie = d3.pie().sort(null).value(([key, value]) => value);
+    const dataArray = Array.from(data, ([key, value]) => ({ key, value }));
+
+    var svg = d3.select("#vis")
+        .append("svg")
+        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("height", 300)
+        .style("border", "1px solid black")
+
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .text(fileName)
+        .attr("font-size", 4)
+    
+        var g = svg.append("g")
+        .attr("transform", `translate(${Math.random() * 200 - 100},${Math.random() * 200 - 100})`); // Random placement
+
 
     const path = svg.datum(data).selectAll("path")
-    .data(pie(data))
-    .join("path")
-    .attr("fill", (d, i) => color(i))
-    .attr("d", arc)
-    .each(function (d) { this._current = d; }); // store the initial angles
+        .data(pie(data))
+        .join("path")
+        .attr("fill", (d, i) => color(i))
+        .attr("height", 5)
+        .attr("width", 5)
+        .attr("d", arc)
+        .each(function (d) { this._current = d; }); // store the initial angles
 }
