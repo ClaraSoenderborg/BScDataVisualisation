@@ -31,6 +31,7 @@ d3.csv("../../data/data.csv", d => {
     return {
         commitSHA: d.commitSHA,
         date: d.date,
+        week: d.week,
         author: d.author,
         linesAdded: +d.linesAdded,
         linesDeleted: +d.linesDeleted,
@@ -52,26 +53,42 @@ d3.csv("../../data/data.csv", d => {
 
 
 const createVis = (data) => {
-    const testGroup = d3.rollup(data, (D) => d3.sum(D, d => d.linesChanged),(d) => d.fileName, (d) => d.author)
-    var cheep = testGroup.get("src/Chirp.Infrastructure/Cheep.cs")
-    var program = testGroup.get("src/Chirp.Web/Program.cs")
+    const primaryGroup = d3.rollup(data, 
+        (D) => d3.sum(D, d => d.linesChanged), 
+        (w) => w.week, 
+        (d) => d.fileName, 
+        (d) => d.author)
 
+    primaryGroup.forEach((fileMap, week) => {
+        const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
+            const totalLinesChanged = d3.sum(authorMap.values())
+            return { week, fileName, totalLinesChanged}; 
+        })
+        fileArray.sort((a,b) => b.totalLinesChanged - a.totalLinesChanged)  
+        const sortedFiles = fileArray.slice(0,10)  
+        //console.log(sortedFiles)    
 
-    const result = Array.from(program, ([author, linesChanged]) => ({
-        author,
-        linesChanged
-    }))
+        sortedFiles.forEach((item) => {
+            const authorMap = fileMap.get(item.fileName)
+            //console.log(authorMap)
+            //const authorArray = Array.from(authorMap, ([key, value]) => ({key, value}))
+            
+            buildDonut(authorMap)
+        })
 
-    console.log(program)
+    })
 
+    //console.log(primaryGroup)
 
-    var pie = d3.pie().sort(null).value((d) => d["linesChanged"])
+}
 
-    const path = svg.datum(result).selectAll("path")
-    .data(pie(result))
+const buildDonut = (data) => {
+    var pie = d3.pie().sort(null).value((d) => d["value"])
+
+    const path = svg.datum(data).selectAll("path")
+    .data(pie(data))
     .join("path")
     .attr("fill", (d, i) => color(i))
     .attr("d", arc)
     .each(function (d) { this._current = d; }); // store the initial angles
-
 }

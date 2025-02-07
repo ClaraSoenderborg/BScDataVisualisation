@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var repoPath string
@@ -65,6 +66,7 @@ func parseGitLog (lines string) [][] string {
 	var blockLineCount int
 	var result = [][]string{}
 	var authors = []string{}
+	var timeLayout = "2006-01-02"
 
 	for _, l := range strings.Split (lines, "\n") {
 		var lineContent = strings.TrimSpace(l)
@@ -85,8 +87,11 @@ func parseGitLog (lines string) [][] string {
 				if addFile(fileName){
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
+					var parseTime, _ = time.Parse(timeLayout, timestamp)
+					var _, weekNumber = parseTime.ISOWeek()
+
 					for _, au := range authors {
-					result = append (result, []string{commitSha, timestamp, au, lineAdd, lineRemove, strconv.Itoa(lineAddInt+lineRemoveInt), fileName})
+					result = append (result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, strconv.Itoa(lineAddInt+lineRemoveInt), fileName})
 					}
 				}
 			}
@@ -126,7 +131,7 @@ func writeToCSVFile(list [][]string) {
 	defer file.Close() 
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string {"commitSHA", "date", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
+	writer.Write([]string {"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
 	writer.WriteAll(list) 
 
 }
