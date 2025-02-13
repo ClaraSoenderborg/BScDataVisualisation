@@ -1,10 +1,11 @@
+
 const width = 100
 const height = 100
-const margin = {top: 50, right: 0, bottom: 50, left: 70}
-const radius = Math.min(width, height) / 2 - margin
+const margin = { top: 50, right: 0, bottom: 50, left: 70 }
+const radius = Math.min(width, height) / 2 - margin.right
 const donutHole = 20
 const innerWidth = width - margin.left - margin.right
-const innerHeight = height - margin.top - margin-bottom
+const innerHeight = height - margin.top - margin.bottom
 var color
 
 
@@ -14,9 +15,9 @@ var color
     astrid,8
     sarah,3`, d3.autoType)*/
 
-var arc = d3.arc()
+/*var arc = d3.arc()
     .innerRadius(donutHole)
-    .outerRadius(radius)
+    .outerRadius(radius)*/
 
 
 
@@ -33,41 +34,44 @@ d3.csv("../../data/data.csv", d => {
         fileName: d.fileName
     };
 }).then(data => {
-    console.log(data);
-
-    console.log(data.length);
-    console.log(d3.max(data, d => d.linesAdded));
-    console.log(d3.min(data, d => d.linesAdded));
-
-    data.sort((a, b) => b.linesAdded - a.linesAdded);
 
     createVis(data);
 });
 
 
 const svg = d3.select("#vis")
-                .append("svg")
-                .attr("viewBox", `0 0 ${width} ${height}`)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
 
 const donutContainers = svg.append("g")
-                            .attr("transform", `translate(${margin.left},${margin.top})`)
+    .attr("transform", `translate(${margin.left},${margin.top})`)
 
 const createVis = (data) => {
-
+    
     authorColor(data)
     createLegend(data)
-
+    
     const primaryGroup = d3.rollup(data,
         (D) => d3.sum(D, d => d.linesChanged),
         (w) => w.week,
         (d) => d.fileName,
         (d) => d.author)
 
-    primaryGroup.forEach((fileMap, week) => {
-        const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
+    console.log(primaryGroup)
+
+    const something = primaryGroup.get("42").get("LICENSE")
+    console.log(something)
+
+
+
+    buildDonut("LICENSE", something)
+
+    /*primaryGroup.forEach((authorMap, fileName) => {
+        /*const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
             const totalLinesChanged = d3.sum(authorMap.values())
             return { week, fileName, totalLinesChanged };
         })
+        //console.log(fileMap)
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const sortedFiles = fileArray.slice(0, 10)
         //console.log(sortedFiles)
@@ -76,15 +80,19 @@ const createVis = (data) => {
             const authorMap = fileMap.get(item.fileName)
             //console.log(authorMap)
             //const authorArray = Array.from(authorMap, ([key, value]) => ({key, value}))
-            //buildDonut(item.fileName, authormap)
+            buildDonut(item.fileName, authormap)
+            
             
         })
 
-        buildDonut(fileMap, week)
+        
+        if(fileName.Equals("test/Chirp.Infrastructure.Tests/CheepUnitTest.cs")){
+            console.log(week)
+            buildDonut(week, fileMap)
+        }
 
-    })
+    })*/
 
-    //console.log(primaryGroup)
 
 }
 
@@ -95,7 +103,37 @@ const defineScales = (data) => {
         .range([0, innerWidth])
 }
 
-const buildDonut = (fileName ,data) => {
+const buildDonut = (fileName, authorMap) => {
+    const singleDonut = donutContainers.append("g")
+    //todo: transform with yscale
+
+    console.log("buildDonut")
+
+    console.log(fileName)
+    console.log(authorMap)
+
+    
+    var pie = d3.pie().sort(null).value(([key, value]) => value);
+
+    const preparedPie = pie(authorMap)
+
+    var arcGen = d3.arc()
+        .innerRadius(donutHole)
+        .outerRadius(radius)
+
+    var arcs = singleDonut.selectAll(`.arc-${fileName}`)
+        .data(preparedPie)
+        .join("g")
+        .attr("class", `arc-${fileName}`)
+
+    arcs.append("path")
+        .attr("d", arcGen)
+        .attr("fill", d => color(d.data[0]))
+
+
+    //var pie = d3.pie().sort(null).value(([key, value]) => value);
+
+
     /*
     //var pie = d3.pie().sort(null).value((d) => d["value"])
     var pie = d3.pie().sort(null).value(([key, value]) => value);
@@ -125,14 +163,12 @@ const buildDonut = (fileName ,data) => {
         .attr("d", arc)
         .each(function (d) { this._current = d; }); // store the initial angles */
 
-    
-    var pie = d3.pie().sort(null).value(([key, value]) => value);
 
-    week.
+
 
 }
 
-/*
+
 const authorColor = (data) => {
     const authors = Array.from(d3.union(data.map(d => d.author)))
     color = d3.scaleOrdinal(d3.schemeCategory10).domain(authors)
@@ -175,4 +211,3 @@ const createLegend = (data) => {
     
 };
 
-*/
