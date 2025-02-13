@@ -3,13 +3,14 @@ const height = 100
 const margin = 20
 const radius = Math.min(width, height) / 2 - margin
 const donutHole = 20
-var color = d3.scaleOrdinal(d3.schemeCategory10)
+var color
 
-var dummyData = d3.csvParse(`author,lines
+
+/* var dummyData = d3.csvParse(`author,lines
     clara,5
     julia,10
     astrid,8
-    sarah,3`, d3.autoType)
+    sarah,3`, d3.autoType)*/ 
 
 var arc = d3.arc()
     .innerRadius(donutHole)
@@ -44,6 +45,10 @@ d3.csv("../../data/data.csv", d => {
 
 
 const createVis = (data) => {
+    
+    authorColor(data)
+
+
     const primaryGroup = d3.rollup(data,
         (D) => d3.sum(D, d => d.linesChanged),
         (w) => w.week,
@@ -98,9 +103,18 @@ const buildDonut = (fileName ,data) => {
     const path = svg.datum(data).selectAll("path")
         .data(pie(data))
         .join("path")
-        .attr("fill", (d, i) => color(i))
+        .attr("fill", (d, i) => color(d.data[0]))
         .attr("height", 5)
         .attr("width", 5)
         .attr("d", arc)
         .each(function (d) { this._current = d; }); // store the initial angles
+    
 }
+
+const authorColor = (data) => {
+    const authors = Array.from(d3.union(data.map(d => d.author)))
+    color = d3.scaleOrdinal(d3.schemeCategory10).domain(authors)
+}
+
+
+
