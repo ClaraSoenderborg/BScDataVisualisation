@@ -10,7 +10,7 @@ var color
     clara,5
     julia,10
     astrid,8
-    sarah,3`, d3.autoType)*/ 
+    sarah,3`, d3.autoType)*/
 
 var arc = d3.arc()
     .innerRadius(donutHole)
@@ -45,7 +45,7 @@ d3.csv("../../data/data.csv", d => {
 
 
 const createVis = (data) => {
-    
+
     authorColor(data)
 
 
@@ -62,7 +62,7 @@ const createVis = (data) => {
         })
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const sortedFiles = fileArray.slice(0, 10)
-        //console.log(sortedFiles)    
+        //console.log(sortedFiles)
 
         sortedFiles.forEach((item) => {
             const authorMap = fileMap.get(item.fileName)
@@ -77,7 +77,7 @@ const createVis = (data) => {
     })
 
     //console.log(primaryGroup)
-
+    createLegend(data);
 }
 
 const buildDonut = (fileName ,data) => {
@@ -95,7 +95,7 @@ const buildDonut = (fileName ,data) => {
         .attr("text-anchor", "middle")
         .text(fileName)
         .attr("font-size", 4)
-    
+
         var g = svg.append("g")
         .attr("transform", `translate(${Math.random() * 200 - 100},${Math.random() * 200 - 100})`); // Random placement
 
@@ -108,7 +108,7 @@ const buildDonut = (fileName ,data) => {
         .attr("width", 5)
         .attr("d", arc)
         .each(function (d) { this._current = d; }); // store the initial angles
-    
+
 }
 
 const authorColor = (data) => {
@@ -116,5 +116,37 @@ const authorColor = (data) => {
     color = d3.scaleOrdinal(d3.schemeCategory10).domain(authors)
 }
 
+// Create the legend
+const createLegend = (data) => {
+  const authors = Array.from(d3.union(data.map(d => d.author)));
 
+  const legendWidth = 200;
+  const legendHeight = authors.length * 20;  // Height depends on the number of authors
+
+  var legendSvg = d3.select("#vis")
+    .append("svg")
+    .attr("width", legendWidth)
+    .attr("height", legendHeight)
+    .style("border", "1px solid black")
+    .attr("transform", "translate(120, 0)"); // Position legend next to the donut chart
+
+  // Add rectangles for each author with a corresponding color
+  legendSvg.selectAll("rect")
+    .data(authors)
+    .join("rect")
+    .attr("x", 10)
+    .attr("y", (d, i) => i * 20)  // Position each legend item vertically
+    .attr("width", 10)
+    .attr("height", 10)
+    .attr("fill", (d) => color(d));
+
+  // Add text for each author
+  legendSvg.selectAll("text")
+    .data(authors)
+    .join("text")
+    .attr("x", 25)
+    .attr("y", (d, i) => i * 20 + 9)  // Align text next to the rectangle
+    .attr("dy", ".35em")  
+    .text(d => d);
+};
 
