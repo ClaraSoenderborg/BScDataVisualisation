@@ -47,7 +47,7 @@ d3.csv("../../data/data.csv", d => {
 const createVis = (data) => {
 
     authorColor(data)
-
+    createLegend(data)
 
     const primaryGroup = d3.rollup(data,
         (D) => d3.sum(D, d => d.linesChanged),
@@ -77,7 +77,7 @@ const createVis = (data) => {
     })
 
     //console.log(primaryGroup)
-    createLegend(data);
+
 }
 
 const buildDonut = (fileName ,data) => {
@@ -118,35 +118,37 @@ const authorColor = (data) => {
 
 // Create the legend
 const createLegend = (data) => {
-  const authors = Array.from(d3.union(data.map(d => d.author)));
+  const authors = Array.from(d3.union(data.map(d => d.author)))
 
-  const legendWidth = 200;
-  const legendHeight = authors.length * 20;  // Height depends on the number of authors
+  const legendWidth = Math.max(...(authors.map(a => a.length))) * 8
+  const legendHeight = authors.length * 25;  
 
   var legendSvg = d3.select("#vis")
     .append("svg")
     .attr("width", legendWidth)
     .attr("height", legendHeight)
     .style("border", "1px solid black")
-    .attr("transform", "translate(120, 0)"); // Position legend next to the donut chart
+    .attr("transform", "translate(0, 0)")
 
   // Add rectangles for each author with a corresponding color
-  legendSvg.selectAll("rect")
+  legendSvg.selectAll("circel")
     .data(authors)
-    .join("rect")
-    .attr("x", 10)
-    .attr("y", (d, i) => i * 20)  // Position each legend item vertically
-    .attr("width", 10)
-    .attr("height", 10)
-    .attr("fill", (d) => color(d));
+    .join("circle")
+    .attr("cx", 10)
+    .attr("cy", (d, i) => 20+i * 20) 
+    .attr("r", 7)
+    .attr("fill", (d) => color(d))
 
   // Add text for each author
   legendSvg.selectAll("text")
     .data(authors)
     .join("text")
     .attr("x", 25)
-    .attr("y", (d, i) => i * 20 + 9)  // Align text next to the rectangle
-    .attr("dy", ".35em")  
-    .text(d => d);
+    .attr("y", function(d,i){ return 20+i*20}) 
+    .text(d => d)
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle")
+    .style("fill", function(d){ return color(d)})
+    
 };
 
