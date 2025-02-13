@@ -1,8 +1,10 @@
 const width = 100
 const height = 100
-const margin = 20
+const margin = {top: 50, right: 0, bottom: 50, left: 70}
 const radius = Math.min(width, height) / 2 - margin
 const donutHole = 20
+const innerWidth = width - margin.left - margin.right
+const innerHeight = height - margin.top - margin-bottom
 var color
 
 
@@ -43,6 +45,12 @@ d3.csv("../../data/data.csv", d => {
 });
 
 
+const svg = d3.select("#vis")
+                .append("svg")
+                .attr("viewBox", `0 0 ${width} ${height}`)
+
+const donutContainers = svg.append("g")
+                            .attr("transform", `translate(${margin.left},${margin.top})`)
 
 const createVis = (data) => {
 
@@ -68,11 +76,11 @@ const createVis = (data) => {
             const authorMap = fileMap.get(item.fileName)
             //console.log(authorMap)
             //const authorArray = Array.from(authorMap, ([key, value]) => ({key, value}))
-
-            buildDonut(item.fileName, authorMap)
+            //buildDonut(item.fileName, authormap)
+            
         })
 
-
+        buildDonut(fileMap, week)
 
     })
 
@@ -80,7 +88,15 @@ const createVis = (data) => {
 
 }
 
+const xScale = d3.scaleBand()
+const defineScales = (data) => {
+    xScale
+        .domain(data.map(d => d.key)) // key is week
+        .range([0, innerWidth])
+}
+
 const buildDonut = (fileName ,data) => {
+    /*
     //var pie = d3.pie().sort(null).value((d) => d["value"])
     var pie = d3.pie().sort(null).value(([key, value]) => value);
     const dataArray = Array.from(data, ([key, value]) => ({ key, value }));
@@ -107,14 +123,21 @@ const buildDonut = (fileName ,data) => {
         .attr("height", 5)
         .attr("width", 5)
         .attr("d", arc)
-        .each(function (d) { this._current = d; }); // store the initial angles
+        .each(function (d) { this._current = d; }); // store the initial angles */
+
+    
+    var pie = d3.pie().sort(null).value(([key, value]) => value);
+
+    week.
 
 }
 
+/*
 const authorColor = (data) => {
     const authors = Array.from(d3.union(data.map(d => d.author)))
     color = d3.scaleOrdinal(d3.schemeCategory10).domain(authors)
-}
+} 
+
 
 // Create the legend
 const createLegend = (data) => {
@@ -152,3 +175,4 @@ const createLegend = (data) => {
     
 };
 
+*/
