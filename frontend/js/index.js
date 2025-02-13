@@ -11,9 +11,9 @@ const yScale = d3.scaleBand()
 const xScale = d3.scaleBand()
 
 const defineScales = (data) => {
-    /*xScale
-        .domain(data.map(d => d.key)) // key is week
-        .range([0, innerWidth])*/
+    xScale
+        .domain(data.keys().map(d => d)) // key is week
+        .range([0, innerWidth])
     yScale
         .domain([0,1,2,3,4,5,6,7,8,9])
         .range([1,innerHeight])
@@ -33,6 +33,7 @@ const svg = d3.select("#vis")
 const outerDonutGroup = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
 
+
 const createVis = (data) => {
 
     authorColor(data)
@@ -43,15 +44,27 @@ const createVis = (data) => {
         (w) => w.week,
         (d) => d.fileName,
         (d) => d.author)
-    
+
     defineScales(primaryGroup)
+
+    const bottomAxis = d3.axisBottom(xScale)
+        //.tickValues(d3.range([0,10]))
+        //.tickSizeOuter(0)
+
+
+    outerDonutGroup.append("g")
+        .attr("transform", `translate(0,${innerHeight})`)
+        .call(bottomAxis)
+
+
 
     console.log(primaryGroup)
 
     const week = primaryGroup.get(42)
 
     const donutContainer = outerDonutGroup.append("g")
-        
+                                            .attr("transform", `translate(${xScale(1)},${innerHeight})`)
+
 
     // sum changes for all files in week
     const fileArray = Array.from(week, ([fileName, authorMap]) => {
