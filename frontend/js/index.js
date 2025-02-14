@@ -56,7 +56,7 @@ toolTip
 
 toolTip
     .append("text")
-    .text("hejsa")
+    //.text("hejsa")
 
 
 const createVis = (data) => {
@@ -122,25 +122,24 @@ const createVis = (data) => {
 
 
             const singleDonut = outerDonutGroup.append("g")
-                .attr("class", "singleDonut")
                 .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
                 .on("click", (e, d) => {
 
                     const [x, y] = d3.pointer(e, svg.node())
 
-                    d3.select(".toolTip")
-                        .attr("transform", `translate(${x+1}, ${y-1})`)
+                    toolTip
+                        .attr("transform", `translate(${x+10}, ${y-10})`)
+                        .style("visibility", "visible")
                         .raise()
                         .transition()
                         .duration(200)
                         .style("opacity", 1)
 
-                    toolTip.text("Dette er data", d)
-                    
+                    d3.select(".toolTip text")
+                        .text(fileName)                    
 
-                    console.log(x)
-                    console.log(y)
                 })
+                
                 
                 
 
