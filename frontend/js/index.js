@@ -7,6 +7,10 @@ const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 var color
 
+
+
+
+
 const yScale = d3.scaleBand()
 const xScale = d3.scaleBand()
 
@@ -35,11 +39,31 @@ const svg = d3.select("#vis")
 const outerDonutGroup = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
 
+// Chapter 7 i bogen
+const toolTip = svg
+    .append("g")
+    //.style("opacity", 0)
+    .attr("class", "toolTip")
+
+toolTip
+    .append("rect")
+    .attr("width", 50)
+    .attr("height", 50)
+    .attr("rx", 3)
+    .attr("ry", 3)
+    .style("fill-opacity", 0.75)
+    .attr("fill", "pink")
+
+toolTip
+    .append("text")
+    .text("hejsa")
+
 
 const createVis = (data) => {
 
     authorColor(data)
     createLegend(data)
+    handleMouse()
 
     const primaryGroup = d3.rollup(data,
         (D) => d3.sum(D, d => d.linesChanged),
@@ -67,7 +91,7 @@ const createVis = (data) => {
         .tickSize(0)
         .ticks(2)
         .tickValues([1, 10])
-        .tickFormat((d,i) => d === 1 ? "Least \n changes" : (d === 10 ? "Most \n changes": ""))
+        .tickFormat((d,i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes": ""))
 
     outerDonutGroup.append("g")
         //.attr("transform", `translate(${margin.left})`)
@@ -75,7 +99,6 @@ const createVis = (data) => {
         .selectAll("text") // Select all text elements within the axis
         .attr("transform", "rotate(-45)")
         .attr("text-anchor", "end")
-        
         .style("font-size", "3px") // Sets the size of the text
 
 
@@ -97,8 +120,29 @@ const createVis = (data) => {
             const fileName = topTenFiles[i].fileName
             const authorMap = fileMap.get(fileName)
 
+
             const singleDonut = outerDonutGroup.append("g")
+                .attr("class", "singleDonut")
                 .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
+                .on("click", (e, d) => {
+
+                    const [x, y] = d3.pointer(e, svg.node())
+
+                    d3.select(".toolTip")
+                        .attr("transform", `translate(${x+1}, ${y-1})`)
+                        .raise()
+                        .transition()
+                        .duration(200)
+                        .style("opacity", 1)
+
+                    toolTip.text("Dette er data", d)
+                    
+
+                    console.log(x)
+                    console.log(y)
+                })
+                
+                
 
 
             var pie = d3.pie().sort(null).value(([key, value]) => value);
@@ -119,6 +163,7 @@ const createVis = (data) => {
             arcs.append("path")
                 .attr("d", arcGen)
                 .attr("fill", d => color(d.data[0]))
+                
 
         }
 
@@ -126,36 +171,16 @@ const createVis = (data) => {
 
 }
 
+// Chapter 7 i bogen
+const handleMouse = () => {
+    outerDonutGroup.selectAll("singleDonut")
+    .on("click", (e,d) => {
+        console.log("event", e)
+        console.log("data", d)
+    })
 
-/*
-const buildDonut = (fileName, authorMap) => {
-    const singleDonut = donutContainers.append("g")
-    //todo: transform with yscale
+} 
 
-    console.log("buildDonut")
-
-    console.log(fileName)
-    console.log(authorMap)
-
-
-    var pie = d3.pie().sort(null).value(([key, value]) => value);
-
-    const preparedPie = pie(authorMap)
-
-    var arcGen = d3.arc()
-        .innerRadius(donutHole)
-        .outerRadius(radius)
-
-    var arcs = singleDonut.selectAll(`.arc-${fileName}`)
-        .data(preparedPie)
-        .join("g")
-        .attr("class", `arc-${fileName}`)
-
-    arcs.append("path")
-        .attr("d", arcGen)
-        .attr("fill", d => color(d.data[0]))
-
-}*/
 
 
 const authorColor = (data) => {
