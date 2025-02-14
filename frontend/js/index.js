@@ -63,49 +63,47 @@ const createVis = (data) => {
 
     console.log(primaryGroup)
 
-    const week = primaryGroup.get(42)
+    primaryGroup.forEach((fileMap, week) => {
 
-    const donutContainer = outerDonutGroup.append("g")
+        // sum changes for all files in week
+        const fileArray = Array.from(fileMap,([fileName, authorMap]) => {
+            const totalLinesChanged = d3.sum(authorMap.values())
+            return { fileName, totalLinesChanged };
+        })
 
+        // find top ten changed files in week
+        fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
+        const topTenFiles = fileArray.slice(0, 10)
+        console.log(topTenFiles)
 
-    // sum changes for all files in week
-    const fileArray = Array.from(week, ([fileName, authorMap]) => {
-        const totalLinesChanged = d3.sum(authorMap.values())
-        return { fileName, totalLinesChanged };
-    })
-
-    // find top ten changed files in week
-    fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
-    const topTenFiles = fileArray.slice(0, 10)
-
-    for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
-        const fileName = topTenFiles[i].fileName
-        const authorMap = week.get(fileName)
-
-        const singleDonut = outerDonutGroup.append("g")
-            .attr("transform", `translate(${xScale(36)+xScale.bandwidth()/2},${yScale(i)})`)
-
-
-        var pie = d3.pie().sort(null).value(([key, value]) => value);
-
-        const preparedPie = pie(authorMap)
-
-        var arcGen = d3.arc()
-            .innerRadius(donutHole)
-            .outerRadius(radius)
-
-        var arcs = singleDonut.selectAll()
-            .data(preparedPie)
-            .join("g")
-            //.attr("class", `arc-${fileName}`)
-
-        arcs.append("path")
-            .attr("d", arcGen)
-            .attr("fill", d => color(d.data[0]))
-
-    }
-
-
+        for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
+            const fileName = topTenFiles[i].fileName
+            const authorMap = fileMap.get(fileName)
+    
+            const singleDonut = outerDonutGroup.append("g")
+                .attr("transform", `translate(${xScale(week)+xScale.bandwidth()/2},${yScale(i)})`)
+    
+    
+            var pie = d3.pie().sort(null).value(([key, value]) => value);
+    
+            const preparedPie = pie(authorMap)
+    
+            var arcGen = d3.arc()
+                .innerRadius(donutHole)
+                .outerRadius(radius)
+    
+            var arcs = singleDonut.selectAll()
+                .data(preparedPie)
+                .join("g")
+                //.attr("class", `arc-${fileName}`)
+    
+            arcs.append("path")
+                .attr("d", arcGen)
+                .attr("fill", d => color(d.data[0]))
+    
+        }
+        
+    });
 
 }
 
