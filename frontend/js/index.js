@@ -1,8 +1,8 @@
 const width = 300
 const height = 100
 const margin = { top: 10, right: 0, bottom: 10, left: 10 }
-const radius = Math.min(width, height) / 40
-const donutHole = radius * 0.4
+const radius = Math.min(width, height) / 30
+const donutHole = radius * 0.0
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 var color
@@ -17,8 +17,8 @@ const defineScales = (data) => {
         .range([0, innerWidth])
     yScale
         .domain([0,1,2,3,4,5,6,7,8,9])
-        .range([0,innerHeight])
-        .paddingInner(0.2)
+        .range([innerHeight,0]) // start y-axis at zero
+        .paddingInner(0,2)
 }
 
 
@@ -95,6 +95,8 @@ const createVis = (data) => {
             var arcs = singleDonut.selectAll()
                 .data(preparedPie)
                 .join("g")
+                .attr("stroke", "white")
+                .attr("stroke-width", "0.1")
                 //.attr("class", `arc-${fileName}`)
     
             arcs.append("path")
