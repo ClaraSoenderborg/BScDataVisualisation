@@ -1,6 +1,6 @@
 const width = 300
 const height = 100
-const margin = { top: 10, right: 0, bottom: 10, left: 10 }
+const margin = { top: 10, right: 0, bottom: 10, left: 20 }
 const radius = Math.min(width, height) / 30
 const donutHole = radius * 0.0
 const innerWidth = width - margin.left - margin.right
@@ -16,9 +16,10 @@ const defineScales = (data) => {
         .domain(sortedweeks) // key is week
         .range([0, innerWidth])
     yScale
-        .domain([0,1,2,3,4,5,6,7,8,9])
-        .range([innerHeight,0]) // start y-axis at zero
-        .paddingInner(0,2)
+        .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        .range([innerHeight, 0]) // start y-axis at zero
+        .paddingInner(0.2)
+        .paddingOuter(0.2)
 }
 
 
@@ -48,63 +49,79 @@ const createVis = (data) => {
 
     defineScales(primaryGroup)
 
+    // x-axis
     const bottomAxis = d3.axisBottom(xScale)
         //.tickValues(d3.range([0,10]))
-        .tickSize(0,1)
-    
+        .tickSize(0)
 
     outerDonutGroup.append("g")
         .attr("transform", `translate(0,${innerHeight})`)
         .call(bottomAxis) // connect x-akse to outerDonut
         .selectAll("text") // Select all text elements within the axis
-        .style("font-size", "4px"); // Sets the size of the text
+        .style("font-size", "4px") // Sets the size of the text
 
 
 
-    console.log(primaryGroup)
+    // y-axis
+    const leftAxis = d3.axisLeft(yScale)
+        .tickSize(0)
+        .ticks(2)
+        .tickValues([1, 10])
+        .tickFormat((d,i) => d === 1 ? "Least \n changes" : (d === 10 ? "Most \n changes": ""))
+
+    outerDonutGroup.append("g")
+        //.attr("transform", `translate(${margin.left})`)
+        .call(leftAxis)
+        .selectAll("text") // Select all text elements within the axis
+        .attr("transform", "rotate(-45)")
+        .attr("text-anchor", "end")
+        
+        .style("font-size", "3px") // Sets the size of the text
+
+
 
     primaryGroup.forEach((fileMap, week) => {
 
         // sum changes for all files in week
-        const fileArray = Array.from(fileMap,([fileName, authorMap]) => {
+        const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
             const totalLinesChanged = d3.sum(authorMap.values())
             return { fileName, totalLinesChanged };
         })
 
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
-        const topTenFiles = fileArray.slice(0, 10)
+        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
         console.log(topTenFiles)
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
             const fileName = topTenFiles[i].fileName
             const authorMap = fileMap.get(fileName)
-    
+
             const singleDonut = outerDonutGroup.append("g")
-                .attr("transform", `translate(${xScale(week)+xScale.bandwidth()/2},${yScale(i)})`)
-    
-    
+                .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
+
+
             var pie = d3.pie().sort(null).value(([key, value]) => value);
-    
+
             const preparedPie = pie(authorMap)
-    
+
             var arcGen = d3.arc()
                 .innerRadius(donutHole)
                 .outerRadius(radius)
-    
+
             var arcs = singleDonut.selectAll()
                 .data(preparedPie)
                 .join("g")
                 .attr("stroke", "white")
                 .attr("stroke-width", "0.1")
-                //.attr("class", `arc-${fileName}`)
-    
+            //.attr("class", `arc-${fileName}`)
+
             arcs.append("path")
                 .attr("d", arcGen)
                 .attr("fill", d => color(d.data[0]))
-    
+
         }
-        
+
     });
 
 }
