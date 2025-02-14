@@ -1,4 +1,4 @@
-const width = 100
+const width = 300
 const height = 100
 const margin = { top: 10, right: 0, bottom: 10, left: 10 }
 const radius = Math.min(width, height) / 40
@@ -11,12 +11,13 @@ const yScale = d3.scaleBand()
 const xScale = d3.scaleBand()
 
 const defineScales = (data) => {
+    const sortedweeks = Array.from(data.keys()).sort()
     xScale
-        .domain(data.keys().map(d => d)) // key is week
+        .domain(sortedweeks) // key is week
         .range([0, innerWidth])
     yScale
         .domain([0,1,2,3,4,5,6,7,8,9])
-        .range([1,innerHeight])
+        .range([0,innerHeight])
         .paddingInner(0.2)
 }
 
@@ -49,12 +50,14 @@ const createVis = (data) => {
 
     const bottomAxis = d3.axisBottom(xScale)
         //.tickValues(d3.range([0,10]))
-        //.tickSizeOuter(0)
-
+        .tickSize(0,1)
+    
 
     outerDonutGroup.append("g")
         .attr("transform", `translate(0,${innerHeight})`)
-        .call(bottomAxis)
+        .call(bottomAxis) // connect x-akse to outerDonut
+        .selectAll("text") // Select all text elements within the axis
+        .style("font-size", "4px"); // Sets the size of the text
 
 
 
@@ -63,7 +66,6 @@ const createVis = (data) => {
     const week = primaryGroup.get(42)
 
     const donutContainer = outerDonutGroup.append("g")
-                                            .attr("transform", `translate(${xScale(1)},${innerHeight})`)
 
 
     // sum changes for all files in week
@@ -80,8 +82,8 @@ const createVis = (data) => {
         const fileName = topTenFiles[i].fileName
         const authorMap = week.get(fileName)
 
-        const singleDonut = donutContainer.append("g")
-            .attr("transform", `translate(${innerWidth/2},${yScale(i)})`)
+        const singleDonut = outerDonutGroup.append("g")
+            .attr("transform", `translate(${xScale(36)+xScale.bandwidth()/2},${yScale(i)})`)
 
 
         var pie = d3.pie().sort(null).value(([key, value]) => value);
