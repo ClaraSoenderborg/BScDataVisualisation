@@ -120,7 +120,7 @@ const createVis = (data) => {
 
     authorColor(data)
     createLegend(data)
-    handleMouse()
+    //handleMouse()
 
     const primaryGroup = d3.rollup(data,
         (D) => d3.sum(D, d => d.linesChanged),
