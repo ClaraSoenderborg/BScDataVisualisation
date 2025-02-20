@@ -67,6 +67,11 @@ toolTip
     .style("font-size",  "5px")
 
 
+const donutGroup = toolTip.append("g")
+.attr("class", "tooltip-donut")
+.attr("transform", "translate(30,40)"); // Center the donut at (40,40)
+
+
 // wrap text to next line in toolTip - very chatty
 function wrapText(text, maxWidth) {
     const textElement = d3.select(".toolTip text")
@@ -197,36 +202,39 @@ const createVis = (data) => {
                         .raise()
                         .transition()
                         .duration(200)
-                        .style("opacity", 1)
-
-                      
-                        
+                        .style("opacity", 1)  
+                    
+                    d3.select(".toolTip-donut")
+                        .call(() => buildSingleDonut(d3.select(".tooltip-donut"), authorMap, 0, 24))
 
                 })
 
-            var pie = d3.pie().sort(null).value(([key, value]) => value);
-
-            const preparedPie = pie(authorMap)
-
-            var arcGen = d3.arc()
-                .innerRadius(donutHole)
-                .outerRadius(radius)
-
-            var arcs = singleDonut.selectAll()
-                .data(preparedPie)
-                .join("g")
-                .attr("stroke", "white")
-                .attr("stroke-width", "0.1")
-            //.attr("class", `arc-${fileName}`)
-
-            arcs.append("path")
-                .attr("d", arcGen)
-                .attr("fill", d => color(d.data[0]))
-                
-
+            buildSingleDonut(singleDonut, authorMap, radius, donutHole)
+    
         }
 
     });   
+}
+
+function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
+    var pie = d3.pie().sort(null).value(([key, value]) => value);
+
+    const preparedPie = pie(authorMap)
+
+    var arcGen = d3.arc()
+        .innerRadius(donuthole)
+        .outerRadius(radius)
+
+    var arcs = singleDonut.selectAll()
+        .data(preparedPie)
+        .join("g")
+        .attr("stroke", "white")
+        .attr("stroke-width", "0.1")
+    //.attr("class", `arc-${fileName}`)
+
+    arcs.append("path")
+        .attr("d", arcGen)
+        .attr("fill", d => color(d.data[0]))
 }
 
 // Hide the tooltip when clicking anywhere on the page except on the donuts
