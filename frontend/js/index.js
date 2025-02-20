@@ -68,8 +68,8 @@ toolTip
 
 
 const donutGroup = toolTip.append("g")
-.attr("class", "tooltip-donut")
-.attr("transform", "translate(30,40)"); // Center the donut at (40,40)
+    .attr("class", "tooltip-donut")
+    .attr("transform", "translate(30,40)")
 
 
 // wrap text to next line in toolTip - very chatty
@@ -242,8 +242,7 @@ d3.select(document).on("click", (e, d) => {
 
     d3.select(".tooltip")
     .style("visibility", "hidden")
-      .style("opacity", 0)
-      .attr("transform", `translate(0, 50)`);
+
     
 })
 d3.select(".toolTip")
