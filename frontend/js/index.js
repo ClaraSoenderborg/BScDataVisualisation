@@ -66,6 +66,10 @@ toolTip
     .attr("alignment-baseline", "hanging")
     .style("font-size",  "5px")
 
+const infoGroup = toolTip.append("g")
+    .attr("class", "details")
+    .attr("transform", "translate(65,20)")
+
 
 const donutGroup = toolTip.append("g")
     .attr("class", "tooltip-donut")
@@ -128,7 +132,7 @@ const createVis = (data) => {
     //handleMouse()
 
     const primaryGroup = d3.rollup(data,
-        (D) => d3.sum(D, d => d.linesChanged),
+        (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
         (w) => w.week,
         (d) => d.fileName,
         (d) => d.author)
@@ -170,14 +174,15 @@ const createVis = (data) => {
 
         // sum changes for all files in week
         const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
-            const totalLinesChanged = d3.sum(authorMap.values())
-            return { fileName, totalLinesChanged };
+            const totalLinesChanged = d3.sum(authorMap.values().map(x => x[0]))
+            return { fileName, totalLinesChanged};
         })
 
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
-        console.log(topTenFiles)
+        
+        //console.log(topTenFiles)
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
             const fileName = topTenFiles[i].fileName
@@ -186,12 +191,15 @@ const createVis = (data) => {
 
             const singleDonut = outerDonutGroup.append("g")
                 .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
-                .style("opacity", 0.7)
+                .style("opacity", 1)
                 .attr("class", "singleDonut")
                 .on("click", (e, d) => {
 
                     d3.selectAll(".singleDonut")
-                    .style("opacity", 0.7)
+                        .style("opacity", 1)
+                    
+                    d3.selectAll(".details text")
+                        .remove()
 
                     e.stopPropagation() // something to do with closing the tooltip again
 
@@ -212,9 +220,19 @@ const createVis = (data) => {
                     d3.select(".toolTip-donut")
                         .call(() => buildSingleDonut(d3.select(".tooltip-donut"), authorMap, 0, 24))
                     
-                    singleDonut.style("opacity", 1)
+                    singleDonut.style("opacity", 0.5)
 
+                    
+                    d3.select(".details").selectAll("text")
+                        .data(authorMap)
+                        .join("text")
+                        .attr("y", (d,i) => 5 + i * 5)
+                        .text(([key, value]) => `Lines added: ${value[1]}, Lines deleted: ${value[2]}`)
+                        .style("font-size",  "4px")
+                        .attr("font-weight", "bold") 
+                        .attr("fill", d => color(d[0])) 
 
+                        console.log(authorMap)
                 })
 
             buildSingleDonut(singleDonut, authorMap, radius, donutHole)
@@ -225,7 +243,7 @@ const createVis = (data) => {
 }
 
 function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
-    var pie = d3.pie().sort(null).value(([key, value]) => value);
+    var pie = d3.pie().sort(null).value(([key, value]) => value[0]);
 
     const preparedPie = pie(authorMap)
 
@@ -252,7 +270,8 @@ d3.select(document).on("click", (e, d) => {
         .style("visibility", "hidden")
 
     d3.selectAll(".singleDonut")
-        .style("opacity", 0.7)
+        .style("opacity", 1)
+
     
 })
 d3.select(".toolTip")
@@ -262,10 +281,9 @@ d3.select(".toolTip")
 
 
 
-
 const authorColor = (data) => {
     const authors = Array.from(d3.union(data.map(d => d.author)))
-    color = d3.scaleOrdinal(d3.schemeCategory10).domain(authors)
+    color = d3.scaleOrdinal(d3.schemeSet2).domain(authors)
 }
 
 
