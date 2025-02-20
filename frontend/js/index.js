@@ -5,9 +5,10 @@ const radius = Math.min(width, height) / 30
 const donutHole = radius * 0.0
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
+const max_width = 120
+const line_height = 5
+const tooltip_padding = 2
 var color
-
-
 
 
 
@@ -44,20 +45,76 @@ const toolTip = svg
     .append("g")
     //.style("opacity", 0)
     .attr("class", "toolTip")
+    .style("visibility", "hidden")
 
 toolTip
     .append("rect")
-    .attr("width", 50)
-    .attr("height", 50)
+    .attr("width", 130)
+    .attr("height", 70)
     .attr("rx", 3)
     .attr("ry", 3)
-    .style("fill-opacity", 0.75)
-    .attr("fill", "pink")
-
+    .style("fill-opacity", 1)
+    .attr("fill", "white")
+    .attr("stroke", "grey")
+    .attr("stroke-width", "0.3px")
+    
 toolTip
     .append("text")
-    //.text("hejsa")
+    .attr("x", 130/2)
+    .attr("y", 70/2+1)
+    .attr("text-anchor", "start")
+    .attr("alignment-baseline", "hanging")
+    .style("font-size",  "5px")
 
+
+// wrap text to next line in toolTip - very chatty
+function wrapText(text, maxWidth) {
+    const textElement = d3.select(".toolTip text")
+    textElement.text("") // Set the full text initially
+
+    let segments = text.split("/"); // Split at "/"
+    let currentLine = "";
+    let lineNumber = 0;
+    let start_x = tooltip_padding
+    let start_y = tooltip_padding * 2
+
+    segments.forEach((segment, index) => {
+        let newLine = currentLine ? currentLine + "/" + segment : segment; // Keep adding segments
+
+        // Create a temporary invisible text element to measure width
+        let tempText = textElement.append("tspan").text(newLine);
+        let textWidth = tempText.node().getComputedTextLength();
+        tempText.remove(); // Remove temp element after measuring
+
+        if (textWidth > maxWidth) {
+            // If the current line exceeds max width, finalize the previous line and start a new one
+            if (currentLine) {
+                textElement.append("tspan")
+                    .attr("x", start_x) // Center text
+                    .attr("y", start_y + line_height * lineNumber)
+                    .attr("text-anchor", "start")
+                    .attr("alignment-baseline", "hanging")
+                    .text(currentLine);
+                lineNumber++;
+            }
+            currentLine = "/" + segment; // Start a new line with the current segment
+        } else {
+            currentLine = newLine; // Continue adding to the same line
+        }
+    });
+
+    // Append the last remaining line
+    textElement.append("tspan")
+        .attr("x", start_x) // Center text
+        .attr("y", start_y + line_height * lineNumber)
+        .attr("text-anchor", "start")
+        .attr("alignment-baseline", "hanging")
+        .text(currentLine);
+
+    // Adjust tooltip height dynamically
+    const newHeight = Math.max(70, (lineNumber + 1) * line_height + tooltip_padding * 2);
+    d3.select(".toolTip rect").attr("height", newHeight);
+    }
 
 const createVis = (data) => {
 
@@ -83,6 +140,7 @@ const createVis = (data) => {
         .call(bottomAxis) // connect x-akse to outerDonut
         .selectAll("text") // Select all text elements within the axis
         .style("font-size", "4px") // Sets the size of the text
+        
 
 
 
@@ -125,24 +183,26 @@ const createVis = (data) => {
                 .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
                 .on("click", (e, d) => {
 
+                    e.stopPropagation() // something to do with closing the tooltip again
+
                     const [x, y] = d3.pointer(e, svg.node())
 
-                    toolTip
-                        .attr("transform", `translate(${x+10}, ${y-10})`)
+                    d3.select(".toolTip text")
+                        .call(() => wrapText(fileName, max_width))
+                        
+
+                    d3.select(".toolTip")
+                        .attr("transform", `translate(${x-10}, ${y+10})`)
                         .style("visibility", "visible")
                         .raise()
                         .transition()
                         .duration(200)
                         .style("opacity", 1)
 
-                    d3.select(".toolTip text")
-                        .text(fileName)                    
+                      
+                        
 
                 })
-                
-                
-                
-
 
             var pie = d3.pie().sort(null).value(([key, value]) => value);
 
@@ -166,19 +226,23 @@ const createVis = (data) => {
 
         }
 
-    });
-
+    });   
 }
 
-// Chapter 7 i bogen
-const handleMouse = () => {
-    outerDonutGroup.selectAll("singleDonut")
-    .on("click", (e,d) => {
-        console.log("event", e)
-        console.log("data", d)
+// Hide the tooltip when clicking anywhere on the page except on the donuts
+d3.select(document).on("click", (e, d) => {
+
+    d3.select(".tooltip")
+    .style("visibility", "hidden")
+      .style("opacity", 0)
+      .attr("transform", `translate(0, 50)`);
+    
+})
+d3.select(".toolTip")
+    .on("click", (e) => {
+        e.stopPropagation()
     })
 
-} 
 
 
 
@@ -203,7 +267,7 @@ const createLegend = (data) => {
         .attr("transform", "translate(0, 0)")
 
     // Add rectangles for each author with a corresponding color
-    legendSvg.selectAll("circel")
+    legendSvg.selectAll("circle")
         .data(authors)
         .join("circle")
         .attr("cx", 10)
