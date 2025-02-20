@@ -186,7 +186,12 @@ const createVis = (data) => {
 
             const singleDonut = outerDonutGroup.append("g")
                 .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
+                .style("opacity", 0.7)
+                .attr("class", "singleDonut")
                 .on("click", (e, d) => {
+
+                    d3.selectAll(".singleDonut")
+                    .style("opacity", 0.7)
 
                     e.stopPropagation() // something to do with closing the tooltip again
 
@@ -206,6 +211,9 @@ const createVis = (data) => {
                     
                     d3.select(".toolTip-donut")
                         .call(() => buildSingleDonut(d3.select(".tooltip-donut"), authorMap, 0, 24))
+                    
+                    singleDonut.style("opacity", 1)
+
 
                 })
 
@@ -241,8 +249,10 @@ function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
 d3.select(document).on("click", (e, d) => {
 
     d3.select(".tooltip")
-    .style("visibility", "hidden")
+        .style("visibility", "hidden")
 
+    d3.selectAll(".singleDonut")
+        .style("opacity", 0.7)
     
 })
 d3.select(".toolTip")
