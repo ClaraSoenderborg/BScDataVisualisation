@@ -183,6 +183,10 @@ const createVis = (data) => {
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
+=======
+        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
+        console.log(topTenFiles)
+>>>>>>> legend
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
             const fileName = topTenFiles[i].fileName
