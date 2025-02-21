@@ -317,11 +317,22 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
         .attr("d", arcGen)
         .attr("fill", d => color(d.data[0]));
 
+    var lastAddedEndPoint = [9999, 9999]
+
     function calculateLinePoints(d) {
         const posStart = arcGen.centroid(d); // Center of segment
+
         const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
+
         const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]]; // Shift label
-        //posEnd[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+
+        // check if x and y will overlap with last added end point
+        if ((Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= 10) && Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])) {
+            posEnd[1] = posEnd[1] - 3 //shift y-value by 3 if overlapping
+        }
+
+        lastAddedEndPoint = posEnd
+
         return [posStart, posMid, posEnd];
     }
 
@@ -351,6 +362,7 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
             const points = calculateLinePoints(d)
             const posEnd = points[2]
 
+
             return posEnd[0] > 0 ? "start" : "end"
         })
         .style("font-size", "3px")
@@ -372,10 +384,10 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
                 .text(d => d);
         })
 
-    
 
 
-} 
+
+}
 
 
 
