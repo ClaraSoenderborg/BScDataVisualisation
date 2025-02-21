@@ -77,7 +77,7 @@ const infoGroup = toolTip.append("g")
 
 const donutGroup = toolTip.append("g")
     .attr("class", "tooltip-donut")
-    .attr("transform", "translate(30,40)")
+    .attr("transform", `translate(${tooltip_width / 2},40)`)
 
 
 
@@ -230,21 +230,21 @@ const createVis = (data) => {
                         .style("opacity", 1)
 
                     d3.select(".toolTip-donut")
-                        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap, 0, 24))
+                        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap, 0, 20))
 
                     singleDonut.style("opacity", 0.5)
 
 
-                    d3.select(".details").selectAll("text")
+                    /*d3.select(".details").selectAll("text")
                         .data(authorMap)
                         .join("text")
                         .attr("y", (d, i) => 5 + i * 5)
                         .text(([key, value]) => `Lines added: ${value[1]}, Lines deleted: ${value[2]}`)
                         .style("font-size", "4px")
                         .attr("font-weight", "bold")
-                        .attr("fill", d => color(d[0]))
+                        .attr("fill", d => color(d[0]))*/
 
-                    console.log(authorMap)
+
                 })
 
             buildSingleDonut(singleDonut, authorMap, radius, donutHole)
@@ -290,26 +290,6 @@ function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
         .attr("fill", d => color(d.data[0]))
 }
 
-/*function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
-    var pie = d3.pie().sort(null).value(([key, value]) => value[0]);
-
-    const preparedPie = pie(authorMap)
-
-    var arcGen = d3.arc()
-        .innerRadius(donuthole)
-        .outerRadius(radius)
-
-    var arcs = singleDonut.selectAll()
-        .data(preparedPie)
-        .join("g")
-        .attr("stroke", "white")
-        .attr("stroke-width", "0.1")
-    //.attr("class", `arc-${fileName}`)
-
-    arcs.append("path")
-        .attr("d", arcGen)
-        .attr("fill", d => color(d.data[0]))
-}*/
 
 //source: https://gist.github.com/dbuezas/9306799
 
@@ -337,36 +317,68 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
         .attr("d", arcGen)
         .attr("fill", d => color(d.data[0]));
 
+    function calculateLinePoints(d) {
+        const posStart = arcGen.centroid(d); // Center of segment
+        const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
+        const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]]; // Shift label
+        //posEnd[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+        return [posStart, posMid, posEnd];
+    }
+
+
     // Add polylines for labels
     arcs.append("polyline")
         .attr("class", "labelLines")
-        .attr("points", d => {
-            const posStart = arcGen.centroid(d); // Center of segment
-            const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
-            const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]]; // Shift label
-            return [posStart, posMid, posEnd].map(p => p.join(",")).join(" ");
-
-        })
+        .attr("points", d => calculateLinePoints(d).map(p => p.join(",")).join(" "))
         .style("fill", "none")
         .style("stroke", "black")
         .style("stroke-width", "0.5px");
+
+
 
     // Add labels outside segments
     arcs.append("text")
         .attr("class", "labelText")
         .attr("transform", d => {
-            const posStart = arcGen.centroid(d); // Center of segment
-            const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
-            
-            const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]];
-            
-            posEnd[0] += (posEnd[0] > 0 ? 12 : -12); // Adjust label position
+            const points = calculateLinePoints(d)
+            const posEnd = points[2]
+
+            posEnd[0] += (posEnd[0] > 0 ? 2 : -2); // padding between line and label
+
             return `translate(${posEnd})`;
         })
-        .attr("text-anchor", d => (outerArc.centroid(d)[0] > 0 ? "start" : "end"))
-        .style("font-size", "4px")
-        .text(d => d.data[0]);
-}
+        .attr("text-anchor", function (d) {
+            const points = calculateLinePoints(d)
+            const posEnd = points[2]
+
+            return posEnd[0] > 0 ? "start" : "end"
+        })
+        .style("font-size", "3px")
+        .attr("font-weight", "bold")
+        .attr("stroke", "none")
+        .attr("fill", d => color(d.data[0]))
+        .each(function (d) {
+            const textElement = d3.select(this);
+            const lines = [
+                `Lines added: ${d.data[1][1]}`,
+                `Lines deleted: ${d.data[1][2]}`
+            ];
+            textElement.selectAll("tspan")
+                .data(lines)
+                .enter()
+                .append("tspan")
+                .attr("x", 0)
+                .attr("dy", (d, i) => i === 0 ? "0em" : "1.2em") // Space between lines
+                .text(d => d);
+        })
+
+    
+
+
+} 
+
+
+
 
 // Hide the tooltip when clicking anywhere on the page except on the donuts
 d3.select(document).on("click", (e, d) => {
