@@ -75,7 +75,7 @@ const createVis = (data) => {
         .selectAll("text") // Select all text elements within the axis
         .attr("transform", "rotate(-45)")
         .attr("text-anchor", "end")
-        
+
         .style("font-size", "3px") // Sets the size of the text
 
 
@@ -90,7 +90,7 @@ const createVis = (data) => {
 
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
-        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
+        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
         console.log(topTenFiles)
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
@@ -164,39 +164,39 @@ const authorColor = (data) => {
 }
 
 
-// Create the legend
 const createLegend = (data) => {
-    const authors = Array.from(d3.union(data.map(d => d.author)))
+    const authors = Array.from(d3.union(data.map(d => d.author)));
 
-    const legendWidth = Math.max(...(authors.map(a => a.length))) * 8
-    const legendHeight = authors.length * 25;
+    // Dynamically calculate legend height based on the number of authors
+    const legendWidth = width;
+    const legendHeight = Math.ceil(authors.length / 2) + 20; // Adjust based on number of authors
+
+    const longestAuthor = Math.max(...(authors.map(a => a.length)))
 
     var legendSvg = d3.select("#vis")
         .append("svg")
-        .attr("width", legendWidth)
-        .attr("height", legendHeight)
+        .attr("viewBox", `0 0 ${legendWidth} ${legendHeight}`)
         .style("border", "1px solid black")
-        .attr("transform", "translate(0, 0)")
+        .attr("transform", "translate(0, 80)");
 
     // Add rectangles for each author with a corresponding color
-    legendSvg.selectAll("circel")
+    legendSvg.selectAll("circle")
         .data(authors)
         .join("circle")
-        .attr("cx", 10)
-        .attr("cy", (d, i) => 20 + i * 20)
-        .attr("r", 7)
-        .attr("fill", (d) => color(d))
+        .attr("cx", (d, i) => 5 + (i % 2)*120) // Adjust for wrapping, two columns
+        .attr("cy", (d, i) => 5 + Math.floor(i / 2) * 5) // Wrap every 2 items, 30px apart
+        .attr("r", 1) // Larger circles
+        .attr("fill", (d) => color(d));
 
     // Add text for each author
     legendSvg.selectAll("text")
         .data(authors)
         .join("text")
-        .attr("x", 25)
-        .attr("y", function (d, i) { return 20 + i * 20 })
+        .attr("x", (d, i) => 10 + (i % 2) * 120) // Adjust text to align with circles
+        .attr("y", (d, i) => 5 + Math.floor(i / 2) * 5) // Align text vertically with circles
         .text(d => d)
-        .attr("text-anchor", "left")
+        .attr("text-anchor", "start")
         .style("alignment-baseline", "middle")
-        .style("fill", function (d) { return color(d) })
-
+        .style("fill", function (d) { return color(d); })
+        .style("font-size", "4px"); // Adjust font size
 };
-
