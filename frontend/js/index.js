@@ -7,7 +7,7 @@ const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 const max_width = 120
 const line_height = 5
-const tooltip_padding = 2
+const tooltip_padding = 5
 const tooltip_width = 130
 const tooltip_height = 70
 var color
@@ -42,6 +42,8 @@ const svg = d3.select("#vis")
 const outerDonutGroup = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
 
+
+
 // Chapter 7 i bogen
 const toolTip = svg
     .append("g")
@@ -59,14 +61,14 @@ toolTip
     .attr("fill", "white")
     .attr("stroke", "grey")
     .attr("stroke-width", "0.3px")
-    
+
 toolTip
     .append("text")
-    .attr("x", 130/2)
-    .attr("y", 70/2+1)
-    .attr("text-anchor", "start")
+    .attr("x", tooltip_width / 2)
+    .attr("y", 100)
+    .attr("text-anchor", "middle")
     .attr("alignment-baseline", "hanging")
-    .style("font-size",  "5px")
+    .style("font-size", "5px")
 
 const infoGroup = toolTip.append("g")
     .attr("class", "details")
@@ -78,6 +80,8 @@ const donutGroup = toolTip.append("g")
     .attr("transform", "translate(30,40)")
 
 
+
+
 // wrap text to next line in toolTip - very chatty
 function wrapText(text, maxWidth) {
     const textElement = d3.select(".toolTip text")
@@ -87,7 +91,7 @@ function wrapText(text, maxWidth) {
     let currentLine = "";
     let lineNumber = 0;
     let start_x = tooltip_padding
-    let start_y = tooltip_padding * 2
+    let start_y = tooltip_padding
 
     segments.forEach((segment, index) => {
         let newLine = currentLine ? currentLine + "/" + segment : segment; // Keep adding segments
@@ -125,7 +129,7 @@ function wrapText(text, maxWidth) {
     // Adjust tooltip height dynamically
     const newHeight = Math.max(70, (lineNumber + 1) * line_height + tooltip_padding * 2);
     d3.select(".toolTip rect").attr("height", newHeight);
-    }
+}
 
 const createVis = (data) => {
 
@@ -151,7 +155,7 @@ const createVis = (data) => {
         .call(bottomAxis) // connect x-akse to outerDonut
         .selectAll("text") // Select all text elements within the axis
         .style("font-size", "4px") // Sets the size of the text
-        
+
 
 
 
@@ -160,7 +164,7 @@ const createVis = (data) => {
         .tickSize(0)
         .ticks(2)
         .tickValues([1, 10])
-        .tickFormat((d,i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes": ""))
+        .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
 
     outerDonutGroup.append("g")
         //.attr("transform", `translate(${margin.left})`)
@@ -177,13 +181,13 @@ const createVis = (data) => {
         // sum changes for all files in week
         const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
             const totalLinesChanged = d3.sum(authorMap.values().map(x => x[0]))
-            return { fileName, totalLinesChanged};
+            return { fileName, totalLinesChanged };
         })
 
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
-        
+
         //console.log(topTenFiles)
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
@@ -199,9 +203,13 @@ const createVis = (data) => {
 
                     d3.selectAll(".singleDonut")
                         .style("opacity", 1)
-                    
+
                     d3.selectAll(".details text")
                         .remove()
+                    d3.selectAll(".tooltip-donut path").remove()
+                    d3.selectAll(".labelLines").remove()
+                    d3.selectAll(".labelText").remove()
+
 
                     e.stopPropagation() // something to do with closing the tooltip again
 
@@ -211,7 +219,7 @@ const createVis = (data) => {
 
                     d3.select(".toolTip text")
                         .call(() => wrapText(fileName, max_width))
-                        
+
 
                     d3.select(".toolTip")
                         .attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY()})`)
@@ -219,47 +227,70 @@ const createVis = (data) => {
                         .raise()
                         .transition()
                         .duration(200)
-                        .style("opacity", 1)  
-                    
+                        .style("opacity", 1)
+
                     d3.select(".toolTip-donut")
-                        .call(() => buildSingleDonut(d3.select(".tooltip-donut"), authorMap, 0, 24))
-                    
+                        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap, 0, 24))
+
                     singleDonut.style("opacity", 0.5)
 
-                    
+
                     d3.select(".details").selectAll("text")
                         .data(authorMap)
                         .join("text")
-                        .attr("y", (d,i) => 5 + i * 5)
+                        .attr("y", (d, i) => 5 + i * 5)
                         .text(([key, value]) => `Lines added: ${value[1]}, Lines deleted: ${value[2]}`)
-                        .style("font-size",  "4px")
-                        .attr("font-weight", "bold") 
-                        .attr("fill", d => color(d[0])) 
+                        .style("font-size", "4px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", d => color(d[0]))
 
-                        console.log(authorMap)
+                    console.log(authorMap)
                 })
 
             buildSingleDonut(singleDonut, authorMap, radius, donutHole)
-    
+
         }
 
-    });   
+    });
 }
 
-function calculateTooltipX(x){
-    if (x > (width / 2 + (margin.left * 0.5))){ // clicked object is on right side
+function calculateTooltipX(x) {
+    if (x > (width / 2 + (margin.left * 0.5))) { // clicked object is on right side
         return x - tooltip_width - 10
     } else {
         return x + 10 // clicked object is on left side
     }
-    
+
 }
 
-function calculateTooltipY(){
+function calculateTooltipY() {
     return height - tooltip_height - margin.top * 1.5
 }
 
 function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
+    var pie = d3.pie().sort(null).value(([key, value]) => value[0]);
+
+    const preparedPie = pie(authorMap)
+
+    var arcGen = d3.arc()
+        .innerRadius(donuthole)
+        .outerRadius(radius)
+
+
+
+    var arcs = singleDonut.selectAll()
+        .data(preparedPie)
+        .join("g")
+        .attr("stroke", "white")
+        .attr("stroke-width", "0.1")
+    //.attr("class", `arc-${fileName}`)
+
+    arcs.append("path")
+        .attr("d", arcGen)
+        .attr("fill", d => color(d.data[0]))
+}
+
+/*function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
     var pie = d3.pie().sort(null).value(([key, value]) => value[0]);
 
     const preparedPie = pie(authorMap)
@@ -278,6 +309,63 @@ function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
     arcs.append("path")
         .attr("d", arcGen)
         .attr("fill", d => color(d.data[0]))
+}*/
+
+//source: https://gist.github.com/dbuezas/9306799
+
+function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
+
+    var pie = d3.pie().sort(null).value(([key, value]) => value[0])
+    const preparedPie = pie(authorMap);
+
+
+    var arcGen = d3.arc()
+        .innerRadius(donuthole)
+        .outerRadius(radius)
+
+
+    var outerArc = d3.arc().innerRadius(0).outerRadius(radius * 1.2);
+
+    var arcs = singleDonut.selectAll(".arc")
+        .data(preparedPie)
+        .join("g")
+        .attr("class", "arc")
+        .attr("stroke", "white")
+        .attr("stroke-width", "0.1");
+
+    arcs.append("path")
+        .attr("d", arcGen)
+        .attr("fill", d => color(d.data[0]));
+
+    // Add polylines for labels
+    arcs.append("polyline")
+        .attr("class", "labelLines")
+        .attr("points", d => {
+            const posStart = arcGen.centroid(d); // Center of segment
+            const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
+            const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]]; // Shift label
+            return [posStart, posMid, posEnd].map(p => p.join(",")).join(" ");
+
+        })
+        .style("fill", "none")
+        .style("stroke", "black")
+        .style("stroke-width", "0.5px");
+
+    // Add labels outside segments
+    arcs.append("text")
+        .attr("class", "labelText")
+        .attr("transform", d => {
+            const posStart = arcGen.centroid(d); // Center of segment
+            const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
+            
+            const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]];
+            
+            posEnd[0] += (posEnd[0] > 0 ? 12 : -12); // Adjust label position
+            return `translate(${posEnd})`;
+        })
+        .attr("text-anchor", d => (outerArc.centroid(d)[0] > 0 ? "start" : "end"))
+        .style("font-size", "4px")
+        .text(d => d.data[0]);
 }
 
 // Hide the tooltip when clicking anywhere on the page except on the donuts
@@ -289,7 +377,7 @@ d3.select(document).on("click", (e, d) => {
     d3.selectAll(".singleDonut")
         .style("opacity", 1)
 
-    
+
 })
 d3.select(".toolTip")
     .on("click", (e) => {
