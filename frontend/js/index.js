@@ -1,5 +1,6 @@
 const width = 300
 const height = 100
+const viewBoxHeight = 150
 const margin = { top: 10, right: 0, bottom: 10, left: 20 }
 const radius = Math.min(width, height) / 30
 const donutHole = radius * 0.0
@@ -37,7 +38,7 @@ d3.csv("../../data/data.csv", d3.autoType).then(data => {
 
 const svg = d3.select("#vis")
     .append("svg")
-    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("viewBox", `0 0 ${width} ${viewBoxHeight}`)
 
 const outerDonutGroup = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
@@ -183,10 +184,6 @@ const createVis = (data) => {
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
-=======
-        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
-        console.log(topTenFiles)
->>>>>>> legend
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
             const fileName = topTenFiles[i].fileName
@@ -399,39 +396,79 @@ const authorColor = (data) => {
 }
 
 
-// Create the legend
 const createLegend = (data) => {
-    const authors = Array.from(d3.union(data.map(d => d.author)))
+    const authors = Array.from(d3.union(data.map(d => d.author)));
 
-    const legendWidth = Math.max(...(authors.map(a => a.length))) * 8
-    const legendHeight = authors.length * 25;
+    const maxWidth = width // Max width before wrapping
+    const rowHeight = 10 // Space for each row
+    var usedRows = 1 
+    let xPosition = margin.left 
+    let yPosition = 12  
 
-    var legendSvg = d3.select("#vis")
-        .append("svg")
-        .attr("width", legendWidth)
+
+    // add legend to svg
+    const legend = svg
+        .append("g")
+        .attr("class", "legend")
+        .attr("viewBox", `0 0 ${maxWidth} 0}`)
+        .attr("transform", `translate(0, ${margin.top + 80})`)
+
+
+    const background = legend
+        .append("rect")
+        .attr("x", margin.left)
+        .attr("y", margin.top + 2)
+        .attr("width", innerWidth)
         .attr("height", legendHeight)
-        .style("border", "1px solid black")
-        .attr("transform", "translate(0, 0)")
-
-    // Add rectangles for each author with a corresponding color
-    legendSvg.selectAll("circle")
+        .attr("rx", 3)
+        .attr("ry", 3)
+        .attr("fill", "#DCD0FF")
+        //.attr("fill", "#E8ADAA")
+        //.attr("fill", "#FFA07A")
+        //.attr("fill", "#D2B48C")
+        //.attr("fill", "#EBF4FA")
+        .attr("fill-opacity", 0.2)
+    
+    
+    // Bind data and create groups for each author
+    const legendItems = legend.selectAll(".legend-item")
         .data(authors)
-        .join("circle")
-        .attr("cx", 10)
-        .attr("cy", (d, i) => 20 + i * 20)
-        .attr("r", 7)
-        .attr("fill", (d) => color(d))
+        .join("g")
+        .attr("class", "legend-item")
+        .each(function (d) {
+            const textElem = d3.select(this).append("text")
+                .attr("x", 10)  // Space from circle
+                .attr("y", 5)
+                .text(d)
+                .style("alignment-baseline", "middle")
+                .style("fill", color(d))
+                .attr("font-size", "4px")
 
-    // Add text for each author
-    legendSvg.selectAll("text")
-        .data(authors)
-        .join("text")
-        .attr("x", 25)
-        .attr("y", function (d, i) { return 20 + i * 20 })
-        .text(d => d)
-        .attr("text-anchor", "left")
-        .style("alignment-baseline", "middle")
-        .style("fill", function (d) { return color(d) })
+            const textWidth = textElem.node().getComputedTextLength() // Measure text width
 
+            // Check if the next item would exceed max width
+            if (xPosition + textWidth + 30 > maxWidth) {
+                xPosition = margin.left  // Move to new row
+                yPosition += rowHeight
+                usedRows++
+            }
+
+            d3.select(this).attr("transform", `translate(${xPosition}, ${yPosition})`)
+            xPosition += textWidth + 15 // Update X position for next item and aligns item
+        });
+
+    legendItems.append("circle")
+        .attr("cx", 7)
+        .attr("cy", 5)
+        .attr("r", 1)
+        .attr("fill", color)
+
+    var legendHeight = usedRows * rowHeight
+    background.attr("height", legendHeight) // make sure rect follows height of legend
+
+    // Adjust SVG height dynamically based on rows
+    //legend.attr("height", legendHeight)
+
+    
+    
 };
-
