@@ -167,36 +167,53 @@ const authorColor = (data) => {
 const createLegend = (data) => {
     const authors = Array.from(d3.union(data.map(d => d.author)));
 
-    // Dynamically calculate legend height based on the number of authors
-    const legendWidth = width;
-    const legendHeight = Math.ceil(authors.length / 2) + 20; // Adjust based on number of authors
+    const maxWidth = window.innerWidth - 20 // Max width before wrapping
+    const rowHeight = 30 // Space for each row
+    var usedRows = 1 
+    let xPosition = 10  
+    let yPosition = 12  
 
-    const longestAuthor = Math.max(...(authors.map(a => a.length)))
-
-    var legendSvg = d3.select("#vis")
+    // Create SVG for legend
+    const legendSvg = d3.select("#vis")
         .append("svg")
-        .attr("viewBox", `0 0 ${legendWidth} ${legendHeight}`)
+        .attr("width", maxWidth)
+        .attr("viewBox", `0 0 ${maxWidth} 0}`)
         .style("border", "1px solid black")
-        .attr("transform", "translate(0, 80)");
+        .attr("transform", `translate(0, 80)`)
 
-    // Add rectangles for each author with a corresponding color
-    legendSvg.selectAll("circle")
+    // Bind data and create groups for each author
+    const legendItems = legendSvg.selectAll(".legend-item")
         .data(authors)
-        .join("circle")
-        .attr("cx", (d, i) => 5 + (i % 2)*120) // Adjust for wrapping, two columns
-        .attr("cy", (d, i) => 5 + Math.floor(i / 2) * 5) // Wrap every 2 items, 30px apart
-        .attr("r", 1) // Larger circles
-        .attr("fill", (d) => color(d));
+        .join("g")
+        .attr("class", "legend-item")
+        .each(function (d) {
+            const textElem = d3.select(this).append("text")
+                .attr("x", 15)  // Space from circle
+                .attr("y", 5)
+                .text(d)
+                .style("alignment-baseline", "middle")
+                .style("fill", color(d))
 
-    // Add text for each author
-    legendSvg.selectAll("text")
-        .data(authors)
-        .join("text")
-        .attr("x", (d, i) => 10 + (i % 2) * 120) // Adjust text to align with circles
-        .attr("y", (d, i) => 5 + Math.floor(i / 2) * 5) // Align text vertically with circles
-        .text(d => d)
-        .attr("text-anchor", "start")
-        .style("alignment-baseline", "middle")
-        .style("fill", function (d) { return color(d); })
-        .style("font-size", "4px"); // Adjust font size
+            const textWidth = textElem.node().getComputedTextLength() // Measure text width
+
+            // Check if the next item would exceed max width
+            if (xPosition + textWidth + 30 > maxWidth) {
+                xPosition = 10  // Move to new row
+                yPosition += rowHeight
+                usedRows++
+            }
+
+            d3.select(this).attr("transform", `translate(${xPosition}, ${yPosition})`)
+            xPosition += textWidth + 50 // Update X position for next item
+        });
+
+    legendItems.append("circle")
+        .attr("cx", 7)
+        .attr("cy", 5)
+        .attr("r", 4)
+        .attr("fill", color)
+
+    // Adjust SVG height dynamically based on rows
+    legendSvg.attr("height", usedRows * rowHeight)
+    
 };
