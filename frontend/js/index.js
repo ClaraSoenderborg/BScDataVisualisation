@@ -68,7 +68,7 @@ toolTip
     .attr("y", 100)
     .attr("text-anchor", "middle")
     .attr("alignment-baseline", "hanging")
-    .style("font-size", "5px")
+    .style("font-size", "4px")
 
 const infoGroup = toolTip.append("g")
     .attr("class", "details")
@@ -78,8 +78,6 @@ const infoGroup = toolTip.append("g")
 const donutGroup = toolTip.append("g")
     .attr("class", "tooltip-donut")
     .attr("transform", `translate(${tooltip_width / 2},40)`)
-
-
 
 
 // wrap text to next line in toolTip - very chatty
@@ -147,7 +145,6 @@ const createVis = (data) => {
 
     // x-axis
     const bottomAxis = d3.axisBottom(xScale)
-        //.tickValues(d3.range([0,10]))
         .tickSize(0)
 
     outerDonutGroup.append("g")
@@ -167,7 +164,6 @@ const createVis = (data) => {
         .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
 
     outerDonutGroup.append("g")
-        //.attr("transform", `translate(${margin.left})`)
         .call(leftAxis)
         .selectAll("text") // Select all text elements within the axis
         .attr("transform", "rotate(-45)")
@@ -187,8 +183,6 @@ const createVis = (data) => {
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
         const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
-
-        //console.log(topTenFiles)
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
             const fileName = topTenFiles[i].fileName
@@ -235,16 +229,6 @@ const createVis = (data) => {
                     singleDonut.style("opacity", 0.5)
 
 
-                    /*d3.select(".details").selectAll("text")
-                        .data(authorMap)
-                        .join("text")
-                        .attr("y", (d, i) => 5 + i * 5)
-                        .text(([key, value]) => `Lines added: ${value[1]}, Lines deleted: ${value[2]}`)
-                        .style("font-size", "4px")
-                        .attr("font-weight", "bold")
-                        .attr("fill", d => color(d[0]))*/
-
-
                 })
 
             buildSingleDonut(singleDonut, authorMap, radius, donutHole)
@@ -283,7 +267,6 @@ function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
         .join("g")
         .attr("stroke", "white")
         .attr("stroke-width", "0.1")
-    //.attr("class", `arc-${fileName}`)
 
     arcs.append("path")
         .attr("d", arcGen)
@@ -384,11 +367,7 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
                 .text(d => d);
         })
 
-
-
-
 }
-
 
 
 
