@@ -8,6 +8,8 @@ const innerHeight = height - margin.top - margin.bottom
 const max_width = 120
 const line_height = 5
 const tooltip_padding = 2
+const tooltip_width = 130
+const tooltip_height = 70
 var color
 
 
@@ -49,8 +51,8 @@ const toolTip = svg
 
 toolTip
     .append("rect")
-    .attr("width", 130)
-    .attr("height", 70)
+    .attr("width", tooltip_width)
+    .attr("height", tooltip_height)
     .attr("rx", 3)
     .attr("ry", 3)
     .style("fill-opacity", 1)
@@ -204,13 +206,15 @@ const createVis = (data) => {
                     e.stopPropagation() // something to do with closing the tooltip again
 
                     const [x, y] = d3.pointer(e, svg.node())
+                    console.log(`x: ${x}`)
+                    console.log(`y: ${y}`)
 
                     d3.select(".toolTip text")
                         .call(() => wrapText(fileName, max_width))
                         
 
                     d3.select(".toolTip")
-                        .attr("transform", `translate(${x-10}, ${y+10})`)
+                        .attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY()})`)
                         .style("visibility", "visible")
                         .raise()
                         .transition()
@@ -240,6 +244,19 @@ const createVis = (data) => {
         }
 
     });   
+}
+
+function calculateTooltipX(x){
+    if (x > (width / 2 + (margin.left * 0.5))){ // clicked object is on right side
+        return x - tooltip_width - 10
+    } else {
+        return x + 10 // clicked object is on left side
+    }
+    
+}
+
+function calculateTooltipY(){
+    return height - tooltip_height - margin.top * 1.5
 }
 
 function buildSingleDonut(singleDonut, authorMap, radius, donuthole) {
