@@ -342,8 +342,8 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
         .attr("class", "labelLines")
         .attr("points", d => calculateLinePoints(d).map(p => p.join(",")).join(" "))
         .style("fill", "none")
-        .style("stroke", "black")
-        .style("stroke-width", "0.5px");
+        .style("stroke", "grey")
+        .style("stroke-width", "0.2px");
 
 
 
