@@ -126,13 +126,13 @@ func writeToCSVFile(list [][]string) {
 	var file, err = os.Create("../../data/data.csv")
 	if err != nil {
 		fmt.Errorf("Could not create file :(")
-	} 
+	}
 
-	defer file.Close() 
+	defer file.Close()
 
 	var writer = csv.NewWriter(file)
 	writer.Write([]string {"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
-	writer.WriteAll(list) 
+	writer.WriteAll(list)
 
 }
 
@@ -148,5 +148,7 @@ func main() {
 	writeToCSVFile(res)
 	//fmt.Printf("%v", res)
 	//fmt.Print(rawData)
+
+	setUpServer()
 }
 
