@@ -25,6 +25,27 @@ const createTooltip = () => {
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "hanging")
         .style("font-size", "4px")
+    
+    toolTip.append("g")
+        .attr("class", "tooltip-donut")
+        .attr("transform", `translate(${tooltip_width/2},40)`)
+        
+    // Hide the tooltip when clicking anywhere on the page except on the donuts
+    d3.select(document).on("click", (e, d) => {
+
+        d3.select(".tooltip")
+         .style("visibility", "hidden")
+
+        d3.selectAll(".singleDonut")
+          .style("opacity", 1)
+
+
+    })
+
+    d3.select(".toolTip")
+      .on("click", (e) => {
+         e.stopPropagation()
+    })
 
 }
 
@@ -101,8 +122,8 @@ function showTooltipOnClick(e, d, fileName, authorMap) {
     console.log(`y: ${y}`)
 
     d3.select(".toolTip text")
-        .text(fileName)
-    //.call(() => wrapText(fileName, max_width))
+        //.text(fileName)
+    .call(() => wrapText(fileName, max_width))
 
 
     d3.select(".toolTip")
@@ -116,7 +137,7 @@ function showTooltipOnClick(e, d, fileName, authorMap) {
     
 
     d3.select(".toolTip-donut")
-        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap, 0, 20))
+        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap, 20))
 
     console.log(d3.select(".toolTip"));
 }
@@ -135,18 +156,14 @@ function calculateTooltipY() {
 }
 
 //source: https://gist.github.com/dbuezas/9306799
-function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
+function buildTooltipChart(singleDonut, authorMap, radius) {
 
     var pie = d3.pie().sort(null).value(([key, value]) => value[0])
     const preparedPie = pie(authorMap);
 
-
     var arcGen = d3.arc()
-        .innerRadius(donuthole)
+        .innerRadius(donutHole)
         .outerRadius(radius)
-
-
-
 
     var arcs = singleDonut.selectAll(".arc")
         .data(preparedPie)
@@ -157,7 +174,7 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
 
     arcs.append("path")
         .attr("d", arcGen)
-        .attr("fill", d => color(d.data[0]));
+        .attr("fill", d => colorScale(d.data[0]));
 
     var lastAddedEndPoint = [9999, 9999]
 
@@ -210,7 +227,7 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
         .style("font-size", "3px")
         .attr("font-weight", "bold")
         .attr("stroke", "none")
-        .attr("fill", d => color(d.data[0]))
+        .attr("fill", d => colorScale(d.data[0]))
         .each(function (d) {
             const textElement = d3.select(this);
             const lines = [
@@ -230,19 +247,5 @@ function buildTooltipChart(singleDonut, authorMap, radius, donuthole) {
 
 
 
-// Hide the tooltip when clicking anywhere on the page except on the donuts
-d3.select(document).on("click", (e, d) => {
 
-    d3.select(".tooltip")
-        .style("visibility", "hidden")
-
-    d3.selectAll(".singleDonut")
-        .style("opacity", 1)
-
-
-})
-d3.select(".toolTip")
-    .on("click", (e) => {
-        e.stopPropagation()
-    })
 
