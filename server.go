@@ -16,7 +16,7 @@ func startServing(pathToServe string) http.Handler {
 	//Maybe we dont need mux?
 	mux := http.NewServeMux()
 
-	mux.Handle("/", http.FileServer(http.FS(frontendFiles)))
+	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(frontendFiles))))
 
 	return mux
 }

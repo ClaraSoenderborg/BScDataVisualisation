@@ -31,7 +31,7 @@ const defineScales = (data) => {
 }
 
 
-d3.csv("../../data/data.csv", d3.autoType).then(data => {
+d3.csv("./data/data.csv", d3.autoType).then(data => {
     createVis(data)
 });
 
@@ -183,7 +183,7 @@ const createVis = (data) => {
 
         // find top ten changed files in week
         fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
-        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top 
+        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
 
         for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
             const fileName = topTenFiles[i].fileName
@@ -401,9 +401,9 @@ const createLegend = (data) => {
 
     const maxWidth = width // Max width before wrapping
     const rowHeight = 10 // Space for each row
-    var usedRows = 1 
-    let xPosition = margin.left 
-    let yPosition = 12  
+    var usedRows = 1
+    let xPosition = margin.left
+    let yPosition = 12
 
 
     // add legend to svg
@@ -428,8 +428,8 @@ const createLegend = (data) => {
         //.attr("fill", "#D2B48C")
         //.attr("fill", "#EBF4FA")
         .attr("fill-opacity", 0.2)
-    
-    
+
+
     // Bind data and create groups for each author
     const legendItems = legend.selectAll(".legend-item")
         .data(authors)
@@ -469,6 +469,6 @@ const createLegend = (data) => {
     // Adjust SVG height dynamically based on rows
     //legend.attr("height", legendHeight)
 
-    
-    
+
+
 };
