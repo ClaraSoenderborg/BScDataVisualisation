@@ -1,6 +1,23 @@
 const yScale = d3.scaleBand()
 const xScale = d3.scaleBand()
-const colorScale = d3.scaleOrdinal(d3.schemeSet2)
+//onst colorScale = d3.scaleOrdinal(d3.schemeSet2)
+
+const colorScale = d3.scaleOrdinal([
+    "#D98B19", // Mustard :)
+    "#8DA0CB", // Blue :)
+    "#006D77", // Current :)
+    "#FDE12D", //School bus yellow :)
+    "#628B35", // Avocado :)
+    "#FFA69E", // Melon :)
+    "#E96A38", // Coral 
+    "#7EBDC3", // Blue :)
+    "#BA274A", // Rose Red :)
+    "#853570", // Violet Dark :)
+    "#46351D", // Shit brown :)
+    "#3DA5D9", // Blue :)
+
+]);
+
 
 const defineScales = (data) => {
     const sortedweeks = Array.from(d3.union((data.map(d => d.week)).sort()))
