@@ -1,0 +1,13 @@
+const width = 300
+const height = 100
+const viewBoxHeight = 150
+const margin = { top: 10, right: 0, bottom: 10, left: 20 }
+const radius = Math.min(width, height) / 30
+const donutHole = radius * 0.0
+const innerWidth = width - margin.left - margin.right
+const innerHeight = height - margin.top - margin.bottom
+const max_width = 120
+const line_height = 5
+const tooltip_padding = 5
+const tooltip_width = 130
+const tooltip_height = 70
