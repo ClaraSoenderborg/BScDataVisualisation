@@ -113,8 +113,8 @@ func addFile(fileName string) bool {
 }
 
 func writeToCSVFile(list [][]string) {
-	//var file, err = os.Create("/tmp/data.csv")
-	var file, err = os.Create("./frontend/data/data.csv")
+	var file, err = os.Create("/tmp/data.csv")
+	//var file, err = os.Create("./frontend/data/data.csv")
 	if err != nil {
 		fmt.Errorf("Could not create file :(")
 	}
