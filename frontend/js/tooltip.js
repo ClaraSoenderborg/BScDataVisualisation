@@ -29,22 +29,22 @@ const createTooltip = () => {
     toolTip.append("g")
         .attr("class", "tooltip-donut")
         .attr("transform", `translate(${tooltip_width/2},40)`)
-        
+    
     // Hide the tooltip when clicking anywhere on the page except on the donuts
     d3.select(document).on("click", (e, d) => {
 
-        d3.select(".tooltip")
-         .style("visibility", "hidden")
+        d3.select(".toolTip")
+        .style("visibility", "hidden")
 
         d3.selectAll(".singleDonut")
-          .style("opacity", 1)
+        .style("opacity", 1)
 
 
     })
 
     d3.select(".toolTip")
-      .on("click", (e) => {
-         e.stopPropagation()
+    .on("click", (e) => {
+        e.stopPropagation()
     })
 
 }
@@ -244,7 +244,6 @@ function buildTooltipChart(singleDonut, authorMap, radius) {
         })
 
 }
-
 
 
 
