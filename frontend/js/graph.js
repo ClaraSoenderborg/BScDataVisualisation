@@ -1,13 +1,15 @@
 
 
-const drawGraph = (data) => {
+const drawGraph = (data, div) => {
 
-    const svg = d3.select("#vis")
+    const svg = div
         .append("svg")
-        .attr("class", "svg")
-        .attr("viewBox", `0 0 ${width} ${viewBoxHeight}`)
+        .attr("class", "graphSVG")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+    
+    createTooltip(svg)
 
-    const outerDonutGroup = svg.append("g")
+    const innerGraph = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`)
 
     const primaryGroup = d3.rollup(data,
@@ -20,7 +22,7 @@ const drawGraph = (data) => {
     const bottomAxis = d3.axisBottom(xScale)
         .tickSize(0)
 
-    outerDonutGroup.append("g")
+    innerGraph.append("g")
         .attr("transform", `translate(0,${innerHeight})`)
         .call(bottomAxis) // connect x-akse to outerDonut
         .selectAll("text") // Select all text elements within the axis
@@ -34,7 +36,7 @@ const drawGraph = (data) => {
         .tickValues([1, 10])
         .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
 
-    outerDonutGroup.append("g")
+    innerGraph.append("g")
         .attr("class", "leftAxis")
         .call(leftAxis)
         .selectAll("text") // Select all text elements within the axis
@@ -60,7 +62,7 @@ const drawGraph = (data) => {
             const fileName = topTenFiles[i].fileName
             const authorMap = fileMap.get(fileName)
 
-            buildPie(authorMap, week, i, fileName)
+            buildPie(authorMap, week, i, fileName, svg)
 
         }
 

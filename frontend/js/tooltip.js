@@ -1,7 +1,7 @@
-const createTooltip = () => {
+const createTooltip = (svg) => {
 
     // Chapter 7 i bogen
-    const toolTip = d3.select(".svg")
+    const toolTip = svg
         .append("g")
         //.style("opacity", 0)
         .attr("class", "toolTip")
@@ -100,7 +100,7 @@ function wrapText(text, maxWidth) {
     d3.select(".toolTip rect").attr("height", newHeight);
 }
 
-function showTooltipOnClick(e, d, fileName, authorMap) {
+function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 
     d3.selectAll(".singleDonut")
         .style("opacity", 1)
@@ -117,7 +117,7 @@ function showTooltipOnClick(e, d, fileName, authorMap) {
 
     
 
-    const [x, y] = d3.pointer(e, d3.select(".svg").node())
+    const [x, y] = d3.pointer(e, svg.node())
     console.log(`x: ${x}`)
     console.log(`y: ${y}`)
 

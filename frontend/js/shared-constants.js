@@ -1,7 +1,7 @@
 const width = 300
-const height = 100
+const height = 120
 const viewBoxHeight = 150
-const margin = { top: 10, right: 0, bottom: 10, left: 20 }
+const margin = { top: 10, right: 0, bottom: 20, left: 20 }
 const radius = Math.min(width, height) / 30
 const donutHole = radius * 0.0
 const innerWidth = width - margin.left - margin.right

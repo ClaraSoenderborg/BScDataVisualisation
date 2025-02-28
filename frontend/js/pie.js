@@ -1,11 +1,11 @@
-const buildPie = (authorMap, week, i, fileName) => {
+const buildPie = (authorMap, week, i, fileName, svg) => {
     const singleDonut = d3.select(".leftAxis").append("g")
         .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
         .style("opacity", 1)
         .attr("class", "singleDonut")
         .on("click", (e, d) => {
 
-            showTooltipOnClick(e, d, fileName, authorMap)
+            showTooltipOnClick(e, d, fileName, authorMap, svg)
             singleDonut.style("opacity", 0.5)
 
         })

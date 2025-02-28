@@ -1,4 +1,4 @@
-const createLegend = (data) => {
+const createLegend = (data, div) => {
     const authors = Array.from(d3.union(data.map(d => d.author)));
 
     const maxWidth = width // Max width before wrapping
@@ -9,11 +9,13 @@ const createLegend = (data) => {
 
 
     // add legend to svg
-    const legend = d3.select(".svg")
-        .append("g")
-        .attr("class", "legend")
-        .attr("viewBox", `0 0 ${maxWidth} 0}`)
-        .attr("transform", `translate(0, ${margin.top + 80})`)
+    const legend = div
+        .append("svg")
+        .attr("class", "legendSVG")
+        //.append("g")
+        .attr("viewBox", `0 0 ${width} ${height}}`) //set to width
+
+        //.attr("transform", `translate(0, ${margin.top + 80})`)
 
 
     const background = legend
