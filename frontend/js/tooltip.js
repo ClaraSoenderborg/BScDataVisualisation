@@ -24,7 +24,7 @@ const createTooltip = (svg) => {
         .attr("x", tooltip_width / 2)
         .attr("y", 100)
         //.attr("text-anchor", "middle")
-        .attr("alignment-baseline", "hanging")
+        //.attr("alignment-baseline", "hanging")
         //.style("font-size", "4px")
     
     toolTip.append("g")

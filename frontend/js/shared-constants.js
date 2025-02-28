@@ -1,9 +1,9 @@
 const width = window.innerWidth * 0.9
-const height = window.innerHeight * 0.7
+const height = window.innerHeight * 0.8
 const viewBoxHeight = 150
 const margin = { top: 10, right: 0, bottom: 20, left: 100 }
-const radius = Math.min(width, height) / 30
-const donutHole = radius * 0.0
+const graphRadius = Math.min(width, height) / 26
+const donutHole = 0.0
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 

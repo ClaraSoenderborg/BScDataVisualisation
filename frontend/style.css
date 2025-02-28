@@ -26,12 +26,12 @@
 }
 
 .labelText {
-    font-size: medium;
+    font-size: 2vh;
     font-weight: bold;
     stroke: none;
 }
 
 .tooltipTitle {
-    font-size: x-large;
+    font-size: 3vh;
     text-anchor: middle;
 }

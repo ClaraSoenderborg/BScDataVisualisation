@@ -16,7 +16,7 @@ const buildPie = (authorMap, week, i, fileName, svg) => {
 
     var arcGen = d3.arc()
         .innerRadius(donutHole)
-        .outerRadius(radius)
+        .outerRadius(graphRadius)
 
 
 
