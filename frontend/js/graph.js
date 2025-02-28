@@ -5,12 +5,12 @@ const drawGraph = (data, div) => {
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")
-        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
     
     createTooltip(svg)
 
-    const innerGraph = svg.append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`)
+    /*const innerGraph = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`)*/
 
     const primaryGroup = d3.rollup(data,
         (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
@@ -20,29 +20,35 @@ const drawGraph = (data, div) => {
 
     // x-axis
     const bottomAxis = d3.axisBottom(xScale)
-        .tickSize(0)
+        .tickSize(10)
+        .tickPadding(5)
+        .tickSizeOuter(0)
 
-    innerGraph.append("g")
-        .attr("transform", `translate(0,${innerHeight})`)
+    svg.append("g")
+        .attr("class", "bottomAxis")
+        .attr("transform", `translate(${margin.left},${innerHeight})`)
         .call(bottomAxis) // connect x-akse to outerDonut
         .selectAll("text") // Select all text elements within the axis
-        .style("font-size", "4px") // Sets the size of the text
+
+        //.style("font-size", "4px") // Sets the size of the text
 
 
     // y-axis
     const leftAxis = d3.axisLeft(yScale)
         .tickSize(0)
         .ticks(2)
+        .tickPadding(20)
         .tickValues([1, 10])
         .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
 
-    innerGraph.append("g")
+    svg.append("g")
         .attr("class", "leftAxis")
+        .attr("transform", `translate(${margin.left}, 0)`)
         .call(leftAxis)
         .selectAll("text") // Select all text elements within the axis
         .attr("transform", "rotate(-45)")
         .attr("text-anchor", "end")
-        .style("font-size", "3px") // Sets the size of the text
+        //.style("font-size", "3px") // Sets the size of the text
 
 
 

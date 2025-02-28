@@ -13,7 +13,7 @@ const createLegend = (data, div) => {
         .append("svg")
         .attr("class", "legendSVG")
         //.append("g")
-        .attr("viewBox", `0 0 ${width} ${height}}`) //set to width
+        //.attr("viewBox", `0 0 ${width} ${height}}`) //set to width
 
         //.attr("transform", `translate(0, ${margin.top + 80})`)
 
@@ -22,7 +22,7 @@ const createLegend = (data, div) => {
         .append("rect")
         .attr("x", margin.left)
         .attr("y", margin.top + 2)
-        .attr("width", innerWidth)
+        .attr("width", maxWidth)
         .attr("height", legendHeight)
         .attr("rx", 3)
         .attr("ry", 3)
@@ -46,7 +46,7 @@ const createLegend = (data, div) => {
                 .text(d)
                 .style("alignment-baseline", "middle")
                 .style("fill", colorScale)
-                .attr("font-size", "4px")
+                //.attr("font-size", "4px")
 
             const textWidth = textElem.node().getComputedTextLength() // Measure text width
 

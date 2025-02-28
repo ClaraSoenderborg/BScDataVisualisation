@@ -1,0 +1,37 @@
+#container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: xx-small;
+
+}
+
+.innerContainer {
+    width: 100%; /* Make it responsive */
+    justify-content: center;
+    font-size: medium;
+    /*max-width: 1640px; /* Prevent it from getting too wide */
+}
+
+.graphDiv, .legendDiv {
+    width: 100%;
+}
+.graphSVG, .legendSVG {
+    width: 100%;
+    height: auto;
+}
+
+.leftAxis, .bottomAxis {
+    font-size: large;
+}
+
+.labelText {
+    font-size: medium;
+    font-weight: bold;
+    stroke: none;
+}
+
+.tooltipTitle {
+    font-size: x-large;
+    text-anchor: middle;
+}

@@ -24,7 +24,7 @@ const buildPie = (authorMap, week, i, fileName, svg) => {
         .data(preparedPie)
         .join("g")
         .attr("stroke", "white")
-        .attr("stroke-width", "0.1")
+        .attr("stroke-width", "1")
 
     arcs.append("path")
         .attr("d", arcGen)

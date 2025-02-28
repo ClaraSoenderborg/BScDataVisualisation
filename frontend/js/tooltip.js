@@ -11,24 +11,25 @@ const createTooltip = (svg) => {
         .append("rect")
         .attr("width", tooltip_width)
         .attr("height", tooltip_height)
-        .attr("rx", 3)
-        .attr("ry", 3)
+        .attr("rx", 10)
+        .attr("ry", 10)
         .style("fill-opacity", 1)
         .attr("fill", "white")
         .attr("stroke", "grey")
-        .attr("stroke-width", "0.3px")
+        .attr("stroke-width", "1px")
 
     toolTip
         .append("text")
+        .attr("class", "tooltipTitle")
         .attr("x", tooltip_width / 2)
         .attr("y", 100)
-        .attr("text-anchor", "middle")
+        //.attr("text-anchor", "middle")
         .attr("alignment-baseline", "hanging")
-        .style("font-size", "4px")
+        //.style("font-size", "4px")
     
     toolTip.append("g")
         .attr("class", "tooltip-donut")
-        .attr("transform", `translate(${tooltip_width/2},40)`)
+        .attr("transform", `translate(${tooltip_width/2},${tooltip_height/2 + tooltip_padding})`)
     
     // Hide the tooltip when clicking anywhere on the page except on the donuts
     d3.select(document).on("click", (e, d) => {
@@ -52,7 +53,7 @@ const createTooltip = (svg) => {
 
 
 // wrap text to next line in toolTip - very chatty
-function wrapText(text, maxWidth) {
+function wrapText(text) {
     const textElement = d3.select(".toolTip text")
     textElement.text("") // Set the full text initially
 
@@ -70,7 +71,8 @@ function wrapText(text, maxWidth) {
         let textWidth = tempText.node().getComputedTextLength();
         tempText.remove(); // Remove temp element after measuring
 
-        if (textWidth > maxWidth) {
+        if (textWidth > tooltip_max_width
+        ) {
             // If the current line exceeds max width, finalize the previous line and start a new one
             if (currentLine) {
                 textElement.append("tspan")
@@ -97,7 +99,7 @@ function wrapText(text, maxWidth) {
 
     // Adjust tooltip height dynamically
     const newHeight = Math.max(70, (lineNumber + 1) * line_height + tooltip_padding * 2);
-    d3.select(".toolTip rect").attr("height", newHeight);
+    //d3.select(".toolTip rect").attr("height", newHeight);
 }
 
 function showTooltipOnClick(e, d, fileName, authorMap, svg) {
@@ -123,7 +125,7 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 
     d3.select(".toolTip text")
         //.text(fileName)
-    .call(() => wrapText(fileName, max_width))
+    .call(() => wrapText(fileName))
 
 
     d3.select(".toolTip")
@@ -137,7 +139,7 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
     
 
     d3.select(".toolTip-donut")
-        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap, 20))
+        .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap))
 
     console.log(d3.select(".toolTip"));
 }
@@ -156,21 +158,21 @@ function calculateTooltipY() {
 }
 
 //source: https://gist.github.com/dbuezas/9306799
-function buildTooltipChart(singleDonut, authorMap, radius) {
+function buildTooltipChart(singleDonut, authorMap) {
 
     var pie = d3.pie().sort(null).value(([key, value]) => value[0])
     const preparedPie = pie(authorMap);
 
     var arcGen = d3.arc()
         .innerRadius(donutHole)
-        .outerRadius(radius)
+        .outerRadius(toolTip_radius)
 
     var arcs = singleDonut.selectAll(".arc")
         .data(preparedPie)
         .join("g")
         .attr("class", "arc")
         .attr("stroke", "white")
-        .attr("stroke-width", "0.1");
+        .attr("stroke-width", "1");
 
     arcs.append("path")
         .attr("d", arcGen)
@@ -183,11 +185,12 @@ function buildTooltipChart(singleDonut, authorMap, radius) {
 
         const posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
 
-        const posEnd = [posMid[0] + (posMid[0] > 0 ? 10 : -10), posMid[1]]; // Shift label
+        const posEnd = [posMid[0] + (posMid[0] > 0 ? 25 : -25), posMid[1]]; // Shift label
 
         // check if x and y will overlap with last added end point
-        if ((Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= 10) && Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])) {
-            posEnd[1] = posEnd[1] - 3 //shift y-value by 3 if overlapping
+        if ((Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= 60) && Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])) {
+            posEnd[1] = posEnd[1] - 10 //shift y-value by 3 if overlapping
+            posMid[1] = posMid[1] - 10
         }
 
         lastAddedEndPoint = posEnd
@@ -201,8 +204,8 @@ function buildTooltipChart(singleDonut, authorMap, radius) {
         .attr("class", "labelLines")
         .attr("points", d => calculateLinePoints(d).map(p => p.join(",")).join(" "))
         .style("fill", "none")
-        .style("stroke", "grey")
-        .style("stroke-width", "0.2px");
+        .style("stroke", "dimgrey")
+        .style("stroke-width", "1px");
 
 
 
@@ -224,9 +227,6 @@ function buildTooltipChart(singleDonut, authorMap, radius) {
 
             return posEnd[0] > 0 ? "start" : "end"
         })
-        .style("font-size", "3px")
-        .attr("font-weight", "bold")
-        .attr("stroke", "none")
         .attr("fill", d => colorScale(d.data[0]))
         .each(function (d) {
             const textElement = d3.select(this);

@@ -24,7 +24,7 @@ const defineScales = (data) => {
     
     xScale
         .domain(sortedweeks) // key is week
-        .range([0, innerWidth])
+        .range([0, width])
     
     yScale
         .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
