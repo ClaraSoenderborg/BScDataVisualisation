@@ -11,9 +11,7 @@ import (
 	"time"
 )
 
-var repoPath string
-
-func callGitLog() string {
+func callGitLog(repoPath string) string {
 	var script = `git -C %s log --pretty=format:"%%h %%as %%ae %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
 
 	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
