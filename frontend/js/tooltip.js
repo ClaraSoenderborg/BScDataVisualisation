@@ -153,10 +153,10 @@ function calculateTooltipX(x) {
 }
 
 function calculateTooltipY(y) {
-    const quarter = height / 3
-    if(y < (quarter - (margin.top * 0.5))) {
+    const bit = height / 3
+    if(y < (bit - (margin.top * 0.5))) {
         return y - 10
-    } else if (y > 2 * (quarter - (margin.top * 0.5))){
+    } else if (y > 2 * (bit - (margin.top * 0.5))){
         return y - tooltip_height
     } else {
         return height - tooltip_height - margin.top * 6
