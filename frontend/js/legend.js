@@ -11,7 +11,7 @@ const createLegend = (data, div) => {
     const legend = div
         .append("svg")
         .attr("class", "legendSVG")
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.15}`) 
+        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`) 
 
 
     const background = legend
@@ -42,7 +42,7 @@ const createLegend = (data, div) => {
             const textWidth = textElem.node().getComputedTextLength() // Measure text width
 
             // Check if the next item would exceed max width
-            if (xPosition + textWidth + 30 > width) {
+            if (xPosition + textWidth + 20 > width) {
                 xPosition = margin.left  // Move to new row
                 yPosition += rowHeight
                 usedRows++
