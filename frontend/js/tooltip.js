@@ -23,8 +23,8 @@ const createTooltip = (svg) => {
         .attr("class", "tooltipTitle")
         .attr("x", tooltip_width / 2)
         .attr("y", 100)
+        //.style("dominant-baseline", "hanging")
         //.attr("text-anchor", "middle")
-        //.attr("alignment-baseline", "hanging")
         //.style("font-size", "4px")
     
     toolTip.append("g")
@@ -79,7 +79,7 @@ function wrapText(text) {
                     .attr("x", start_x) // Center text
                     .attr("y", start_y + line_height * lineNumber)
                     .attr("text-anchor", "start")
-                    .attr("alignment-baseline", "hanging")
+                    .style("dominant-baseline", "hanging")
                     .text(currentLine);
                 lineNumber++;
             }
@@ -94,7 +94,7 @@ function wrapText(text) {
         .attr("x", start_x) // Center text
         .attr("y", start_y + line_height * lineNumber)
         .attr("text-anchor", "start")
-        .attr("alignment-baseline", "hanging")
+        .style("dominant-baseline", "hanging")
         .text(currentLine);
 
     // Adjust tooltip height dynamically
@@ -124,12 +124,11 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
     console.log(`y: ${y}`)
 
     d3.select(".toolTip text")
-        //.text(fileName)
-    .call(() => wrapText(fileName))
+        .call(() => wrapText(fileName))
 
 
     d3.select(".toolTip")
-        .attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY()})`)
+        .attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY(y)})`)
         .style("visibility", "visible")
         .raise()
         .transition()
@@ -153,8 +152,16 @@ function calculateTooltipX(x) {
 
 }
 
-function calculateTooltipY() {
-    return height - tooltip_height - margin.top * 1.5
+function calculateTooltipY(y) {
+    const quarter = height / 3
+    if(y < (quarter - (margin.top * 0.5))) {
+        return y - 10
+    } else if (y > 2 * (quarter - (margin.top * 0.5))){
+        return y - tooltip_height
+    } else {
+        return height - tooltip_height - margin.top * 6
+    }
+    
 }
 
 //source: https://gist.github.com/dbuezas/9306799
