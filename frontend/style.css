@@ -35,3 +35,22 @@
     font-size: 3vh;
     text-anchor: middle;
 }
+
+.legend-text {
+    font-size: 2.5vh;
+    dominant-baseline: middle;
+    
+}
+
+.legend-background{
+    fill: #DCD0FF;
+    fill-opacity: 0.2;
+    rx: 5;
+    ry: 5;
+}
+
+.legend-circle {
+    cx: 7px;
+    cy: 5px;
+    r: 3px;
+}

@@ -5,7 +5,7 @@ const drawGraph = (data, div) => {
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`)
+        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`)
     
     createTooltip(svg)
 
