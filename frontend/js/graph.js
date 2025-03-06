@@ -2,10 +2,12 @@
 
 const drawGraph = (data, div) => {
 
+    margin.left = window.innerWidth * 0.07; // Changes
+
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`)
+        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`) 
     
     createTooltip(svg)
 

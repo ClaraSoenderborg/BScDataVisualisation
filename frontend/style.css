@@ -22,7 +22,7 @@
 }
 
 .leftAxis, .bottomAxis {
-    font-size: large;
+    font-size: 2vh;
 }
 
 .labelText {
