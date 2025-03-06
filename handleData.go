@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -39,7 +40,7 @@ func parseCoAuthors(author string) []string {
 			}
 		}
 	} else {
-		fmt.Errorf("No parsable co-authors")
+		log.Printf("Warning: Co-author %s could not be parsed, skipping co-author \n", author)
 	}
 	return listCoAuthor
 
@@ -110,11 +111,11 @@ func addFile(fileName string) bool {
 	return !match
 }
 
-func writeToCSVFile(list [][]string) {
-	var file, err = os.Create("/tmp/data.csv")
-	//var file, err = os.Create("./frontend/data/data.csv")
+func writeToCSVFile(list [][]string, location string) {
+	var file, err = os.Create(location)
+	
 	if err != nil {
-		fmt.Errorf("Could not create file :(")
+		log.Fatal("Data file could not be created at path: " + location)
 	}
 
 	defer file.Close()
