@@ -28,7 +28,7 @@ const defineScales = (data) => {
     
     yScale
         .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        .range([innerHeight, 0]) // start y-axis at zero
+        .range([window.innerHeight * 0.8 - margin.top - margin.bottom, 0]) // start y-axis at zero
         .paddingInner(0.2)
         .paddingOuter(0.2)
 

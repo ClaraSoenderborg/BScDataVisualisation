@@ -2,75 +2,99 @@
 
 const drawGraph = (data, div) => {
 
-    margin.left = window.innerWidth * 0.07; // Changes
+    
 
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")
-        .attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`) 
+        //.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`) 
     
     createTooltip(svg)
 
     /*const innerGraph = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`)*/
 
-    const primaryGroup = d3.rollup(data,
-        (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
-        (w) => w.week,
-        (d) => d.fileName,
-        (d) => d.author)
+    const createGraph = () => {
+        margin.left = window.innerWidth * 0.07; // Changes
+        defineScales(data)
 
-    // x-axis
-    const bottomAxis = d3.axisBottom(xScale)
+        //margin.top = window.innerHeight * 0.07
+        //margin.bottom = 
+        graphHeight = window.innerHeight * 0.8 - margin.top - margin.bottom
+
+        svg.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`)
+
+        svg.selectAll(".bottomAxis").remove()
+        svg.selectAll(".leftAxis").remove()
+        
+
+        // x-axis
+        const bottomAxis = d3.axisBottom(xScale)
         .tickSize(10)
         .tickPadding(5)
         .tickSizeOuter(0)
 
-    svg.append("g")
-        .attr("class", "bottomAxis")
-        .attr("transform", `translate(${margin.left},${innerHeight})`)
-        .call(bottomAxis) // connect x-akse to outerDonut
+        svg.append("g")
+            .attr("class", "bottomAxis")
+            .attr("transform", `translate(${margin.left},${graphHeight})`)
+            .call(bottomAxis) // connect x-akse to outerDonut
 
 
-    // y-axis
-    const leftAxis = d3.axisLeft(yScale)
-        .tickSize(0)
-        .ticks(2)
-        .tickPadding(20)
-        .tickValues([1, 10])
-        .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
+        // y-axis
+        const leftAxis = d3.axisLeft(yScale)
+            .tickSize(0)
+            .ticks(2)
+            .tickPadding(20)
+            .tickValues([1, 10])
+            .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
 
-    svg.append("g")
-        .attr("class", "leftAxis")
-        .attr("transform", `translate(${margin.left}, 0)`)
-        .call(leftAxis)
-        .selectAll("text") // Select all text elements within the axis
-        .attr("transform", "rotate(-45)")
-        .attr("text-anchor", "end")
+        svg.append("g")
+            .attr("class", "leftAxis")
+            .attr("transform", `translate(${margin.left}, 0)`)
+            .call(leftAxis)
+            .selectAll("text") // Select all text elements within the axis
+            .attr("transform", "rotate(-45)")
+            .attr("text-anchor", "end")
+
+
+            const primaryGroup = d3.rollup(data,
+                (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
+                (w) => w.week,
+                (d) => d.fileName,
+                (d) => d.author)
+        
+        
+            primaryGroup.forEach((fileMap, week) => {
+        
+                // sum changes for all files in week
+                const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
+                    const totalLinesChanged = d3.sum(authorMap.values().map(x => x[0]))
+                    return { fileName, totalLinesChanged };
+                })
+        
+                // find top ten changed files in week
+                fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
+                const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
+        
+                for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
+                    const fileName = topTenFiles[i].fileName
+                    const authorMap = fileMap.get(fileName)
+        
+                    buildPie(authorMap, week, i, fileName, svg)
+        
+                }
+        
+            })
+    }
+
+    createGraph()
+    
+
+    window.addEventListener("resize", createGraph)
 
 
 
-    primaryGroup.forEach((fileMap, week) => {
-
-        // sum changes for all files in week
-        const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
-            const totalLinesChanged = d3.sum(authorMap.values().map(x => x[0]))
-            return { fileName, totalLinesChanged };
-        })
-
-        // find top ten changed files in week
-        fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
-        const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
-
-        for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
-            const fileName = topTenFiles[i].fileName
-            const authorMap = fileMap.get(fileName)
-
-            buildPie(authorMap, week, i, fileName, svg)
-
-        }
-
-    })
+    
 
 
 
