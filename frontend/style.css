@@ -49,8 +49,8 @@
 .legend-background{
     fill: #DCD0FF;
     fill-opacity: 0.2;
-    rx: 5;
-    ry: 5;
+    rx: 8px;
+    ry: 8px;
 }
 
 .legend-circle {

@@ -17,12 +17,10 @@ const buildPie = (authorMap, week, i, fileName, svg) => {
 
     const drawPie = () => {     
         
-        pieRadius = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.8) / 26
-
 
         var arcGen = d3.arc()
             .innerRadius(donutHole)
-            .outerRadius(pieRadius)
+            .outerRadius(graph_radius)
 
 
         var arcs = singleDonut.selectAll()

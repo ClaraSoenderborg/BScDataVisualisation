@@ -8,15 +8,7 @@ const createTooltip = (svg) => {
         .style("visibility", "hidden")
 
 
-    const drawTooltip = () => {
-
-        toolTip.selectAll(".toolTip").remove()
-        toolTip.selectAll(".toolTip rect").remove()
-        toolTip.selectAll(".toolTip text").remove()
-        toolTip.selectAll(".tooltip-donut").remove()
-
-
-        toolTip
+    toolTip
         .append("rect")
         .attr("width", tooltip_width)
         .attr("height", tooltip_height)
@@ -26,45 +18,63 @@ const createTooltip = (svg) => {
         .attr("fill", "white")
         .attr("stroke", "grey")
         .attr("stroke-width", "1px")
-    
-        toolTip
+
+    toolTip
         .append("text")
         .attr("class", "tooltipTitle")
         .attr("x", tooltip_width / 2)
         .attr("y", 100)
-        //.style("dominant-baseline", "hanging")
-        //.attr("text-anchor", "middle")
-        //.style("font-size", "4px")
+    //.style("dominant-baseline", "hanging")
+    //.attr("text-anchor", "middle")
+    //.style("font-size", "4px")
 
-        toolTip.append("g")
+    toolTip.append("g")
         .attr("class", "tooltip-donut")
-        .attr("transform", `translate(${tooltip_width/2},${tooltip_height/2 + tooltip_padding})`)
+        .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + tooltip_padding})`)
 
-    }
 
-    
     // Hide the tooltip when clicking anywhere on the page except on the donuts
     d3.select(document).on("click", (e, d) => {
 
         d3.select(".toolTip")
-        .style("visibility", "hidden")
+            .style("visibility", "hidden")
 
         d3.selectAll(".singleDonut")
-        .style("opacity", 1)
+            .style("opacity", 1)
 
 
     })
 
     d3.select(".toolTip")
-    .on("click", (e) => {
-        e.stopPropagation()
+        .on("click", (e) => {
+            e.stopPropagation()
+        })
+
+
+    window.addEventListener("resize", function (e) {
+        closeTooltip(e)
     })
 
-    drawTooltip()
-
-    window.addEventListener("resize", drawTooltip)
 
 }
+
+function closeTooltip(e) {
+    d3.selectAll(".singleDonut")
+        .style("opacity", 1)
+
+    d3.select(".toolTip")
+        .style("visibility", "hidden")
+
+    d3.selectAll(".details text").remove()
+    d3.selectAll(".tooltip-donut path").remove()
+    d3.selectAll(".labelLines").remove()
+    d3.selectAll(".labelText").remove()
+
+
+    e.stopPropagation()
+}
+
+
 
 
 
@@ -113,27 +123,22 @@ function wrapText(text) {
         .style("dominant-baseline", "hanging")
         .text(currentLine);
 
-    // Adjust tooltip height dynamically
-    //const newHeight = Math.max(70, (lineNumber + 1) * line_height + tooltip_padding * 2);
-    //d3.select(".toolTip rect").attr("height", newHeight);
+    // Update the tooltip background size
+    d3.select(".toolTip rect")
+        .attr("height", tooltip_height + (lineNumber * line_height))
+        .attr("width", tooltip_width)
+
+    // Ensure the donut chart remains centered within the new tooltip height
+    d3.select(".tooltip-donut")
+        .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + (line_height * lineNumber) + tooltip_padding})`)
+
 }
 
 function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 
-    d3.selectAll(".singleDonut")
-        .style("opacity", 1)
-
-    d3.selectAll(".details text")
-        .remove()
-
-    d3.selectAll(".tooltip-donut path").remove()
-    d3.selectAll(".labelLines").remove()
-    d3.selectAll(".labelText").remove()
-
-
-    e.stopPropagation() // something to do with closing the tooltip again
-
-    
+    // close previous tooltip and recalculate shared variables
+    closeTooltip(e)
+    reCalculateSizes()
 
     const [x, y] = d3.pointer(e, svg.node())
     console.log(`x: ${x}`)
@@ -151,33 +156,30 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
         .duration(200)
         .style("opacity", 1)
 
-    
-
     d3.select(".toolTip-donut")
         .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap))
 
-    console.log(d3.select(".toolTip"));
+
+    createTooltip
 }
 
 function calculateTooltipX(x) {
-    if (x > (width / 2 + (margin.left * 0.5))) { // clicked object is on right side
-        return x - tooltip_width - 10
+    if (x > (width / 2 + margin.left)) { // clicked object is on right side
+        return x - tooltip_width - graph_radius
     } else {
-        return x + 10 // clicked object is on left side
+        return x + graph_radius // clicked object is on left side
     }
 
 }
 
 function calculateTooltipY(y) {
-    const bit = height / 3
-    if(y < (bit - (margin.top * 0.5))) {
-        return y - 10
-    } else if (y > 2 * (bit - (margin.top * 0.5))){
-        return y - tooltip_height
-    } else {
-        return height - tooltip_height - margin.top * 6
+    const overflow = tooltip_height + y - graph_height + graph_radius
+    if (overflow > 0){
+        return y - overflow - tooltip_padding
     }
-    
+    return y + tooltip_padding
+
+
 }
 
 //source: https://gist.github.com/dbuezas/9306799
@@ -213,7 +215,7 @@ function buildTooltipChart(singleDonut, authorMap) {
         // check if x and y will overlap with last added end point
         if ((Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= label_height * 2) && Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])) {
             posEnd[1] = posEnd[1] - label_height  //shift y-value by 3 if overlapping
-            posMid[1] = posMid[1] - label_height 
+            posMid[1] = posMid[1] - label_height
         }
 
         lastAddedEndPoint = posEnd
