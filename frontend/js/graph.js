@@ -30,9 +30,6 @@ const drawGraph = (data, div) => {
         .attr("class", "bottomAxis")
         .attr("transform", `translate(${margin.left},${innerHeight})`)
         .call(bottomAxis) // connect x-akse to outerDonut
-        .selectAll("text") // Select all text elements within the axis
-
-        //.style("font-size", "4px") // Sets the size of the text
 
 
     // y-axis
@@ -50,7 +47,6 @@ const drawGraph = (data, div) => {
         .selectAll("text") // Select all text elements within the axis
         .attr("transform", "rotate(-45)")
         .attr("text-anchor", "end")
-        //.style("font-size", "3px") // Sets the size of the text
 
 
 

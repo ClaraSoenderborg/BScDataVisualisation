@@ -2,28 +2,39 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    font-size: xx-small;
+    /*font-size: xx-small;*/
 
 }
 
 .innerContainer {
     width: 100%; /* Make it responsive */
     justify-content: center;
-    font-size: medium;
+    /*font-size: medium;*/
     /*max-width: 1640px; /* Prevent it from getting too wide */
 }
 
+/*
 .graphDiv, .legendDiv {
     width: 100%;
+  
 }
+*/
+
+/*
 .graphSVG, .legendSVG {
     width: 100%;
     height: auto;
 }
+*/
 
 .leftAxis, .bottomAxis {
-    font-size: 2vh;
+    font-size: 2vmin; /* Changed */  
+    font-weight: bold;  /* Make the text bold (optional) */
+    fill: #333;         /* Dark color for the text */
+
 }
+
+/* ToolTip */
 
 .labelText {
     font-size: 2vh;
@@ -36,12 +47,8 @@
     text-anchor: middle;
 }
 
-.legend-text {
-    font-size: 2.5vh;
-    dominant-baseline: middle;
-    
-}
 
+/* Legend */
 .legend-background{
     fill: #DCD0FF;
     fill-opacity: 0.2;
@@ -53,4 +60,10 @@
     cx: 7px;
     cy: 5px;
     r: 3px;
+}
+
+.legend-text {
+    font-size: 2.5vmin; /* Scales with both width and height */
+    dominant-baseline: middle;
+    
 }

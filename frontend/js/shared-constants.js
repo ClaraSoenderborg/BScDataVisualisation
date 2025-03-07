@@ -7,7 +7,6 @@ const donutHole = 0.0
 const innerWidth = width - margin.left - margin.right
 const innerHeight = height - margin.top - margin.bottom
 
-
 const line_height = 20
 const tooltip_padding = 15
 const tooltip_width = innerWidth * 0.5
