@@ -24,11 +24,11 @@ const defineScales = (data) => {
     
     xScale
         .domain(sortedweeks) // key is week
-        .range([0, window.innerWidth * 0.9]) //Changes
+        .range([0, width]) //Changes
     
     yScale
         .domain([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        .range([window.innerHeight * 0.8 - margin.top - margin.bottom, 0]) // start y-axis at zero
+        .range([graph_height, 0]) // start y-axis at zero
         .paddingInner(0.2)
         .paddingOuter(0.2)
 

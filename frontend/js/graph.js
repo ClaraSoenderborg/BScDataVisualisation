@@ -1,26 +1,13 @@
-
-
 const drawGraph = (data, div) => {
-
-    
 
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")
-        //.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`) 
     
     createTooltip(svg)
 
-    /*const innerGraph = svg.append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`)*/
-
     const createGraph = () => {
-        margin.left = window.innerWidth * 0.07; // Changes
         defineScales(data)
-
-        //margin.top = window.innerHeight * 0.07
-        //margin.bottom = 
-        graphHeight = window.innerHeight * 0.8 - margin.top - margin.bottom
 
         svg.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`)
 
@@ -36,7 +23,7 @@ const drawGraph = (data, div) => {
 
         svg.append("g")
             .attr("class", "bottomAxis")
-            .attr("transform", `translate(${margin.left},${graphHeight})`)
+            .attr("transform", `translate(${margin.left},${graph_height})`)
             .call(bottomAxis) // connect x-akse to outerDonut
 
 

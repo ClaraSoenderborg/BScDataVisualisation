@@ -28,22 +28,19 @@
 
 
 .leftAxis, .bottomAxis {
-    font-size: 2vmin; /* Changed */  
-    font-weight: bold;  /* Make the text bold (optional) */
-    fill: #333;         /* Dark color for the text */
-
+    font-size: 2vmin; /* Changed */     
 }
 
 /* ToolTip */
 
 .labelText {
-    font-size: 2vh;
+    font-size: 2vmin;
     font-weight: bold;
     stroke: none;
 }
 
 .tooltipTitle {
-    font-size: 3vh;
+    font-size: 3vmin;
     text-anchor: middle;
 }
 

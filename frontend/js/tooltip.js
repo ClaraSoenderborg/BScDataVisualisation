@@ -7,7 +7,16 @@ const createTooltip = (svg) => {
         .attr("class", "toolTip")
         .style("visibility", "hidden")
 
-    toolTip
+
+    const drawTooltip = () => {
+
+        toolTip.selectAll(".toolTip").remove()
+        toolTip.selectAll(".toolTip rect").remove()
+        toolTip.selectAll(".toolTip text").remove()
+        toolTip.selectAll(".tooltip-donut").remove()
+
+
+        toolTip
         .append("rect")
         .attr("width", tooltip_width)
         .attr("height", tooltip_height)
@@ -17,8 +26,8 @@ const createTooltip = (svg) => {
         .attr("fill", "white")
         .attr("stroke", "grey")
         .attr("stroke-width", "1px")
-
-    toolTip
+    
+        toolTip
         .append("text")
         .attr("class", "tooltipTitle")
         .attr("x", tooltip_width / 2)
@@ -26,10 +35,13 @@ const createTooltip = (svg) => {
         //.style("dominant-baseline", "hanging")
         //.attr("text-anchor", "middle")
         //.style("font-size", "4px")
-    
-    toolTip.append("g")
+
+        toolTip.append("g")
         .attr("class", "tooltip-donut")
         .attr("transform", `translate(${tooltip_width/2},${tooltip_height/2 + tooltip_padding})`)
+
+    }
+
     
     // Hide the tooltip when clicking anywhere on the page except on the donuts
     d3.select(document).on("click", (e, d) => {
@@ -47,6 +59,10 @@ const createTooltip = (svg) => {
     .on("click", (e) => {
         e.stopPropagation()
     })
+
+    drawTooltip()
+
+    window.addEventListener("resize", drawTooltip)
 
 }
 
@@ -98,7 +114,7 @@ function wrapText(text) {
         .text(currentLine);
 
     // Adjust tooltip height dynamically
-    const newHeight = Math.max(70, (lineNumber + 1) * line_height + tooltip_padding * 2);
+    //const newHeight = Math.max(70, (lineNumber + 1) * line_height + tooltip_padding * 2);
     //d3.select(".toolTip rect").attr("height", newHeight);
 }
 
@@ -195,9 +211,9 @@ function buildTooltipChart(singleDonut, authorMap) {
         const posEnd = [posMid[0] + (posMid[0] > 0 ? 25 : -25), posMid[1]]; // Shift label
 
         // check if x and y will overlap with last added end point
-        if ((Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= 60) && Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])) {
-            posEnd[1] = posEnd[1] - 10 //shift y-value by 3 if overlapping
-            posMid[1] = posMid[1] - 10
+        if ((Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= label_height * 2) && Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])) {
+            posEnd[1] = posEnd[1] - label_height  //shift y-value by 3 if overlapping
+            posMid[1] = posMid[1] - label_height 
         }
 
         lastAddedEndPoint = posEnd

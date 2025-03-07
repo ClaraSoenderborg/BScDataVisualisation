@@ -13,10 +13,8 @@ const createLegend = (data, div) => {
     // Function to draw the legend
     const drawLegend = () => {
         let usedRows = 1;
-        margin.left = window.innerWidth * 0.07; // Changes
         let xPosition = margin.left;
         let yPosition = margin.top + 5;
-        const legendWidth = window.innerWidth * 0.90 // Changes
 
         // Update viewBox dynamically based on window size
         legend.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`);
@@ -41,7 +39,7 @@ const createLegend = (data, div) => {
                 const textWidth = textElem.node().getComputedTextLength(); // Measure text width
 
                 // Check if the next item would exceed max width
-                if (xPosition + textWidth + 20 > legendWidth) {
+                if (xPosition + textWidth + 20 > width) {
                     xPosition = margin.left; // Move to new row
                     yPosition += rowHeight;
                     usedRows++;
@@ -66,7 +64,7 @@ const createLegend = (data, div) => {
         const legendHeight = usedRows * rowHeight;
         background
             .attr("height", legendHeight + 5)
-            .attr("width", legendWidth)
+            .attr("width", width)
             
     };
 
