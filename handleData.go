@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -59,7 +60,7 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-func parseGitLog(lines string) [][]string {
+func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string) [][]string {
 	var commitSha, timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
@@ -82,7 +83,7 @@ func parseGitLog(lines string) [][]string {
 			} else {
 				var fields = strings.Fields(lineContent)
 				lineAdd, lineRemove, fileName = fields[0], fields[1], fields[2]
-				if addFile(fileName) {
+				if addFile(fileName, excludeFile, excludePath, excludeKind) {
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
@@ -105,15 +106,50 @@ func parseGitLog(lines string) [][]string {
 	return result
 }
 
-func addFile(fileName string) bool {
-	var match, _ = regexp.MatchString("^.*(md|gitignore|png|pdf|drawio)$", fileName)
+func matchExcludeExp(regex string, input string) bool {
+	var match, _ = regexp.MatchString(regex, input)
+	return match
+}
 
-	return !match
+func getFileKind(filepath string) string {
+	var cmd = exec.Command("file", "--brief", filepath)
+
+	var output, err = cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Could not find file kind for file: %s", filepath)
+	}
+
+	return string(output)
+}
+
+func addFile(filePath string, excludeFile string, excludePath string, excludeKind string) bool {
+	var addFile = true
+
+	if excludeFile != "" {
+		var fileName = filepath.Base(filePath)
+		if matchExcludeExp(excludeFile, fileName) {
+			addFile = false
+		}
+	}
+	
+	if excludePath != "" {
+		if matchExcludeExp(excludePath, filePath) {
+			addFile = false
+		}
+	}
+
+	if excludeKind != "" {
+		if matchExcludeExp(excludeKind, getFileKind(filePath)) {
+			addFile = false
+		}
+	}
+
+	return addFile
 }
 
 func writeToCSVFile(list [][]string, location string) {
 	var file, err = os.Create(location)
-	
+
 	if err != nil {
 		log.Fatal("Data file could not be created at path: " + location)
 	}

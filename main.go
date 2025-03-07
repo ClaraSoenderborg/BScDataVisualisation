@@ -7,14 +7,19 @@ import (
 	"strings"
 )
 
-// default version. Overwritten at buildtime
+// default version. Overridden at build time
 var version = "dev"
 
 func main() {
-
+	// argument flags
 	var repoPath = flag.String("repoPath", "", "Mandatory: Path to repository")
 	var dataLocation = flag.String("dataLocation", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
 	var versionFlag = flag.Bool("version", false, "Show version")
+	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
+	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
+	var excludeKind = flag.String("excludeKind", "", "RegExp on file kinds to exclude")
+
+	// usage documentation for tool
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
 ... [-repoPath <path_to_repository>] [-dataLocation <path_to_data>]
@@ -28,14 +33,17 @@ Options:` + "\n" + `
 	}
 
 	flag.Parse()
+
+	// in case of -version
 	if *versionFlag {
-		//printVersion()
 		fmt.Println("Version:", version)
 		os.Exit(0)
 	}
+
 	var rawData = callGitLog(*repoPath)
-	var res = parseGitLog(rawData)
-	//parseToCSV(res)
+	var res = parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind)
+
+	// if data should be saved locally at specified path
 	if *dataLocation != "" {
 		var fixedPath = strings.TrimSuffix(*dataLocation, "/") + "/data.csv"
 		fmt.Printf("Saving data file at: " + fixedPath + "\n")
@@ -43,11 +51,8 @@ Options:` + "\n" + `
 		writeToCSVFile(res, fixedPath)
 		setUpServer(fixedPath, nil)
 
-	} else {
+	} else { // if data should be immediately served at /data.csv
 		setUpServer("", res)
 	}
-
-	//fmt.Printf("%v", res)
-	//fmt.Print(rawData)
 
 }
