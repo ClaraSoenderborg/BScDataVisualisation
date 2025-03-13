@@ -54,7 +54,10 @@ const drawGraph = (data, div) => {
                 (d) => d.fileName,
                 (d) => d.author)
 
-
+        let globalMin = Infinity
+        let globalMinFile = ""
+        let globalMaxFile = ""
+        let globalMax=-Infinity
             primaryGroup.forEach((fileMap, week) => {
 
                 // sum changes for all files in week
@@ -67,15 +70,41 @@ const drawGraph = (data, div) => {
                 fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
                 const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
 
+                const min = d3.min(topTenFiles, d => d.totalLinesChanged)
+                const max = d3.max(topTenFiles, d => d.totalLinesChanged)
+                const minFileName = topTenFiles.find(d => d.totalLinesChanged === min)?.fileName || "Unknown";
+                const maxFileName = topTenFiles.find(d => d.totalLinesChanged === max)?.fileName || "Unknown";
+
+                if (min < globalMin) {
+                    globalMin = min;
+                    globalMinFile = minFileName;
+                    }
+                    if (max > globalMax) {
+                    globalMax = max;
+                    globalMaxFile = maxFileName;
+                    }
+
+
+
+
+
                 for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
                     const fileName = topTenFiles[i].fileName
                     const authorMap = fileMap.get(fileName)
 
+                   // console.log(`${i + 1}.${fileName}:${topTenFiles[i].totalLinesChanged} changes`)
+
+
                     buildPie(authorMap, week, i, fileName, svg)
+
+
 
                 }
 
+
             })
+            console.log(globalMinFile + "min: "+globalMin + "   " + globalMaxFile+ " max: "+globalMax)
+
     }
 
     createGraph()
