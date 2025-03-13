@@ -7,7 +7,7 @@ const createLegend = (data, div) => {
         .attr("class", "legendSVG");
 
     // Background rectangle for legend
-    
+
     // Function to draw the legend
     const drawLegend = () => {
         let usedRows = 1;
@@ -60,10 +60,13 @@ const createLegend = (data, div) => {
         background
             .attr("height", legendHeight + 5)
             .attr("width", width)
-        
+
+        //Sets the width of the legend to be as wide as the container(from chat)
+        const containerWidth = div.node().getBoundingClientRect().width;
+
         // Update viewBox dynamically based on window size
-        legend.attr("viewBox", `0 0 ${window.innerWidth} ${legendHeight + margin.bottom}`);
-            
+        legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + margin.bottom}`);
+
     };
 
     // Initial draw

@@ -1,15 +1,12 @@
 var width
-var height 
-var viewBoxHeight = 150
-var margin 
+var height
+var margin
 var graph_radius
 var donutHole = 0.0
-//var innerWidth = width - margin.left - margin.right
-//var innerHeight = height - margin.top - margin.bottom
-var graph_height 
+var graph_height
 
-var line_height 
-var label_height 
+var line_height
+var label_height
 
 
 const min_width = 700
@@ -21,18 +18,19 @@ const min_graph_height = 300
 var legendPadding
 
 //Tooltip
-var tooltip_padding 
+var tooltip_padding
 var tooltip_width
-var tooltip_height 
-var tooltip_max_width 
-var toolTip_radius 
+var tooltip_height
+var tooltip_max_width
+var toolTip_radius
 
 const reCalculateSizes = () => {
 
     //Graph
     height = window.innerHeight * 0.8
     width = Math.max(min_width, window.innerWidth * 0.9)
-    margin = { top: 10, right: 0, bottom: 20, left: window.innerWidth * 0.07}
+
+    margin = { top: window.innerWidth*0.005, right: 0, bottom: window.innerWidth*0.01, left: window.innerWidth * 0.07 }
     graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) - margin.top - margin.bottom
     graph_radius = Math.min(width, graph_height) / 26
 
