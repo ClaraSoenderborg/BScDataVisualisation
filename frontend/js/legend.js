@@ -8,16 +8,11 @@ const createLegend = (data, div) => {
 
     // Background rectangle for legend
     
-    
-
     // Function to draw the legend
     const drawLegend = () => {
         let usedRows = 1;
         let xPosition = margin.left;
         let yPosition = margin.top + 5;
-
-        // Update viewBox dynamically based on window size
-        legend.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`);
 
         // Remove existing legend items before redrawing
         legend.selectAll(".legend-item").remove();
@@ -65,6 +60,9 @@ const createLegend = (data, div) => {
         background
             .attr("height", legendHeight + 5)
             .attr("width", width)
+        
+        // Update viewBox dynamically based on window size
+        legend.attr("viewBox", `0 0 ${window.innerWidth} ${legendHeight + margin.bottom}`);
             
     };
 

@@ -9,7 +9,7 @@ const drawGraph = (data, div) => {
     const createGraph = () => {
         defineScales(data)
 
-        svg.attr("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight * 0.85}`)
+        svg.attr("viewBox", `0 0 ${window.innerWidth} ${graph_height + legendPadding}`)
 
         svg.selectAll(".bottomAxis").remove()
         svg.selectAll(".leftAxis").remove()
