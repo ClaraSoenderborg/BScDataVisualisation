@@ -1,7 +1,7 @@
-const buildPie = (authorMap, week, i, fileName, svg) => {
+const buildPie = (authorMap, week, i, fileName, svg, totalLinesChanged) => {
 
     const singleDonut = d3.select(".leftAxis").append("g")
-        .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
+        .attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(totalLinesChanged)})`)
         .style("opacity", 1)
         .attr("class", "singleDonut")
         .on("click", (e, d) => {

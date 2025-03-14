@@ -8,6 +8,7 @@ const drawGraph = (data, div) => {
 
     const createGraph = () => {
         defineScales(data)
+
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
 
@@ -34,19 +35,20 @@ const drawGraph = (data, div) => {
         // y-axis
         const leftAxis = d3.axisLeft(yScale)
             .tickSize(0)
-            .ticks(2)
+           // .ticks(2)
             .tickPadding(20)
-            .tickValues([1, 10])
-            .tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
+            //.tickValues([1, 10])
+            //.tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
+
+            
 
         svg.append("g")
             .attr("class", "leftAxis")
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(leftAxis)
-            .selectAll("text") // Select all text elements within the axis
-            .attr("transform", "rotate(-45)")
-            .attr("text-anchor", "end")
-
+           // .selectAll("text") // Select all text elements within the axis
+           // .attr("transform", "rotate(-45)")
+           // .attr("text-anchor", "end")
 
             const primaryGroup = d3.rollup(data,
                 (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
@@ -54,10 +56,7 @@ const drawGraph = (data, div) => {
                 (d) => d.fileName,
                 (d) => d.author)
 
-        let globalMin = Infinity
-        let globalMinFile = ""
-        let globalMaxFile = ""
-        let globalMax=-Infinity
+
             primaryGroup.forEach((fileMap, week) => {
 
                 // sum changes for all files in week
@@ -70,53 +69,26 @@ const drawGraph = (data, div) => {
                 fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
                 const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
 
-                const min = d3.min(topTenFiles, d => d.totalLinesChanged)
-                const max = d3.max(topTenFiles, d => d.totalLinesChanged)
-                const minFileName = topTenFiles.find(d => d.totalLinesChanged === min)?.fileName || "Unknown";
-                const maxFileName = topTenFiles.find(d => d.totalLinesChanged === max)?.fileName || "Unknown";
-
-                if (min < globalMin) {
-                    globalMin = min;
-                    globalMinFile = minFileName;
-                    }
-                    if (max > globalMax) {
-                    globalMax = max;
-                    globalMaxFile = maxFileName;
-                    }
-
-
-
-
 
                 for (let i = 0; i < topTenFiles.length; i++) { // for loop for each file in a week
                     const fileName = topTenFiles[i].fileName
                     const authorMap = fileMap.get(fileName)
 
-                   // console.log(`${i + 1}.${fileName}:${topTenFiles[i].totalLinesChanged} changes`)
-
-
-                    buildPie(authorMap, week, i, fileName, svg)
-
-
+                    buildPie(authorMap, week, i, fileName, svg, topTenFiles[i].totalLinesChanged)
+                    console.log(`Week: ${week}, File: ${fileName}, Lines Changed: ${topTenFiles[i].totalLinesChanged}`);
 
                 }
 
 
             })
-            console.log(globalMinFile + "min: "+globalMin + "   " + globalMaxFile+ " max: "+globalMax)
-
+            //console.log(globalMinFile + "min: "+globalMin + "   " + globalMaxFile+ " max: "+globalMax)
+        
     }
 
     createGraph()
 
 
     window.addEventListener("resize", createGraph)
-
-
-
-
-
-
 
 
 }
