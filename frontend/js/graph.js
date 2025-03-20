@@ -20,21 +20,39 @@ const drawGraph = (data, div) => {
 
 
         // x-axis
+        // x-axis
         const bottomAxis = d3.axisBottom(xScale)
         .tickSize(10)
         .tickPadding(5)
         .tickSizeOuter(0)
 
-        svg.append("g")
+        const xAxisBackground = svg.append("g")
+            .attr("class", "xAxisBackground");
+
+        xAxisBackground.selectAll("rect")
+            .data(xScale.domain()) 
+            .enter()
+            .append("rect")
+            .attr("x", d => xScale(d) + margin.left) 
+            .attr("y", 0) 
+            .attr("width", xScale.bandwidth()) 
+            .attr("height", graph_height + margin.right) // Dont ask me why it's margin.right :)))
+            .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2) 
+            .attr("opacity", 0.2); 
+        
+        // Append x-axis
+        const xAxisGroup = svg.append("g")
             .attr("class", "bottomAxis")
             .attr("transform", `translate(${margin.left},${graph_height})`)
-            .call(bottomAxis) // connect x-akse to outerDonut
-            .attr("fill", "green")
+            .call(bottomAxis)
+            .attr("fill", "black"); // Default text color
 
 
         // y-axis
+        
         const leftAxis = d3.axisLeft(yScale)
             .tickSize(0)
+            
            // .ticks(2)
             .tickPadding(20)
             //.tickValues([1, 10])
@@ -101,10 +119,6 @@ const drawGraph = (data, div) => {
                 .force("collide", d3.forceCollide().radius(graph_radius))
                 .on("tick", tick)
                 
-            
-            /*for (let i = 0; i < 100; i++) {
-                simulation.tick()   
-            }*/
 
             
 

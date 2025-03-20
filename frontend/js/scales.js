@@ -19,6 +19,8 @@ const colorScale = d3.scaleOrdinal([
     "#3DA5D9", // Blue :)
 
 ]);
+const backgroundColor1 = "#FFFFFF"; // White
+const backgroundColor2 = "#D3D3D3"; // Gray
 
 
 const defineScales = (data) => {
@@ -68,7 +70,7 @@ const defineScales = (data) => {
         .range([0, width]) //Changes
     
     yScale 
-        .domain([Math.max(1,globalMin), globalMax])
+        .domain([Math.max(1,globalMin) / 1.5, globalMax * 1.5]) // 
         .range([graph_height, 0]).base(2) // start y-axis at zero
     // Colors
     const authors = Array.from(d3.union(data.map(d => d.author)))
