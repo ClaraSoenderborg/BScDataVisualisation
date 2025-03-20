@@ -20,7 +20,6 @@ const drawGraph = (data, div) => {
         svg.selectAll(".xAxisBackground").remove()
 
         // x-axis
-        // x-axis
         const bottomAxis = d3.axisBottom(xScale)
         .tickSize(10)
         .tickPadding(5)
@@ -36,37 +35,27 @@ const drawGraph = (data, div) => {
             .attr("x", d => xScale(d) + margin.left) 
             .attr("y", 0) 
             .attr("width", xScale.bandwidth()) 
-            .attr("height", graph_height + margin.right) // Dont ask me why it's margin.right :)))
+            .attr("height", graph_height)
             .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2) 
             .attr("opacity", 0.2); 
         
         // Append x-axis
-        const xAxisGroup = svg.append("g")
+        svg.append("g")
             .attr("class", "bottomAxis")
             .attr("transform", `translate(${margin.left},${graph_height})`)
             .call(bottomAxis)
-            .attr("fill", "black"); // Default text color
 
 
         // y-axis
-        
         const leftAxis = d3.axisLeft(yScale)
             .tickSize(0)
-            
-           // .ticks(2)
             .tickPadding(20)
-            //.tickValues([1, 10])
-            //.tickFormat((d, i) => d === 1 ? "Least changes" : (d === 10 ? "Most changes" : ""))
-
-            
 
         svg.append("g")
             .attr("class", "leftAxis")
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(leftAxis)
-           // .selectAll("text") // Select all text elements within the axis
-           // .attr("transform", "rotate(-45)")
-           // .attr("text-anchor", "end")
+
 
             const primaryGroup = d3.rollup(data,
                 (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
