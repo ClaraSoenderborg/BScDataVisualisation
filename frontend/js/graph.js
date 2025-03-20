@@ -17,7 +17,7 @@ const drawGraph = (data, div) => {
 
         svg.selectAll(".bottomAxis").remove()
         svg.selectAll(".leftAxis").remove()
-
+        svg.selectAll(".xAxisBackground").remove()
 
         // x-axis
         // x-axis
