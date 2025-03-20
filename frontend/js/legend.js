@@ -1,76 +1,77 @@
-const createLegend = (data) => {
-    const authors = Array.from(d3.union(data.map(d => d.author)));
+const createLegend = (data, div) => {
+    const authors = Array.from(new Set(data.map(d => d.author))); // Use Set for unique values
+    const rowHeight = 30; // Space for each row
 
-    const maxWidth = width // Max width before wrapping
-    const rowHeight = 10 // Space for each row
-    var usedRows = 1
-    let xPosition = margin.left
-    let yPosition = 12
+    // Create the SVG legend container
+    const legend = div.append("svg")
+        .attr("class", "legendSVG");
 
+    // Background rectangle for legend
 
-    // add legend to svg
-    const legend = d3.select(".svg")
-        .append("g")
-        .attr("class", "legend")
-        .attr("viewBox", `0 0 ${maxWidth} 0}`)
-        .attr("transform", `translate(0, ${margin.top + 80})`)
+    // Function to draw the legend
+    const drawLegend = () => {
+        let usedRows = 1;
+        let xPosition = margin.left;
+        let yPosition = margin.top + 5;
 
+        // Remove existing legend items before redrawing
+        legend.selectAll(".legend-item").remove();
+        legend.selectAll(".legend-background").remove();
 
-    const background = legend
-        .append("rect")
-        .attr("x", margin.left)
-        .attr("y", margin.top + 2)
-        .attr("width", innerWidth)
-        .attr("height", legendHeight)
-        .attr("rx", 3)
-        .attr("ry", 3)
-        .attr("fill", "#DCD0FF")
-        //.attr("fill", "#E8ADAA")
-        //.attr("fill", "#FFA07A")
-        //.attr("fill", "#D2B48C")
-        //.attr("fill", "#EBF4FA")
-        .attr("fill-opacity", 0.2)
+        // Bind data and create groups for each author
+        const legendItems = legend.selectAll(".legend-item")
+            .data(authors)
+            .join("g")
+            .attr("class", "legend-item")
+            .each(function (d) {
+                const textElem = d3.select(this).append("text")
+                    .attr("class", "legend-text")
+                    .attr("x", 15) // Space from circle
+                    .attr("y", 5)
+                    .text(d)
+                    .style("fill", colorScale);
 
+                const textWidth = textElem.node().getComputedTextLength(); // Measure text width
 
-    // Bind data and create groups for each author
-    const legendItems = legend.selectAll(".legend-item")
-        .data(authors)
-        .join("g")
-        .attr("class", "legend-item")
-        .each(function (d) {
-            const textElem = d3.select(this).append("text")
-                .attr("x", 10)  // Space from circle
-                .attr("y", 5)
-                .text(d)
-                .style("alignment-baseline", "middle")
-                .style("fill", colorScale)
-                .attr("font-size", "4px")
+                // Check if the next item would exceed max width
+                if (xPosition + textWidth + 20 > width) {
+                    xPosition = margin.left; // Move to new row
+                    yPosition += rowHeight;
+                    usedRows++;
+                }
 
-            const textWidth = textElem.node().getComputedTextLength() // Measure text width
+                d3.select(this).attr("transform", `translate(${xPosition}, ${yPosition})`);
+                xPosition += textWidth + 35; // Update X position for next item
+            });
 
-            // Check if the next item would exceed max width
-            if (xPosition + textWidth + 30 > maxWidth) {
-                xPosition = margin.left  // Move to new row
-                yPosition += rowHeight
-                usedRows++
-            }
+        const background = legend.append("rect")
+            .attr("class", "legend-background")
+            .attr("x", margin.left)
+             //.attr("width", width)
+              //.attr("height", legendHeight)
 
-            d3.select(this).attr("transform", `translate(${xPosition}, ${yPosition})`)
-            xPosition += textWidth + 15 // Update X position for next item and aligns item
-        });
+        // Append circles for legend markers
+        legendItems.append("circle")
+            .attr("class", "legend-circle")
+            .attr("fill", colorScale);
 
-    legendItems.append("circle")
-        .attr("cx", 7)
-        .attr("cy", 5)
-        .attr("r", 1)
-        .attr("fill", colorScale)
+        // Update legend background height
+        const legendHeight = usedRows * rowHeight;
+        background
+            .attr("height", legendHeight + 5)
+            .attr("width", width)
 
-    var legendHeight = usedRows * rowHeight
-    background.attr("height", legendHeight) // make sure rect follows height of legend
+        //Sets the width of the legend to be as wide as the container(from chat)
+        const containerWidth = div.node().getBoundingClientRect().width;
 
-    // Adjust SVG height dynamically based on rows
-    //legend.attr("height", legendHeight)
+        // Update viewBox dynamically based on window size
+        legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + margin.bottom}`);
 
+    };
 
+    // Initial draw
+    drawLegend();
 
-}
+    // Redraw legend when window resizes
+    window.addEventListener("resize", drawLegend);
+};
