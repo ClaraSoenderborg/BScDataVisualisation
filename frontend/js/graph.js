@@ -56,7 +56,7 @@ const drawGraph = (data, div) => {
                 (d) => d.fileName,
                 (d) => d.author)
 
-
+            var nodes = []
             primaryGroup.forEach((fileMap, week) => {
 
                 // sum changes for all files in week
@@ -74,14 +74,42 @@ const drawGraph = (data, div) => {
                     const fileName = topTenFiles[i].fileName
                     const authorMap = fileMap.get(fileName)
 
-                    buildPie(authorMap, week, i, fileName, svg, topTenFiles[i].totalLinesChanged)
-                    console.log(`Week: ${week}, File: ${fileName}, Lines Changed: ${topTenFiles[i].totalLinesChanged}`);
+                    //buildPie(authorMap, week, i, fileName, svg)
+                    nodes.push({
+                        x: xScale(week) + xScale.bandwidth() / 2, 
+                        y: yScale(topTenFiles[i].totalLinesChanged), 
+                        week: week,
+                        fileName: fileName, 
+                        authorMap: authorMap,
+                        //totalLinesChanged: totalLinesChanged
+                    })
 
                 }
 
-
             })
-            //console.log(globalMinFile + "min: "+globalMin + "   " + globalMaxFile+ " max: "+globalMax)
+
+            nodes.forEach(d => buildPie(d, svg))
+
+            const tick = () => {
+                d3.selectAll(".singleDonut")
+                    .data(nodes)
+                    .attr("transform", d => `translate(${d.x}, ${d.y})`)
+            }
+
+            d3.forceSimulation(nodes)
+                .force("x", d3.forceX(d => xScale(d.week) + xScale.bandwidth()/2).strength(0.1))
+                //.force("y", d3.forceY(d => yScale(d.y)).strength(0.1))
+                .force("collide", d3.forceCollide().radius(graph_radius))
+                .on("tick", tick)
+                //.stop()
+            
+            /*for (let i = 0; i < 100; i++) {
+                simulation.tick()   
+            }*/
+
+            
+
+            
         
     }
 
