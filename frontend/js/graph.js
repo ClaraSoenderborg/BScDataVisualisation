@@ -76,9 +76,8 @@ const drawGraph = (data, div) => {
 
                     //buildPie(authorMap, week, i, fileName, svg)
                     nodes.push({
-                        x: xScale(week) + xScale.bandwidth() / 2, 
-                        y: yScale(topTenFiles[i].totalLinesChanged), 
-                        week: week,
+                        x: week, 
+                        y: topTenFiles[i].totalLinesChanged, 
                         fileName: fileName, 
                         authorMap: authorMap,
                         //totalLinesChanged: totalLinesChanged
@@ -97,11 +96,11 @@ const drawGraph = (data, div) => {
             }
 
             d3.forceSimulation(nodes)
-                .force("x", d3.forceX(d => xScale(d.week) + xScale.bandwidth()/2).strength(0.1))
-                //.force("y", d3.forceY(d => yScale(d.y)).strength(0.1))
+                .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
+                .force("y", d3.forceY(d => yScale(d.y)).strength(1))
                 .force("collide", d3.forceCollide().radius(graph_radius))
                 .on("tick", tick)
-                //.stop()
+                
             
             /*for (let i = 0; i < 100; i++) {
                 simulation.tick()   
