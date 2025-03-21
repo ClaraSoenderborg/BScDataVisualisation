@@ -29,16 +29,16 @@ const drawGraph = (data, div) => {
             .attr("class", "xAxisBackground");
 
         xAxisBackground.selectAll("rect")
-            .data(xScale.domain()) 
+            .data(xScale.domain())
             .enter()
             .append("rect")
-            .attr("x", d => xScale(d) + margin.left) 
-            .attr("y", 0) 
-            .attr("width", xScale.bandwidth()) 
+            .attr("x", d => xScale(d) + margin.left)
+            .attr("y", 0)
+            .attr("width", xScale.bandwidth())
             .attr("height", graph_height)
-            .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2) 
-            .attr("opacity", 0.2); 
-        
+            .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2)
+            .attr("opacity", 0.2);
+
         // Append x-axis
         svg.append("g")
             .attr("class", "bottomAxis")
@@ -83,9 +83,10 @@ const drawGraph = (data, div) => {
 
                     //buildPie(authorMap, week, i, fileName, svg)
                     nodes.push({
-                        x: week, 
-                        y: topTenFiles[i].totalLinesChanged, 
-                        fileName: fileName, 
+                        x: week,
+                        y: topTenFiles[i].totalLinesChanged,
+                        week: week,
+                        fileName: fileName,
                         authorMap: authorMap,
                         //totalLinesChanged: totalLinesChanged
                     })
@@ -100,19 +101,32 @@ const drawGraph = (data, div) => {
                 d3.selectAll(".singleDonut")
                     .data(nodes)
                     .attr("transform", d => `translate(${d.x}, ${d.y})`)
+
             }
+
+            const end = () => {
+                nodes.forEach(d => {
+                    const limitRight = xScale(d.week) + (xScale.bandwidth())
+                    const limitLeft = xScale(d.week)
+
+                    if (limitRight < (d.x)) {
+                        console.log(`x: ${d.x},\nweek: ${d.week},\nfilename: ${d.fileName},\nxscale(week): ${xScale(d.week) + xScale.bandwidth() / 2}`)
+                        width = width + 1000
+                    } else if (limitLeft > (d.x)) {
+                        console.log(`x: ${d.x},\nweek: ${d.week},\nfilename: ${d.fileName},\nxscale(week): ${xScale(d.week) + xScale.bandwidth() / 2}`)
+                        width = width + 1000
+
+                    }
+
+                })}
 
             d3.forceSimulation(nodes)
                 .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
                 .force("y", d3.forceY(d => yScale(d.y)).strength(1))
                 .force("collide", d3.forceCollide().radius(graph_radius))
                 .on("tick", tick)
-                
+                .on("end", end)
 
-            
-
-            
-        
     }
 
     createGraph()

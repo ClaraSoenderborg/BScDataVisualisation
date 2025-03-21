@@ -1,6 +1,6 @@
 const buildPie = (node, svg) => {
 
-    const {x, y, fileName, authorMap} = node
+    const {x, y, week, fileName, authorMap} = node
 
     const singleDonut = d3.select(".leftAxis").append("g")
         //.attr("transform", `translate(${x}, ${y})`)
@@ -14,13 +14,13 @@ const buildPie = (node, svg) => {
             singleDonut.style("opacity", 0.5)
 
         })
-    
+
     var pie = d3.pie().sort(null).value(([key, value]) => value[0])
 
     const preparedPie = pie(authorMap)
 
-    const drawPie = () => {     
-        
+    const drawPie = () => {
+
 
         var arcGen = d3.arc()
             .innerRadius(donutHole)
@@ -39,9 +39,9 @@ const buildPie = (node, svg) => {
         .attr("d", arcGen)
         .attr("fill", d => colorScale(d.data[0]))
     }
-    
+
     drawPie()
 
     window.addEventListener("resize", drawPie)
-    
+
 }
