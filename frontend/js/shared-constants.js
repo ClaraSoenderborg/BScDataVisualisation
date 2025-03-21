@@ -16,8 +16,6 @@ const max_graph_height = 500
 const min_graph_height = 300
 
 let globalMin = Infinity
-let globalMinFile = ""
-let globalMaxFile = ""
 let globalMax= -Infinity
 
 //Legend

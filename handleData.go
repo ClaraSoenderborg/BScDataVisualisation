@@ -88,29 +88,32 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
 					var _, weekNumber = parseTime.ISOWeek()
-					var yAxisValue string
-					var nodeSizeValue string
+					var yAxisValue int
+					var nodeSizeValue int
 
 
 					if (yAxis == "churn"){
-						yAxisValue = strconv.Itoa(lineAddInt + lineRemoveInt)
+						yAxisValue = lineAddInt + lineRemoveInt
+						fmt.Println(yAxisValue)
 					} else if (yAxis == "growth"){
-						yAxisValue = strconv.Itoa(lineAddInt - lineRemoveInt)
+						yAxisValue = lineAddInt - lineRemoveInt
 					} else if(yAxis == "commit"){
-						yAxisValue = "1"
+						yAxisValue = 1
 					}
 
 					if (nodeSize == "churn"){
-						nodeSizeValue = strconv.Itoa(lineAddInt + lineRemoveInt)
+						nodeSizeValue = lineAddInt + lineRemoveInt
 					} else if (nodeSize == "growth"){
-						nodeSizeValue = strconv.Itoa(lineAddInt - lineRemoveInt)
+						nodeSizeValue = lineAddInt - lineRemoveInt
 					} else if(nodeSize == "commit"){
-						nodeSizeValue = "1"
+						nodeSizeValue = 1
 					}
 
+					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, yAxisValue, nodeSizeValue, fileName})
+						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue), fileName})
 					}
+				}
 				}
 			}
 			blockLineCount++

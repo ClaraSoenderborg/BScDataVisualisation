@@ -44,7 +44,7 @@ func serveCSV(w http.ResponseWriter, r *http.Request, dataLocation string, data 
 		var writer = csv.NewWriter(w)
 		defer writer.Flush()
 
-		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
+		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis","nodeSize", "fileName"})
 		var err = writer.WriteAll(data)
 		if err != nil {
 			http.Error(w, "Could not write CSV data", http.StatusInternalServerError)
