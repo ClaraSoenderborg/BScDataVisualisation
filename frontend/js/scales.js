@@ -25,10 +25,11 @@ const backgroundColor2 = "#D3D3D3"; // Gray
 
 const defineScales = (data, globalMax, globalMin) => {
 
-    const sortedweeks = Array.from(d3.union((data.map(d => d.week)).sort()))
+    const minWeek = d3.min(data.map(d => d.week))
+    const maxWeek = d3.max(data.map(d => d.week))
 
     xScale
-        .domain(sortedweeks) // key is week
+        .domain(d3.range(minWeek, maxWeek +1)) // key is week
         .range([0, width]) //Changes
 
     yScale

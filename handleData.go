@@ -94,7 +94,6 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 
 					if (yAxis == "churn"){
 						yAxisValue = lineAddInt + lineRemoveInt
-						fmt.Println(yAxisValue)
 					} else if (yAxis == "growth"){
 						yAxisValue = lineAddInt - lineRemoveInt
 					} else if(yAxis == "commit"){
