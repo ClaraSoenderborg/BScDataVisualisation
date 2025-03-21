@@ -60,7 +60,7 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string) [][]string {
+func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, yAxis string, nodeSize string) [][]string {
 	var commitSha, timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
@@ -88,9 +88,28 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
 					var _, weekNumber = parseTime.ISOWeek()
+					var yAxisValue string
+					var nodeSizeValue string
+
+
+					if (yAxis == "churn"){
+						yAxisValue = strconv.Itoa(lineAddInt + lineRemoveInt)
+					} else if (yAxis == "growth"){
+						yAxisValue = strconv.Itoa(lineAddInt - lineRemoveInt)
+					} else if(yAxis == "commit"){
+						yAxisValue = "1"
+					}
+
+					if (nodeSize == "churn"){
+						nodeSizeValue = strconv.Itoa(lineAddInt + lineRemoveInt)
+					} else if (nodeSize == "growth"){
+						nodeSizeValue = strconv.Itoa(lineAddInt - lineRemoveInt)
+					} else if(nodeSize == "commit"){
+						nodeSizeValue = "1"
+					}
 
 					for _, au := range authors {
-						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, strconv.Itoa(lineAddInt + lineRemoveInt), fileName})
+						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, yAxisValue, nodeSizeValue, fileName})
 					}
 				}
 			}
@@ -131,7 +150,7 @@ func addFile(filePath string, excludeFile string, excludePath string, excludeKin
 			addFile = false
 		}
 	}
-	
+
 	if excludePath != "" {
 		if matchExcludeExp(excludePath, filePath) {
 			addFile = false
@@ -157,7 +176,7 @@ func writeToCSVFile(list [][]string, location string) {
 	defer file.Close()
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
+	writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis", "nodeSize", "fileName"})
 	writer.WriteAll(list)
 
 }

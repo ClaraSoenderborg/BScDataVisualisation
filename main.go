@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -18,6 +20,9 @@ func main() {
 	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
 	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
 	var excludeKind = flag.String("excludeKind", "", "RegExp on file kinds to exclude")
+	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis")
+	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size")
+
 
 	// usage documentation for tool
 	flag.Usage = func() {
@@ -40,8 +45,16 @@ Options:` + "\n" + `
 		os.Exit(0)
 	}
 
+	var metricOptions = [] string{"churn", "growth", "commit"}
+	if(!slices.Contains(metricOptions, *yAxis)){
+		log.Fatal("yAxis argument must be churn, growth or commit")
+	}
+	if(!slices.Contains(metricOptions, *nodeSize)){
+		log.Fatal("nodeSize argument must be churn, growth or commit")
+	}
+
 	var rawData = callGitLog(*repoPath)
-	var res = parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind)
+	var res = parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize)
 
 	// if data should be saved locally at specified path
 	if *dataLocation != "" {
