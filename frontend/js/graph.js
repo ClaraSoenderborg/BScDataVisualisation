@@ -95,37 +95,91 @@ const drawGraph = (data, div) => {
 
             })
 
-            nodes.forEach(d => buildPie(d, svg))
-
-            const tick = () => {
-                d3.selectAll(".singleDonut")
-                    .data(nodes)
-                    .attr("transform", d => `translate(${d.x}, ${d.y})`)
-
-            }
-
+            // Chapter 12, Helge book.
+            //const tick = () => {
+            //    d3.selectAll(".singleDonut")
+            //        .data(nodes)
+            //        .attr("transform", d => `translate(${d.x}, ${d.y})`)
+            //
+            //}
+ 
             const end = () => {
+                var updated = false; // Flag to track if an update is needed
+
                 nodes.forEach(d => {
                     const limitRight = xScale(d.week) + (xScale.bandwidth())
                     const limitLeft = xScale(d.week)
+                    console.log("R: " + limitRight)
+                    console.log("L: " + limitLeft)
 
-                    if (limitRight < (d.x)) {
+                    if ((limitRight < (d.x) + graph_radius) || (limitLeft > (d.x) - graph_radius))  {
                         console.log(`x: ${d.x},\nweek: ${d.week},\nfilename: ${d.fileName},\nxscale(week): ${xScale(d.week) + xScale.bandwidth() / 2}`)
-                        width = width + 1000
-                    } else if (limitLeft > (d.x)) {
-                        console.log(`x: ${d.x},\nweek: ${d.week},\nfilename: ${d.fileName},\nxscale(week): ${xScale(d.week) + xScale.bandwidth() / 2}`)
-                        width = width + 1000
+                        updated = true; // Mark update as needed   
 
-                    }
+                    } 
 
-                })}
+                })
 
-            d3.forceSimulation(nodes)
+            /*if(updated) {
+
+                svg.selectAll(".bottomAxis").remove()
+                        svg.selectAll(".xAxisBackground").remove()
+
+                        // x-axis
+                        const bottomAxis = d3.axisBottom(xScale)
+                        .tickSize(10)
+                        .tickPadding(5)
+                        .tickSizeOuter(0)
+
+                        const xAxisBackground = svg.append("g")
+                            .attr("class", "xAxisBackground");
+
+                        xAxisBackground.selectAll("rect")
+                            .data(xScale.domain())
+                            .enter()
+                            .append("rect")
+                            .attr("x", d => xScale(d) + margin.left)
+                            .attr("y", 0)
+                            .attr("width", xScale.bandwidth())
+                            .attr("height", graph_height)
+                            .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2)
+                            .attr("opacity", 0.2);
+
+                        // Append x-axis
+                        svg.append("g")
+                            .attr("class", "bottomAxis")
+                            .attr("transform", `translate(${margin.left},${graph_height})`)
+                            .call(bottomAxis)
+
+                         // **Update Nodes' x Positions**
+                        nodes.forEach(d => {
+                            d.x = d.x * 1.2;
+                            
+                        });
+
+                        d3.selectAll(".singleDonut")
+                            .data(nodes)
+                            .attr("transform", d => `translate(${d.x}, ${d.y})`)
+                                            
+
+            }*/
+            }
+
+            const simulation = d3.forceSimulation(nodes)
                 .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
                 .force("y", d3.forceY(d => yScale(d.y)).strength(1))
                 .force("collide", d3.forceCollide().radius(graph_radius))
-                .on("tick", tick)
+                //.on("tick", tick)
                 .on("end", end)
+            
+            for (let i = 0; i < 300; i++) {
+                simulation.tick()
+                
+            }
+
+            nodes.forEach(d => buildPie(d, svg))
+
+        
 
     }
 

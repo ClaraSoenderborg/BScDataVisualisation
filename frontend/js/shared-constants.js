@@ -38,7 +38,7 @@ const reCalculateSizes = () => {
 
     margin = { top: window.innerWidth*0.005, right: 0, bottom: window.innerWidth*0.01, left: window.innerWidth * 0.07 }
     graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) - margin.top - margin.bottom
-    graph_radius = Math.min(width, graph_height) / 30
+    graph_radius = Math.min(width, graph_height) / 26
 
 
     //Legend

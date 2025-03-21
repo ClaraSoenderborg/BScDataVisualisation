@@ -3,7 +3,7 @@ const buildPie = (node, svg) => {
     const {x, y, week, fileName, authorMap} = node
 
     const singleDonut = d3.select(".leftAxis").append("g")
-        //.attr("transform", `translate(${x}, ${y})`)
+        .attr("transform", `translate(${x}, ${y})`)
         ///.attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(totalLinesChanged)})`)
         //.attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
         .style("opacity", 1)
