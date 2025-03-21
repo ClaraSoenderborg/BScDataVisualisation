@@ -40,10 +40,10 @@ func serveCSV(w http.ResponseWriter, r *http.Request, dataLocation string, data 
 			http.Error(w, "No CSV data available", http.StatusInternalServerError)
 			return
 		}
-		
+
 		var writer = csv.NewWriter(w)
 		defer writer.Flush()
-		
+
 		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "linesChanged", "fileName"})
 		var err = writer.WriteAll(data)
 		if err != nil {
@@ -53,7 +53,7 @@ func serveCSV(w http.ResponseWriter, r *http.Request, dataLocation string, data 
 
 }
 
-func startServing(dataLocation string, data [][]string) http.Handler {
+func startServing(dataLocation string, data [][]string, numberOfFiles string) http.Handler {
 	//Maybe we dont need mux?
 	var mux = http.NewServeMux()
 
@@ -63,14 +63,20 @@ func startServing(dataLocation string, data [][]string) http.Handler {
 		serveCSV(w, r, dataLocation, data)
 	})
 
+	mux.HandleFunc("/files", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(numberOfFiles))
+	})
+
 	return mux
 }
 
-func setUpServer(dataLocation string, data [][]string) {
+func setUpServer(dataLocation string, data [][]string, numberOfFiles string) {
 	var addr = "127.0.0.1"
 	var port = "8080"
 	var path = "cunt" //TODO fix this
 
 	log.Print(fmt.Sprintf("Serving %s on http://%s:%s", path, addr, port))
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", addr, port), startServing(dataLocation, data)))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", addr, port), startServing(dataLocation, data, numberOfFiles)))
 }

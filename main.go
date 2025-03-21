@@ -22,6 +22,8 @@ func main() {
 	var excludeKind = flag.String("excludeKind", "", "RegExp on file kinds to exclude")
 	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis")
 	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size")
+	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week")
+
 
 
 	// usage documentation for tool
@@ -62,10 +64,10 @@ Options:` + "\n" + `
 		fmt.Printf("Saving data file at: " + fixedPath + "\n")
 
 		writeToCSVFile(res, fixedPath)
-		setUpServer(fixedPath, nil)
+		setUpServer(fixedPath, nil, *numberOfFiles)
 
 	} else { // if data should be immediately served at /data.csv
-		setUpServer("", res)
+		setUpServer("", res, *numberOfFiles)
 	}
 
 }

@@ -58,7 +58,7 @@ const drawGraph = (data, div) => {
 
 
             const primaryGroup = d3.rollup(data,
-                (D) => [d3.sum(D, d => d.linesChanged), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
+                (D) => [d3.sum(D, d => d.yAxis), d3.sum(D, d => d.nodeSize), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
                 (w) => w.week,
                 (d) => d.fileName,
                 (d) => d.author)
@@ -68,12 +68,12 @@ const drawGraph = (data, div) => {
 
                 // sum changes for all files in week
                 const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
-                    const totalLinesChanged = d3.sum(authorMap.values().map(x => x[0]))
-                    return { fileName, totalLinesChanged };
+                    const totalyAxis = d3.sum(authorMap.values().map(x => x[0]))
+                    return { fileName, totalyAxis };
                 })
 
                 // find top ten changed files in week
-                fileArray.sort((a, b) => b.totalLinesChanged - a.totalLinesChanged)
+                fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
                 const topTenFiles = fileArray.slice(0, 10).reverse() // reverse to have most changed files on top
 
 
@@ -102,7 +102,7 @@ const drawGraph = (data, div) => {
             //        .attr("transform", d => `translate(${d.x}, ${d.y})`)
             //
             //}
- 
+
             const end = () => {
                 var updated = false; // Flag to track if an update is needed
 
@@ -114,9 +114,9 @@ const drawGraph = (data, div) => {
 
                     if ((limitRight < (d.x) + graph_radius) || (limitLeft > (d.x) - graph_radius))  {
                         console.log(`x: ${d.x},\nweek: ${d.week},\nfilename: ${d.fileName},\nxscale(week): ${xScale(d.week) + xScale.bandwidth() / 2}`)
-                        updated = true; // Mark update as needed   
+                        updated = true; // Mark update as needed
 
-                    } 
+                    }
 
                 })
 
@@ -154,13 +154,13 @@ const drawGraph = (data, div) => {
                          // **Update Nodes' x Positions**
                         nodes.forEach(d => {
                             d.x = d.x * 1.2;
-                            
+
                         });
 
                         d3.selectAll(".singleDonut")
                             .data(nodes)
                             .attr("transform", d => `translate(${d.x}, ${d.y})`)
-                                            
+
 
             }*/
             }
@@ -171,15 +171,15 @@ const drawGraph = (data, div) => {
                 .force("collide", d3.forceCollide().radius(graph_radius))
                 //.on("tick", tick)
                 .on("end", end)
-            
+
             for (let i = 0; i < 300; i++) {
                 simulation.tick()
-                
+
             }
 
             nodes.forEach(d => buildPie(d, svg))
 
-        
+
 
     }
 
