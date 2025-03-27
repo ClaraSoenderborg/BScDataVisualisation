@@ -1,6 +1,6 @@
 const buildPie = (node, svg) => {
 
-    const {x, y, week, fileName, authorMap} = node
+    const {x, y, week, fileName, authorMap, nodeSize} = node
 
     const singleDonut = d3.select(".leftAxis").append("g")
         .attr("transform", `translate(${x}, ${y})`)
@@ -24,7 +24,7 @@ const buildPie = (node, svg) => {
 
         var arcGen = d3.arc()
             .innerRadius(donutHole)
-            .outerRadius(graph_radius)
+            .outerRadius(rScale(nodeSize))
 
 
         var arcs = singleDonut.selectAll()

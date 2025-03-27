@@ -15,8 +15,11 @@ const min_width = 700
 const max_graph_height = 500
 const min_graph_height = 300
 
-let globalMin = Infinity
-let globalMax= -Infinity
+let globalyMin = Infinity
+let globalyMax= -Infinity
+
+let globalNodeMin = Infinity
+let globalNodeMax= -Infinity
 
 //Legend
 var legendPadding
@@ -36,7 +39,7 @@ const reCalculateSizes = () => {
 
     margin = { top: window.innerWidth*0.005, right: 0, bottom: window.innerWidth*0.01, left: window.innerWidth * 0.07 }
     graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) - margin.top - margin.bottom
-    graph_radius = Math.min(width, graph_height) / 26
+    graph_radius = Math.min(width, graph_height) / 20
 
 
     //Legend

@@ -19,8 +19,9 @@ const drawGraph = (data, div, numberOfFiles) => {
 
                 // sum changes for all files in week
                 const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
+                    const totalNodeSize = d3.sum(authorMap.values().map(x => x[0]))
                     const totalyAxis = d3.sum(authorMap.values().map(x => x[1]))
-                    return { fileName, totalyAxis };
+                    return { fileName, totalyAxis, totalNodeSize};
 
                 })
 
@@ -28,15 +29,24 @@ const drawGraph = (data, div, numberOfFiles) => {
                 fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
                 const topFiles = fileArray.slice(0, numberOfFiles).reverse() // reverse to have most changed files on top
 
-                const min = d3.min(topFiles, d => d.totalyAxis)
-                const max = d3.max(topFiles, d => d.totalyAxis)
+                const yAxisMin = d3.min(topFiles, d => d.totalyAxis)
+                const yAxisMax = d3.max(topFiles, d => d.totalyAxis)
+                const nodeSizeMin = d3.min(topFiles, d => d.totalNodeSize)
+                const nodeSizeMax = d3.max(topFiles, d => d.totalNodeSize)
 
 
-                if (min < globalMin) {
-                    globalMin = min;
+                if (yAxisMin < globalyMin) {
+                    globalyMin = yAxisMin;
                     }
-                    if (max > globalMax) {
-                    globalMax = max;
+                    if (yAxisMax > globalyMax) {
+                    globalyMax = yAxisMax;
+                    }
+                
+                if (nodeSizeMin < globalNodeMin) {
+                    globalNodeMin = nodeSizeMin;
+                    }
+                    if (nodeSizeMax > globalNodeMax) {
+                        globalNodeMax = nodeSizeMax;
                     }
 
                 for (let i = 0; i < topFiles.length; i++) { // for loop for each file in a week
@@ -50,6 +60,7 @@ const drawGraph = (data, div, numberOfFiles) => {
                         week: week,
                         fileName: fileName,
                         authorMap: authorMap,
+                        nodeSize: topFiles[i].totalNodeSize
                         //totalLinesChanged: totalLinesChanged
                     })
 
@@ -57,7 +68,7 @@ const drawGraph = (data, div, numberOfFiles) => {
 
         })
 
-        defineScales(data, globalMax, globalMin)
+        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin)
 
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
@@ -127,7 +138,7 @@ const drawGraph = (data, div, numberOfFiles) => {
             const simulation = d3.forceSimulation(nodes)
                 .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
                 .force("y", d3.forceY(d => yScale(d.y)).strength(1))
-                .force("collide", d3.forceCollide().radius(graph_radius))
+                .force("collide", d3.forceCollide().radius(d =>rScale(d.nodeSize)))
                 //.on("tick", tick)
                 .on("end", end)
 
