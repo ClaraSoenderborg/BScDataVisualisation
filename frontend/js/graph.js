@@ -7,64 +7,64 @@ const drawGraph = (data, div, numberOfFiles) => {
     createTooltip(svg)
 
     const createGraph = () => {
-         const primaryGroup = d3.rollup(data,
-                (D) => [d3.sum(D, d => d.nodeSize), d3.sum(D, d => d.yAxis), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
-                (w) => w.week,
-                (d) => d.fileName,
-             (d) => d.author)
+        const primaryGroup = d3.rollup(data,
+            (D) => [d3.sum(D, d => d.nodeSize), d3.sum(D, d => d.yAxis), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
+            (w) => w.week,
+            (d) => d.fileName,
+            (d) => d.author)
 
         var nodes = []
 
         primaryGroup.forEach((fileMap, week) => {
 
-                // sum changes for all files in week
-                const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
-                    const totalNodeSize = d3.sum(authorMap.values().map(x => x[0]))
-                    const totalyAxis = d3.sum(authorMap.values().map(x => x[1]))
-                    return { fileName, totalyAxis, totalNodeSize};
+            // sum changes for all files in week
+            const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
+                const totalNodeSize = d3.sum(authorMap.values().map(x => x[0]))
+                const totalyAxis = d3.sum(authorMap.values().map(x => x[1]))
+                return { fileName, totalyAxis, totalNodeSize };
 
+            })
+
+            // find top ten changed files in week
+            fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
+            const topFiles = fileArray.slice(0, numberOfFiles).reverse() // reverse to have most changed files on top
+
+            const yAxisMin = d3.min(topFiles, d => d.totalyAxis)
+            const yAxisMax = d3.max(topFiles, d => d.totalyAxis)
+            const nodeSizeMin = d3.min(topFiles, d => d.totalNodeSize)
+            const nodeSizeMax = d3.max(topFiles, d => d.totalNodeSize)
+
+
+            if (yAxisMin < globalyMin) {
+                globalyMin = yAxisMin;
+            }
+            if (yAxisMax > globalyMax) {
+                globalyMax = yAxisMax;
+            }
+
+            if (nodeSizeMin < globalNodeMin) {
+                globalNodeMin = nodeSizeMin;
+            }
+            if (nodeSizeMax > globalNodeMax) {
+                globalNodeMax = nodeSizeMax;
+            }
+
+            for (let i = 0; i < topFiles.length; i++) { // for loop for each file in a week
+                const fileName = topFiles[i].fileName
+                const authorMap = fileMap.get(fileName)
+
+                //buildPie(authorMap, week, i, fileName, svg)
+                nodes.push({
+                    x: week,
+                    y: topFiles[i].totalyAxis,
+                    week: week,
+                    fileName: fileName,
+                    authorMap: authorMap,
+                    nodeSize: topFiles[i].totalNodeSize
+                    //totalLinesChanged: totalLinesChanged
                 })
 
-                // find top ten changed files in week
-                fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
-                const topFiles = fileArray.slice(0, numberOfFiles).reverse() // reverse to have most changed files on top
-
-                const yAxisMin = d3.min(topFiles, d => d.totalyAxis)
-                const yAxisMax = d3.max(topFiles, d => d.totalyAxis)
-                const nodeSizeMin = d3.min(topFiles, d => d.totalNodeSize)
-                const nodeSizeMax = d3.max(topFiles, d => d.totalNodeSize)
-
-
-                if (yAxisMin < globalyMin) {
-                    globalyMin = yAxisMin;
-                    }
-                    if (yAxisMax > globalyMax) {
-                    globalyMax = yAxisMax;
-                    }
-                
-                if (nodeSizeMin < globalNodeMin) {
-                    globalNodeMin = nodeSizeMin;
-                    }
-                    if (nodeSizeMax > globalNodeMax) {
-                        globalNodeMax = nodeSizeMax;
-                    }
-
-                for (let i = 0; i < topFiles.length; i++) { // for loop for each file in a week
-                    const fileName = topFiles[i].fileName
-                    const authorMap = fileMap.get(fileName)
-
-                    //buildPie(authorMap, week, i, fileName, svg)
-                    nodes.push({
-                        x: week,
-                        y: topFiles[i].totalyAxis,
-                        week: week,
-                        fileName: fileName,
-                        authorMap: authorMap,
-                        nodeSize: topFiles[i].totalNodeSize
-                        //totalLinesChanged: totalLinesChanged
-                    })
-
-                }
+            }
 
         })
 
@@ -82,9 +82,9 @@ const drawGraph = (data, div, numberOfFiles) => {
 
         // x-axis
         const bottomAxis = d3.axisBottom(xScale)
-        .tickSize(10)
-        .tickPadding(5)
-        .tickSizeOuter(0)
+            .tickSize(10)
+            .tickPadding(5)
+            .tickSizeOuter(0)
 
         const xAxisBackground = svg.append("g")
             .attr("class", "xAxisBackground");
@@ -118,24 +118,24 @@ const drawGraph = (data, div, numberOfFiles) => {
             .call(leftAxis)
 
 
-            // Chapter 12, Helge book.
-            const simulation = d3.forceSimulation(nodes)
-                .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
-                .force("y", d3.forceY(d => yScale(d.y)).strength(1))
-                .force("boundary", forceBoundary(
-                    (d) => xScale(d.x) + graph_radius,  // Min X boundary
-                    0 + graph_radius,  // Min Y (top)
-                    (d) => xScale(d.x) + xScale.bandwidth() - graph_radius,  // Max X boundary
-                    graph_height - graph_radius))  // Max Y (bottom)
-                .force("collide", d3.forceCollide().radius(d =>rScale(d.nodeSize)))
-                
+        // Chapter 12, Helge book.
+        const simulation = d3.forceSimulation(nodes)
+            .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth() / 2).strength(0.8))
+            .force("y", d3.forceY(d => yScale(d.y)).strength(1))
+            .force("boundary", forceBoundary(
+                (d) => xScale(d.x) + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min X boundary
+                (d) => 0 + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min Y (top)
+                (d) => xScale(d.x) + xScale.bandwidth() - rScale(d.nodeSize) - graph_bandwidth_padding,  // Max X boundary
+                (d) => graph_height - rScale(d.nodeSize) - graph_bandwidth_padding))  // Max Y (bottom)
+            .force("collide", d3.forceCollide().radius(d => rScale(d.nodeSize)))
 
-            for (let i = 0; i < 300; i++) {
-                simulation.tick()
 
-            }
+        for (let i = 0; i < 300; i++) {
+            simulation.tick()
 
-            nodes.forEach(d => buildPie(d, svg))
+        }
+
+        nodes.forEach(d => buildPie(d, svg))
 
     }
 
