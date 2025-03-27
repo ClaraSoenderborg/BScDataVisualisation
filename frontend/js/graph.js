@@ -5,6 +5,7 @@ const drawGraph = (data, div, numberOfFiles) => {
         .attr("class", "graphSVG")
 
     createTooltip(svg)
+    createSimpleTooltip(svg)
 
     const createGraph = () => {
          const primaryGroup = d3.rollup(data,
@@ -136,10 +137,15 @@ const drawGraph = (data, div, numberOfFiles) => {
             }
 
             const simulation = d3.forceSimulation(nodes)
-                .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
-                .force("y", d3.forceY(d => yScale(d.y)).strength(1))
+                .force("y", d3.forceY(d => yScale(d.y)))
+                .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2))
+                .force("boundary", forceBoundary(
+                    (d) => xScale(d.x) + graph_radius,  // Min X boundary
+                    0,  // Min Y (top)
+                    (d) => xScale(d.x) + xScale.bandwidth() - graph_radius,  // Max X boundary
+                    graph_height))  // Max Y (bottom)
                 .force("collide", d3.forceCollide().radius(d =>rScale(d.nodeSize)))
-                //.on("tick", tick)
+
                 .on("end", end)
 
             for (let i = 0; i < 300; i++) {

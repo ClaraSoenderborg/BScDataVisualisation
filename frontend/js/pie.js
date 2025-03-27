@@ -14,6 +14,14 @@ const buildPie = (node, svg) => {
             singleDonut.style("opacity", 0.5)
 
         })
+        .on("mouseover", (e, d) => {
+            showSimpleTooltip(e,d,fileName,svg)
+            singleDonut.style("opacity", 0.5)
+        })
+        .on("mouseout", (e, d) => {
+            d3.select(".simpleToolTip").style("visibility", "hidden");
+            singleDonut.style("opacity", 1)
+        });
 
     var pie = d3.pie().sort(null).value(([key, value]) => value[0])
 
