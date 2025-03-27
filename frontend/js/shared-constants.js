@@ -56,4 +56,21 @@ const reCalculateSizes = () => {
 
 }
 
+function calculateTooltipX(x, tooltipWidth) {
+    if (x > (width / 2 + margin.left)) { // clicked object is on right side
+        return x - tooltipWidth - graph_radius
+    } else {
+        return x + graph_radius // clicked object is on left side
+    }
+
+}
+
+function calculateTooltipY(y, tooltipHeight) {
+    const overflow = tooltipHeight + y - graph_height + graph_radius
+    if (overflow > 0) {
+        return y - overflow - tooltip_padding
+    }
+    return y + tooltip_padding
+}
+
 window.addEventListener("resize", reCalculateSizes)

@@ -1,4 +1,4 @@
-const createTooltip = (svg) => {
+const createClickTooltip = (svg) => {
 
     // Chapter 7 i bogen
     const toolTip = svg
@@ -22,12 +22,13 @@ const createTooltip = (svg) => {
     toolTip
         .append("text")
         .attr("class", "tooltipTitle")
-        .attr("x", tooltip_width / 2)
+        //.attr("x", tooltip_width / 2)
         .attr("y", 100)
     //.style("dominant-baseline", "hanging")
     //.attr("text-anchor", "middle")
     //.style("font-size", "4px")
 
+    // group for pie chart
     toolTip.append("g")
         .attr("class", "tooltip-donut")
         .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + tooltip_padding})`)
@@ -133,16 +134,7 @@ function wrapText(text) {
         .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + (line_height * lineNumber) + tooltip_padding})`)
 
 }
-function showTest (e,d,filename) {
-    d3.select(".tooltipTest")
-        .attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY(y)})`)
-        .style("visibility", "visible")
-        .raise()
-        .transition()
-        .duration(200)
-        .style("opacity", 1)
 
-}
 
 function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 
@@ -159,7 +151,7 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 
 
     d3.select(".toolTip")
-        .attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY(y)})`)
+        .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
         .style("visibility", "visible")
         .raise()
         .transition()
@@ -170,27 +162,10 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
         .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap))
 
 
-    createTooltip
+    createClickTooltip()
 }
 
-function calculateTooltipX(x) {
-    if (x > (width / 2 + margin.left)) { // clicked object is on right side
-        return x - tooltip_width - graph_radius
-    } else {
-        return x + graph_radius // clicked object is on left side
-    }
 
-}
-
-function calculateTooltipY(y) {
-    const overflow = tooltip_height + y - graph_height + graph_radius
-    if (overflow > 0){
-        return y - overflow - tooltip_padding
-    }
-    return y + tooltip_padding
-
-
-}
 
 //source: https://gist.github.com/dbuezas/9306799
 function buildTooltipChart(singleDonut, authorMap) {
@@ -259,7 +234,6 @@ function buildTooltipChart(singleDonut, authorMap) {
             const points = calculateLinePoints(d)
             const posEnd = points[2]
 
-
             return posEnd[0] > 0 ? "start" : "end"
         })
         .attr("fill", d => colorScale(d.data[0]))
@@ -280,76 +254,3 @@ function buildTooltipChart(singleDonut, authorMap) {
 
 }
 
-// Function to create a simple tooltip with the filename inside a rectangle
-// Function to create a simple tooltip with the filename inside a rectangle
-const createSimpleTooltip = (svg) => {
-    // Create tooltip group, initially hidden
-    const toolTip = svg
-        .append("g")
-        .attr("class", "simpleToolTip")
-        .style("visibility", "hidden")
-        .style("opacity", 0);  // Initially invisible
-
-    // Append a rectangle to the tooltip with white background
-    toolTip
-        .append("rect")
-        .attr("width", tooltip_width * 0.33) // Set the width of the tooltip
-        .attr("height", 30) // Set the height of the tooltip
-        .attr("rx", 5)  // Rounded corners
-        .attr("ry", 5)
-        .style("fill", "white") // White background
-        .style("fill-opacity", 1) // Ensure fill opacity is 1 for visibility
-        .style("stroke", "grey") // Grey border
-        .style("stroke-width", "1px")
-
-    // Append a text element to display the filename, initially empty
-    toolTip
-        .append("text")
-        .attr("class", "simpleTooltipText")
-        .attr("x", (tooltip_width * 0.33) * 0.5) 
-        .attr("y", 20) // Position it vertically in the middle of the rectangle
-        .style("text-anchor", "middle") // Align text to center
-        .style("font-size", "14px") // Set font size
-        .style("fill", "black"); // Text color to black (changeable as needed)
-};
-
-// Function to display the tooltip with the filename
-function showSimpleTooltip(e, d, fileName, svg) {
-    const toolTip = d3.select(".simpleToolTip");
-    const [x, y] = d3.pointer(e, svg.node()); // Get mouse coordinates
-    
-    // Set the text inside the tooltip to the filename
-    toolTip.select(".simpleTooltipText").text(fileName);
-
-    // Position the tooltip based on mouse position
-    toolTip.attr("transform", `translate(${calculateTooltipX(x)}, ${calculateTooltipY(y)})`)
-        .style("visibility", "visible")  // Show the tooltip
-        .transition()
-        .duration(200)
-        .style("opacity", 1);  // Fade in the tooltip
-}
-
-// Hide the tooltip when clicking anywhere outside
-d3.select(document).on("click", (e) => {
-    d3.select(".simpleToolTip").style("visibility", "hidden").style("opacity", 0);
-});
-
-// Calculate the tooltip's x position based on the mouse's x
-function calculateTooltipX(x) {
-    const tooltipWidth = 300; // Adjust the width of the tooltip as necessary
-    if (x > (width / 2 + margin.left)) { // If the mouse is on the right side
-        return x - tooltipWidth - graph_radius;
-    } else { // If the mouse is on the left side
-        return x + graph_radius;
-    }
-}
-
-// Calculate the tooltip's y position based on the mouse's y
-function calculateTooltipY(y) {
-    const tooltipHeight = 30; // Adjust the height of the tooltip as necessary
-    const overflow = tooltipHeight + y - graph_height + graph_radius;
-    if (overflow > 0) {
-        return y - overflow - tooltip_padding;
-    }
-    return y + tooltip_padding;
-}

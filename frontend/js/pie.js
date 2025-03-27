@@ -15,7 +15,7 @@ const buildPie = (node, svg) => {
 
         })
         .on("mouseover", (e, d) => {
-            showSimpleTooltip(e,d,fileName,svg)
+            showTooltipOnHover(e,d,fileName,svg)
             singleDonut.style("opacity", 0.5)
         })
         .on("mouseout", (e, d) => {

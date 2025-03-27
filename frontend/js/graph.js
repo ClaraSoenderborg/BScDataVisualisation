@@ -4,8 +4,8 @@ const drawGraph = (data, div, numberOfFiles) => {
         .append("svg")
         .attr("class", "graphSVG")
 
-    createTooltip(svg)
-    createSimpleTooltip(svg)
+    createClickTooltip(svg)
+    createHoverTooltip(svg)
 
     const createGraph = () => {
          const primaryGroup = d3.rollup(data,
