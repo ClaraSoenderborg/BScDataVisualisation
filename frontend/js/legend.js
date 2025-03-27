@@ -65,7 +65,7 @@ const createLegend = (data, div) => {
         const containerWidth = div.node().getBoundingClientRect().width;
 
         // Update viewBox dynamically based on window size
-        legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + margin.bottom}`);
+        legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + legendPadding}`);
 
     };
 

@@ -1,4 +1,4 @@
-const createContainer = (data, numberOfFiles) => {
+const createContainer = (data, metadata) => {
 
     const container = d3.select("#container")
 
@@ -11,7 +11,7 @@ const createContainer = (data, numberOfFiles) => {
     const legendDiv = innerContainer.append("div")
         .attr("class","legendDiv")
 
-    drawGraph(data, graphDiv, numberOfFiles)
+    drawGraph(data, graphDiv, metadata)
     createLegend(data, legendDiv)
 
 

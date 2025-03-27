@@ -1,4 +1,4 @@
-const drawGraph = (data, div, numberOfFiles) => {
+const drawGraph = (data, div, metadata) => {
 
     const svg = div
         .append("svg")
@@ -27,7 +27,7 @@ const drawGraph = (data, div, numberOfFiles) => {
 
             // find top ten changed files in week
             fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
-            const topFiles = fileArray.slice(0, numberOfFiles).reverse() // reverse to have most changed files on top
+            const topFiles = fileArray.slice(0, metadata.numberOfFiles).reverse() // reverse to have most changed files on top
 
             const yAxisMin = d3.min(topFiles, d => d.totalyAxis)
             const yAxisMax = d3.max(topFiles, d => d.totalyAxis)
@@ -79,6 +79,8 @@ const drawGraph = (data, div, numberOfFiles) => {
         svg.selectAll(".bottomAxis").remove()
         svg.selectAll(".leftAxis").remove()
         svg.selectAll(".xAxisBackground").remove()
+        svg.selectAll(".xAxisLabel").remove()
+        svg.selectAll(".yAxisLabel").remove()
 
         // x-axis
         const bottomAxis = d3.axisBottom(xScale)
@@ -101,10 +103,17 @@ const drawGraph = (data, div, numberOfFiles) => {
             .attr("opacity", 0.2)
 
         // Append x-axis
-        svg.append("g")
+        const bottomAxisGroup = svg.append("g")
             .attr("class", "bottomAxis")
             .attr("transform", `translate(${margin.left},${graph_height})`)
             .call(bottomAxis)
+
+        // x-axis label
+        svg.append("text")
+            .attr("class", "xAxisLabel")
+            .attr("x", margin.left + width / 2)
+            .attr("y", graph_height + margin.bottom)
+            .text("Weeks")
 
 
         // y-axis
@@ -116,6 +125,13 @@ const drawGraph = (data, div, numberOfFiles) => {
             .attr("class", "leftAxis")
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(leftAxis)
+
+        svg.append("text")
+            .attr("class", "yAxisLabel")
+            //.attr("x", margin.left)
+            //.attr("y", graph_height / 2)
+            .attr("transform", `translate(${margin.left * 0.25}, ${graph_height * 0.5}) rotate(-90)`)
+            .text(String(metadata.yAxis).charAt(0).toUpperCase() + String(metadata.yAxis).slice(1))
 
 
         // Chapter 12, Helge book.
