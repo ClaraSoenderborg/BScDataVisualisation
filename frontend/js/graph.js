@@ -119,28 +119,16 @@ const drawGraph = (data, div, numberOfFiles) => {
 
 
             // Chapter 12, Helge book.
-            const end = () => {
-                var updated = false; // Flag to track if an update is needed
-
-                nodes.forEach(d => {
-                    const limitRight = xScale(d.week) + (xScale.bandwidth())
-                    const limitLeft = xScale(d.week)
-
-                    if ((limitRight < (d.x) + graph_radius) || (limitLeft > (d.x) - graph_radius))  {
-                       //console.log(`x: ${d.x},\nweek: ${d.week},\nfilename: ${d.fileName},\nxscale(week): ${xScale(d.week) + xScale.bandwidth() / 2}`)
-                        updated = true; // Mark update as needed
-
-                    }
-
-                })
-            }
-
             const simulation = d3.forceSimulation(nodes)
                 .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth()/2).strength(0.8))
                 .force("y", d3.forceY(d => yScale(d.y)).strength(1))
+                .force("boundary", forceBoundary(
+                    (d) => xScale(d.x) + graph_radius,  // Min X boundary
+                    0 + graph_radius,  // Min Y (top)
+                    (d) => xScale(d.x) + xScale.bandwidth() - graph_radius,  // Max X boundary
+                    graph_height - graph_radius))  // Max Y (bottom)
                 .force("collide", d3.forceCollide().radius(d =>rScale(d.nodeSize)))
-                //.on("tick", tick)
-                .on("end", end)
+                
 
             for (let i = 0; i < 300; i++) {
                 simulation.tick()
