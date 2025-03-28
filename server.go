@@ -45,7 +45,7 @@ func serveCSV(w http.ResponseWriter, r *http.Request, dataLocation string, data 
 		var writer = csv.NewWriter(w)
 		defer writer.Flush()
 
-		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis","nodeSize", "fileName"})
+		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis","nodeSize", "fileName", "repoPath"})
 		var err = writer.WriteAll(data)
 		if err != nil {
 			http.Error(w, "Could not write CSV data", http.StatusInternalServerError)
@@ -67,7 +67,7 @@ func startServing(dataLocation string, data [][]string, metadata map[string]stri
 	mux.HandleFunc("/metadata", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		
+
 		// Encode metadata as JSON and send it
 		if err := json.NewEncoder(w).Encode(metadata); err != nil {
 			http.Error(w, "Failed to encode metadata", http.StatusInternalServerError)

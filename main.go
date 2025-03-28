@@ -14,7 +14,7 @@ var version = "dev"
 
 func main() {
 	// argument flags
-	var repoPath = flag.String("repoPath", "", "Mandatory: Path to repository")
+	var repoPath = flag.String("repoPath", "", "Mandatory: Path to repository. If more than one then seperate by comma without spacing")
 	var dataLocation = flag.String("dataLocation", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
 	var versionFlag = flag.Bool("version", false, "Show version")
 	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
@@ -56,21 +56,34 @@ Options:` + "\n" + `
 	}
 
 	var metadata = map[string]string{"numberOfFiles":*numberOfFiles, "yAxis":*yAxis, "nodeSize":*nodeSize}
-	
 
-	var rawData = callGitLog(*repoPath)
-	var res = parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize)
+	var allRepos[] string = strings.Split(*repoPath, ",")
 
-	// if data should be saved locally at specified path
-	if *dataLocation != "" {
-		var fixedPath = strings.TrimSuffix(*dataLocation, "/") + "/data.csv"
-		fmt.Printf("Saving data file at: " + fixedPath + "\n")
+	fmt.Println(allRepos)
 
-		writeToCSVFile(res, fixedPath)
-		setUpServer(fixedPath, nil, metadata)
+	var res [][] string
+	for _, item := range allRepos{
+		fmt.Println(item)
+	var rawData = callGitLog(item)
+	parsedData := parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize, item)
 
-	} else { // if data should be immediately served at /data.csv
-		setUpServer("", res, metadata)
+	for _, row := range parsedData {
+        res = append(res, row)
+    }
+
+	fmt.Println(res)
+
 	}
+		// if data should be saved locally at specified path
+		if *dataLocation != "" {
+			var fixedPath = strings.TrimSuffix(*dataLocation, "/") + "/data.csv"
+			fmt.Printf("Saving data file at: " + fixedPath + "\n")
+
+			writeToCSVFile(res, fixedPath)
+			setUpServer(fixedPath, nil, metadata)
+
+		} else { // if data should be immediately served at /data.csv
+			setUpServer("", res, metadata)
+		}
 
 }

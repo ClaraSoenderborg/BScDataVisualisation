@@ -14,16 +14,19 @@ import (
 )
 
 func callGitLog(repoPath string) string {
-	var script = `git -C %s log --pretty=format:"%%h %%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
 
-	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
+		var script = `git -C %s log --pretty=format:"%%h %%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
 
-	var output, err = cmd.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Could not execute command")
-	}
+		var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
 
-	return string(output)
+		var output, err = cmd.CombinedOutput()
+		if err != nil {
+			fmt.Printf("Could not execute command")
+		}
+
+		return string(output)
+
+
 }
 
 func parseCoAuthors(author string) []string {
@@ -60,7 +63,7 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, yAxis string, nodeSize string) [][]string {
+func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
 	var commitSha, timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
@@ -110,7 +113,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 
 					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue), fileName})
+						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue), fileName, repoPath})
 					}
 				}
 				}
@@ -178,7 +181,7 @@ func writeToCSVFile(list [][]string, location string) {
 	defer file.Close()
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis", "nodeSize", "fileName"})
+	writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis", "nodeSize", "fileName", "repoPath"})
 	writer.WriteAll(list)
 
 }
