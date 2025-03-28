@@ -6,7 +6,8 @@ var donutHole = 0.0
 var graph_height
 var graph_bandwidth_padding 
 
-var line_height
+var click_line_height
+var hover_line_height
 var label_height
 
 
@@ -48,8 +49,8 @@ const reCalculateSizes = () => {
     legendPadding = window.innerWidth * 0.045
 
     //ToolTip
-    line_height = Math.min(window.innerHeight, window.innerWidth) * 0.03
-    label_height = Math.min(window.innerHeight, window.innerWidth) * 0.02
+    click_line_height = Math.min(window.innerHeight, window.innerWidth) * 0.03
+    label_height = Math.min(window.innerHeight, window.innerWidth) * 0.03
     tooltip_width = width * 0.5
     tooltip_height = tooltip_width * 0.6
     tooltip_padding = tooltip_width * 0.02
@@ -76,3 +77,51 @@ function calculateTooltipY(y, tooltipHeight) {
 }
 
 window.addEventListener("resize", reCalculateSizes)
+
+
+// Wrap text to next line in toolTip
+function wrapText(textElement, text, maxWidth, lineHeight) {
+    textElement.text("") // Set the full text initially
+
+    var segments = text.split("/"); // Split at "/"
+    var currentLine = ""
+    var lineNumber = 0
+    var start_x = parseFloat(textElement.attr("x"))
+    var start_y = parseFloat(textElement.attr("y"))
+
+    segments.forEach((segment) => {
+        var newLine = currentLine ? currentLine + "/" + segment : segment; // Keep adding segments
+
+        // Create a temporary invisible text element to measure width
+        var tempText = textElement.append("tspan").text(newLine)
+        var textWidth = tempText.node().getComputedTextLength()
+        tempText.remove() // Remove temp element after measuring
+
+        if (textWidth > maxWidth) {
+            // If the current line exceeds max width, finalize the previous line and start a new one
+            if (currentLine) {
+                textElement.append("tspan")
+                    .attr("x", start_x) // Center text
+                    .attr("y", start_y + lineHeight * lineNumber)
+                    .attr("text-anchor", "start")
+                    .style("dominant-baseline", "hanging")
+                    .text(currentLine);
+                lineNumber++;
+            }
+            currentLine = "/" + segment; // Start a new line with the current segment
+        } else {
+            currentLine = newLine; // Continue adding to the same line
+        }
+    })
+
+    // Append the last remaining line
+    textElement.append("tspan")
+        .attr("x", start_x) // Center text
+        .attr("y", start_y + lineHeight * lineNumber)
+        .attr("text-anchor", "start")
+        .style("dominant-baseline", "hanging")
+        .text(currentLine)
+
+    return lineNumber
+
+}

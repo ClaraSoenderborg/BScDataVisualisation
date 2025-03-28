@@ -10,7 +10,7 @@ const buildPie = (node, svg) => {
         .attr("class", "singleDonut")
         .on("click", (e, d) => {
 
-            showTooltipOnClick(e, d, fileName, authorMap, svg)
+            showTooltipOnClick(e, fileName, authorMap, svg, nodeSize)
             singleDonut.style("opacity", 0.5)
 
         })
@@ -23,7 +23,7 @@ const buildPie = (node, svg) => {
             singleDonut.style("opacity", 1)
         });
 
-    var pie = d3.pie().sort(null).value(([key, value]) => value[0])
+    var pie = d3.pie().sort(null).value(([key, value]) => value.get("nodeSize"))
 
     const preparedPie = pie(authorMap)
 

@@ -4,12 +4,17 @@ const drawGraph = (data, div, metadata) => {
         .append("svg")
         .attr("class", "graphSVG")
 
-    createClickTooltip(svg)
+    createClickTooltip(svg, metadata)
     createHoverTooltip(svg)
 
     const createGraph = () => {
         const primaryGroup = d3.rollup(data,
-            (D) => [d3.sum(D, d => d.nodeSize), d3.sum(D, d => d.yAxis), d3.sum(D, d => d.linesAdded), d3.sum(D, d => d.linesDeleted)],
+            (D) => new Map([
+                ["yAxis", d3.sum(D, d => d.yAxis)], 
+                ["nodeSize", d3.sum(D, d => d.nodeSize)],
+                ["linesAdded", d3.sum(D, d => d.linesAdded)], 
+                ["linesDeleted", d3.sum(D, d => d.linesDeleted)],
+            ]),
             (w) => w.week,
             (d) => d.fileName,
             (d) => d.author)
@@ -20,8 +25,8 @@ const drawGraph = (data, div, metadata) => {
 
             // sum changes for all files in week
             const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
-                const totalNodeSize = d3.sum(authorMap.values().map(x => x[0]))
-                const totalyAxis = d3.sum(authorMap.values().map(x => x[1]))
+                const totalNodeSize = d3.sum(authorMap.values().map(x => x.get("nodeSize")))
+                const totalyAxis = d3.sum(authorMap.values().map(x => x.get("yAxis")))
                 return { fileName, totalyAxis, totalNodeSize };
 
             })
@@ -54,7 +59,6 @@ const drawGraph = (data, div, metadata) => {
                 const fileName = topFiles[i].fileName
                 const authorMap = fileMap.get(fileName)
 
-                //buildPie(authorMap, week, i, fileName, svg)
                 nodes.push({
                     x: week,
                     y: topFiles[i].totalyAxis,
@@ -62,7 +66,6 @@ const drawGraph = (data, div, metadata) => {
                     fileName: fileName,
                     authorMap: authorMap,
                     nodeSize: topFiles[i].totalNodeSize
-                    //totalLinesChanged: totalLinesChanged
                 })
 
             }

@@ -1,9 +1,12 @@
-const createClickTooltip = (svg) => {
+var setMetadata
+
+const createClickTooltip = (svg, metadata) => {
+
+    setMetadata = metadata
 
     // Chapter 7 i bogen
     const toolTip = svg
         .append("g")
-        //.style("opacity", 0)
         .attr("class", "toolTip")
         .style("visibility", "hidden")
 
@@ -22,16 +25,20 @@ const createClickTooltip = (svg) => {
     toolTip
         .append("text")
         .attr("class", "tooltipTitle")
-        //.attr("x", tooltip_width / 2)
-        .attr("y", 100)
-    //.style("dominant-baseline", "hanging")
-    //.attr("text-anchor", "middle")
-    //.style("font-size", "4px")
+        .attr("x", tooltip_padding)
+        .attr("y", tooltip_padding)
 
     // group for pie chart
     toolTip.append("g")
         .attr("class", "tooltip-donut")
         .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + tooltip_padding})`)
+
+    toolTip.append("text")
+        .attr("class", "tooltipTotal")
+        .attr("x", tooltip_width - tooltip_padding)
+        .attr("y", tooltip_padding)
+        .attr("text-anchor", "end")
+        .style("dominant-baseline", "hanging")
 
 
     // Hide the tooltip when clicking anywhere on the page except on the donuts
@@ -76,79 +83,38 @@ function closeTooltip(e) {
 }
 
 
-
-
-
-// wrap text to next line in toolTip - very chatty
-function wrapText(text) {
-    const textElement = d3.select(".toolTip text")
-    textElement.text("") // Set the full text initially
-
-    let segments = text.split("/"); // Split at "/"
-    let currentLine = "";
-    let lineNumber = 0;
-    let start_x = tooltip_padding
-    let start_y = tooltip_padding
-
-    segments.forEach((segment, index) => {
-        let newLine = currentLine ? currentLine + "/" + segment : segment; // Keep adding segments
-
-        // Create a temporary invisible text element to measure width
-        let tempText = textElement.append("tspan").text(newLine);
-        let textWidth = tempText.node().getComputedTextLength();
-        tempText.remove(); // Remove temp element after measuring
-
-        if (textWidth > tooltip_max_width
-        ) {
-            // If the current line exceeds max width, finalize the previous line and start a new one
-            if (currentLine) {
-                textElement.append("tspan")
-                    .attr("x", start_x) // Center text
-                    .attr("y", start_y + line_height * lineNumber)
-                    .attr("text-anchor", "start")
-                    .style("dominant-baseline", "hanging")
-                    .text(currentLine);
-                lineNumber++;
-            }
-            currentLine = "/" + segment; // Start a new line with the current segment
-        } else {
-            currentLine = newLine; // Continue adding to the same line
-        }
-    });
-
-    // Append the last remaining line
-    textElement.append("tspan")
-        .attr("x", start_x) // Center text
-        .attr("y", start_y + line_height * lineNumber)
-        .attr("text-anchor", "start")
-        .style("dominant-baseline", "hanging")
-        .text(currentLine);
-
+// When text is wrapped, make tooltip larger
+function adjustTooltipHeight(lineNumber) {
     // Update the tooltip background size
     d3.select(".toolTip rect")
-        .attr("height", tooltip_height + (lineNumber * line_height))
+        .attr("height", tooltip_height + (lineNumber * click_line_height))
         .attr("width", tooltip_width)
 
-    // Ensure the donut chart remains centered within the new tooltip height
-    d3.select(".tooltip-donut")
-        .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + (line_height * lineNumber) + tooltip_padding})`)
+     // Ensure the donut chart remains centered within the new tooltip height
+     d3.select(".tooltip-donut")
+     .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + (click_line_height * lineNumber) + tooltip_padding})`)
 
 }
 
 
-function showTooltipOnClick(e, d, fileName, authorMap, svg) {
+function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
     // close previous tooltip and recalculate shared variables
     closeTooltip(e)
     reCalculateSizes()
 
     const [x, y] = d3.pointer(e, svg.node())
-    console.log(`x: ${x}`)
-    console.log(`y: ${y}`)
 
-    d3.select(".toolTip text")
-        .call(() => wrapText(fileName))
 
+    const totalText = d3.select(".tooltipTotal")
+        .text(`Total ${setMetadata.nodeSize}: ${nodeSize}`)
+    
+    const totalTextLength = totalText.node().getComputedTextLength()
+
+    const element = d3.select(".tooltipTitle")
+
+    const retLineNumber = wrapText(element, fileName, tooltip_max_width-totalTextLength, click_line_height)
+    adjustTooltipHeight(retLineNumber)
 
     d3.select(".toolTip")
         .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
@@ -160,9 +126,6 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 
     d3.select(".toolTip-donut")
         .call(() => buildTooltipChart(d3.select(".tooltip-donut"), authorMap))
-
-
-    createClickTooltip()
 }
 
 
@@ -170,7 +133,7 @@ function showTooltipOnClick(e, d, fileName, authorMap, svg) {
 //source: https://gist.github.com/dbuezas/9306799
 function buildTooltipChart(singleDonut, authorMap) {
 
-    var pie = d3.pie().sort(null).value(([key, value]) => value[0])
+    var pie = d3.pie().sort(null).value(([key, value]) => value.get("nodeSize"))
     const preparedPie = pie(authorMap);
 
     var arcGen = d3.arc()
@@ -212,7 +175,10 @@ function buildTooltipChart(singleDonut, authorMap) {
     // Add polylines for labels
     arcs.append("polyline")
         .attr("class", "labelLines")
-        .attr("points", d => calculateLinePoints(d).map(p => p.join(",")).join(" "))
+        .attr("points", function(d){
+            d.calcPoints = calculateLinePoints(d)
+            return d.calcPoints.map(p => p.join(",")).join(" ")
+        } )
         .style("fill", "none")
         .style("stroke", "dimgrey")
         .style("stroke-width", "1px");
@@ -223,7 +189,7 @@ function buildTooltipChart(singleDonut, authorMap) {
     arcs.append("text")
         .attr("class", "labelText")
         .attr("transform", d => {
-            const points = calculateLinePoints(d)
+            const points = d.calcPoints
             const posEnd = points[2]
 
             posEnd[0] += (posEnd[0] > 0 ? 2 : -2); // padding between line and label
@@ -231,17 +197,21 @@ function buildTooltipChart(singleDonut, authorMap) {
             return `translate(${posEnd})`;
         })
         .attr("text-anchor", function (d) {
-            const points = calculateLinePoints(d)
+            const points = d.calcPoints
             const posEnd = points[2]
 
             return posEnd[0] > 0 ? "start" : "end"
         })
+        .style("dominant-baseline", "middle")
         .attr("fill", d => colorScale(d.data[0]))
         .each(function (d) {
-            const textElement = d3.select(this);
+            console.log(d.data)
+            if(setMetadata.nodeSize === "churn") {
+            const textElement = d3.select(this)
+
             const lines = [
-                `Lines added: ${d.data[1][1]}`,
-                `Lines deleted: ${d.data[1][2]}`
+                `Lines added: ${d.data[1].get("linesAdded")}`,
+                `Lines deleted: ${d.data[1].get("linesDeleted")}`
             ];
             textElement.selectAll("tspan")
                 .data(lines)
@@ -250,6 +220,13 @@ function buildTooltipChart(singleDonut, authorMap) {
                 .attr("x", 0)
                 .attr("dy", (d, i) => i === 0 ? "0em" : "1.2em") // Space between lines
                 .text(d => d);
+            } else if(setMetadata.nodeSize === "growth") {
+                const textElement = d3.select(this)
+                textElement.text(`Growth: ${d.data[1].get("nodeSize")}`)
+            } else if(setMetadata.nodeSize === "commit") {
+                const textElement = d3.select(this)
+                textElement.text(`Commits: ${d.data[1].get("nodeSize")}`)
+            }   
         })
 
 }
