@@ -116,7 +116,7 @@ const drawGraph = (data, div, metadata) => {
         svg.append("text")
             .attr("class", "xAxisLabel")
             .attr("x", margin.left + width / 2)
-            .attr("y", graph_height + margin.bottom)
+            .attr("y", graph_height + bottomAxisGroup.node().getBBox().height + margin.bottom * 0.5)
             .text("Weeks")
 
 

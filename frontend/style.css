@@ -6,23 +6,11 @@
     min-width: 750px;
 }
 
-.innerContainer {
-    /*width: 100%;*/
-    /* Make the container take full width */
 
+
+.xAxisLabel, .yAxisLabel{
+    font-size: 2vmin;
 }
-
-/*.graphDiv, .legendDiv{
-}*/
-
-
-
-/*
-.graphSVG, .legendSVG {
-    width: 100%;
-    height: auto;
-}*/
-
 
 .leftAxis, .bottomAxis {
     font-size: 2vmin; /* Changed */
