@@ -55,6 +55,9 @@ Options:` + "\n" + `
 		log.Fatal("nodeSize argument must be churn, growth or commit")
 	}
 
+	var metadata = map[string]string{"numberOfFiles":*numberOfFiles, "yAxis":*yAxis, "nodeSize":*nodeSize}
+	
+
 	var rawData = callGitLog(*repoPath)
 	var res = parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize)
 
@@ -64,10 +67,10 @@ Options:` + "\n" + `
 		fmt.Printf("Saving data file at: " + fixedPath + "\n")
 
 		writeToCSVFile(res, fixedPath)
-		setUpServer(fixedPath, nil, *numberOfFiles)
+		setUpServer(fixedPath, nil, metadata)
 
 	} else { // if data should be immediately served at /data.csv
-		setUpServer("", res, *numberOfFiles)
+		setUpServer("", res, metadata)
 	}
 
 }

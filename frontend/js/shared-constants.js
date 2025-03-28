@@ -4,6 +4,7 @@ var margin
 var graph_radius
 var donutHole = 0.0
 var graph_height
+var graph_bandwidth_padding 
 
 var line_height
 var label_height
@@ -37,9 +38,10 @@ const reCalculateSizes = () => {
     height = window.innerHeight * 0.8
     width = Math.max(min_width, window.innerWidth * 0.9)
 
-    margin = { top: window.innerWidth*0.005, right: 0, bottom: window.innerWidth*0.01, left: window.innerWidth * 0.07 }
-    graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) - margin.top - margin.bottom
+    margin = { top: window.innerWidth*0.005, right: 0, bottom: window.innerWidth*0.035, left: window.innerWidth * 0.07 }
+    graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) //- margin.top - margin.bottom
     graph_radius = Math.min(width, graph_height) / 20
+    graph_bandwidth_padding = graph_radius * 0.15
 
 
     //Legend
