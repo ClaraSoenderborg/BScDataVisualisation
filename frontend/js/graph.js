@@ -19,7 +19,6 @@ const drawGraph = (data, div, metadata) => {
             (d) => d.author)
 
         var nodes = []
-
         primaryGroup.forEach((fileMap, week) => {
 
             // sum changes for all files in week
@@ -137,8 +136,8 @@ const drawGraph = (data, div, metadata) => {
             //.attr("y", graph_height / 2)
             .attr("transform", `translate(${margin.left * 0.25}, ${graph_height * 0.5}) rotate(-90)`)
             .text(String(metadata.yAxis).charAt(0).toUpperCase() + String(metadata.yAxis).slice(1))
-
-
+        
+         
         // Chapter 12, Helge book.
         const simulation = d3.forceSimulation(nodes)
             .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth() / 2).strength(0.8))
@@ -149,14 +148,13 @@ const drawGraph = (data, div, metadata) => {
                 (d) => xScale(d.x) + xScale.bandwidth() - rScale(d.nodeSize) - graph_bandwidth_padding,  // Max X boundary
                 (d) => graph_height - rScale(d.nodeSize) - graph_bandwidth_padding))  // Max Y (bottom)
             .force("collide", d3.forceCollide().radius(d => rScale(d.nodeSize)))
-
-
+         
         for (let i = 0; i < 300; i++) {
             simulation.tick()
 
         }
 
-        nodes.forEach(d => buildPie(d, svg))
+        nodes.forEach(d => buildPie(d,svg))
 
     }
 
