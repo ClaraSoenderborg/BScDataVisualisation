@@ -7,7 +7,7 @@ const createClickTooltip = (svg, metadata) => {
     // Chapter 7 i bogen
     const toolTip = svg
         .append("g")
-        .attr("class", "toolTip")
+        .attr("class", "clickTooltip")
         .style("visibility", "hidden")
 
 
@@ -35,8 +35,6 @@ const createClickTooltip = (svg, metadata) => {
 
     toolTip.append("text")
         .attr("class", "tooltipTotal")
-        .attr("x", tooltip_width - tooltip_padding)
-        .attr("y", tooltip_padding)
         .attr("text-anchor", "end")
         .style("dominant-baseline", "hanging")
 
@@ -44,7 +42,7 @@ const createClickTooltip = (svg, metadata) => {
     // Hide the tooltip when clicking anywhere on the page except on the donuts
     d3.select(document).on("click", (e, d) => {
 
-        d3.select(".toolTip")
+        d3.select(".clickTooltip")
             .style("visibility", "hidden")
 
         d3.selectAll(".singleDonut")
@@ -53,7 +51,7 @@ const createClickTooltip = (svg, metadata) => {
 
     })
 
-    d3.select(".toolTip")
+    d3.select(".clickTooltip")
         .on("click", (e) => {
             e.stopPropagation()
         })
@@ -70,7 +68,7 @@ function closeTooltip(e) {
     d3.selectAll(".singleDonut")
         .style("opacity", 1)
 
-    d3.select(".toolTip")
+    d3.select(".clickTooltip")
         .style("visibility", "hidden")
 
     d3.selectAll(".details text").remove()
@@ -86,13 +84,13 @@ function closeTooltip(e) {
 // When text is wrapped, make tooltip larger
 function adjustTooltipHeight(lineNumber) {
     // Update the tooltip background size
-    d3.select(".toolTip rect")
+    d3.select(".clickTooltip rect")
         .attr("height", tooltip_height + (lineNumber * click_line_height))
         .attr("width", tooltip_width)
 
-     // Ensure the donut chart remains centered within the new tooltip height
-     d3.select(".tooltip-donut")
-     .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + (click_line_height * lineNumber) + tooltip_padding})`)
+    // Ensure the donut chart remains centered within the new tooltip height
+    d3.select(".tooltip-donut")
+        .attr("transform", `translate(${tooltip_width / 2},${tooltip_height / 2 + (click_line_height * lineNumber) + tooltip_padding})`)
 
 }
 
@@ -108,15 +106,24 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
     const totalText = d3.select(".tooltipTotal")
         .text(`Total ${setMetadata.nodeSize}: ${nodeSize}`)
-    
+        .attr("x", tooltip_width - tooltip_padding)
+        .attr("y", tooltip_padding)
+
+
     const totalTextLength = totalText.node().getComputedTextLength()
 
     const element = d3.select(".tooltipTitle")
 
-    const retLineNumber = wrapText(element, fileName, tooltip_max_width-totalTextLength, click_line_height)
+    const retLineNumber = wrapText(
+        element,
+        fileName,
+        tooltip_max_width - totalTextLength - tooltip_padding,
+        click_line_height
+    )
+
     adjustTooltipHeight(retLineNumber)
 
-    d3.select(".toolTip")
+    d3.select(".clickTooltip")
         .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
         .style("visibility", "visible")
         .raise()
@@ -175,10 +182,10 @@ function buildTooltipChart(singleDonut, authorMap) {
     // Add polylines for labels
     arcs.append("polyline")
         .attr("class", "labelLines")
-        .attr("points", function(d){
+        .attr("points", function (d) {
             d.calcPoints = calculateLinePoints(d)
             return d.calcPoints.map(p => p.join(",")).join(" ")
-        } )
+        })
         .style("fill", "none")
         .style("stroke", "dimgrey")
         .style("stroke-width", "1px");
@@ -206,27 +213,27 @@ function buildTooltipChart(singleDonut, authorMap) {
         .attr("fill", d => colorScale(d.data[0]))
         .each(function (d) {
             console.log(d.data)
-            if(setMetadata.nodeSize === "churn") {
-            const textElement = d3.select(this)
+            if (setMetadata.nodeSize === "churn") {
+                const textElement = d3.select(this)
 
-            const lines = [
-                `Lines added: ${d.data[1].get("linesAdded")}`,
-                `Lines deleted: ${d.data[1].get("linesDeleted")}`
-            ];
-            textElement.selectAll("tspan")
-                .data(lines)
-                .enter()
-                .append("tspan")
-                .attr("x", 0)
-                .attr("dy", (d, i) => i === 0 ? "0em" : "1.2em") // Space between lines
-                .text(d => d);
-            } else if(setMetadata.nodeSize === "growth") {
+                const lines = [
+                    `Lines added: ${d.data[1].get("linesAdded")}`,
+                    `Lines deleted: ${d.data[1].get("linesDeleted")}`
+                ];
+                textElement.selectAll("tspan")
+                    .data(lines)
+                    .enter()
+                    .append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", (d, i) => i === 0 ? "0em" : "1.2em") // Space between lines
+                    .text(d => d);
+            } else if (setMetadata.nodeSize === "growth") {
                 const textElement = d3.select(this)
                 textElement.text(`Growth: ${d.data[1].get("nodeSize")}`)
-            } else if(setMetadata.nodeSize === "commit") {
+            } else if (setMetadata.nodeSize === "commit") {
                 const textElement = d3.select(this)
                 textElement.text(`Commits: ${d.data[1].get("nodeSize")}`)
-            }   
+            }
         })
 
 }
