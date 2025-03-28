@@ -20,7 +20,6 @@ const buildPie = (node, svg) => {
                 singleDonut.style("opacity", 0.5)
             }
 
-            
         })
         .on("mouseout", (e, d) => {
             if (d3.select(".clickTooltip").style("visibility") !== "visible"){
