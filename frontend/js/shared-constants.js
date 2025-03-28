@@ -16,12 +16,6 @@ const min_width = 700
 const max_graph_height = 500
 const min_graph_height = 300
 
-let globalyMin = Infinity
-let globalyMax= -Infinity
-
-let globalNodeMin = Infinity
-let globalNodeMax= -Infinity
-
 //Legend
 var legendPadding
 

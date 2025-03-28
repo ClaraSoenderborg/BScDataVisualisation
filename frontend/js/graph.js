@@ -1,4 +1,9 @@
 const drawGraph = (data, div, metadata) => {
+    let globalyMin = Infinity
+    let globalyMax= -Infinity
+
+    let globalNodeMin = Infinity
+    let globalNodeMax= -Infinity
 
     const svg = div
         .append("svg")

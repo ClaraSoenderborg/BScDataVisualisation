@@ -59,19 +59,15 @@ Options:` + "\n" + `
 
 	var allRepos[] string = strings.Split(*repoPath, ",")
 
-	fmt.Println(allRepos)
 
 	var res [][] string
 	for _, item := range allRepos{
-		fmt.Println(item)
 	var rawData = callGitLog(item)
 	parsedData := parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize, item)
 
 	for _, row := range parsedData {
         res = append(res, row)
     }
-
-	fmt.Println(res)
 
 	}
 		// if data should be saved locally at specified path
