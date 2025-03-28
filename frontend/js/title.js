@@ -7,8 +7,8 @@ const createTitle = (data, div) => {
 
     title.append("text")
         .attr("class", "title-text")
-        .attr("x", "50%") // Center horizontally
-        .attr("y", "50%") // Center vertically
+        .attr("x", "2%") 
+        .attr("y", "50%") 
         .text(titles); 
 
 
