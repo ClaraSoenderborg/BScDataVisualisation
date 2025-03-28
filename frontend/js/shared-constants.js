@@ -6,11 +6,6 @@ var donutHole = 0.0
 var graph_height
 var graph_bandwidth_padding 
 
-var click_line_height
-var hover_line_height
-var label_height
-
-
 const min_width = 700
 
 //Graph
@@ -26,12 +21,22 @@ let globalNodeMax= -Infinity
 //Legend
 var legendPadding
 
-//Tooltip
+//ClickTooltip
 var tooltip_padding
 var tooltip_width
 var tooltip_height
 var tooltip_max_width
 var toolTip_radius
+var click_line_height
+var label_height
+
+//HoverTooltip
+var hover_tooltip_width
+var hover_tooltip_height
+var hover_line_height
+var hover_tooltip_max_width
+var hover_tooltip_padding
+
 
 const reCalculateSizes = () => {
 
@@ -56,6 +61,15 @@ const reCalculateSizes = () => {
     tooltip_padding = tooltip_width * 0.02
     tooltip_max_width = tooltip_width - tooltip_padding * 2
     toolTip_radius = tooltip_height * 0.25
+
+    //hover tooltip
+    hover_tooltip_width = width * 0.25
+    hover_tooltip_padding = hover_tooltip_width * 0.02
+    hover_tooltip_max_width = hover_tooltip_width - hover_tooltip_padding * 2
+    hover_line_height = Math.min(window.innerHeight, window.innerWidth) * 0.02
+    hover_tooltip_height = hover_line_height + hover_tooltip_padding 
+    
+
 
 }
 

@@ -38,8 +38,23 @@
 
 .tooltipTitle {
     font-size: 3vmin;
-    
 }
+.tooltipTotal{
+    font-size: 2vmin;
+}
+
+/* hover tooltip */
+.hoverTooltipText{
+    font-size: 2vmin;
+    dominant-baseline: hanging;
+}
+
+.hoverTooltipBox{
+    fill: #f5f1ff;
+    stroke: lightgray;
+    stroke-width: 1px;
+}
+
 
 /* Legend */
 .legend-background{

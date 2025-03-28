@@ -7,39 +7,52 @@ const createHoverTooltip = (svg) => {
 
     toolTip
         .append("rect")
-        .attr("width", 300) 
-        .attr("height", 30) 
-        .attr("rx", 5) 
+        .attr("class", "hoverTooltipBox")
+        .attr("width", hover_tooltip_width)
+        .attr("height", hover_tooltip_height)
+        .attr("rx", 5)
         .attr("ry", 5)
-        .style("fill", "white")
+        //.style("fill", "periwinkle")
 
 
     toolTip
         .append("text")
         .attr("class", "hoverTooltipText")
-        .attr("y", tooltip_padding) 
-        .attr("x", tooltip_padding) 
-        .style("font-size", "14px") 
-        .style("fill", "black") 
+        .attr("y", hover_tooltip_padding)
+        .attr("x", hover_tooltip_padding)
 };
 
-function showTooltipOnHover(e, d, fileName, svg) {
+function showTooltipOnHover(e, fileName, svg) {
     const toolTip = d3.select(".hoverToolTip")
     const [x, y] = d3.pointer(e, svg.node())
 
-    toolTip.select(".hoverTooltipText").text(fileName);
+    d3.select(".hoverTooltipBox")
+        .attr("width", hover_tooltip_width)
+        .attr("height", hover_tooltip_height)
+
+    const element = d3.select(".hoverTooltipText")
+
+    const lineNumber = wrapText(element, fileName, hover_tooltip_max_width, hover_line_height)
+    adjustHoverTooltipHeight(lineNumber)
 
     toolTip
-        .attr("transform", `translate(${calculateTooltipX(x, 300)}, ${calculateTooltipY(y, 30)})`)
-        .style("visibility", "visible")  
+        .attr("transform", `translate(${calculateTooltipX(x, hover_tooltip_width)}, ${calculateTooltipY(y, hover_tooltip_height)})`)
+        .style("visibility", "visible")
         .raise()
         .transition()
         .duration(200)
-        .style("opacity", 1); 
+        .style("opacity", 1);
 }
 
 d3.select(document).on("click", (e) => {
     d3.select(".hoverToolTip").style("visibility", "hidden").style("opacity", 0);
 });
+
+function adjustHoverTooltipHeight(lineNumber) {
+    // Update the tooltip background size
+    d3.select(".hoverTooltipBox")
+        .attr("height", hover_tooltip_height + (lineNumber * (hover_line_height + hover_tooltip_padding)))
+        .attr("width", hover_tooltip_width)
+}
 
 

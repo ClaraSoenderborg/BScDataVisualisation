@@ -4,8 +4,6 @@ const buildPie = (node, svg) => {
 
     const singleDonut = d3.select(".leftAxis").append("g")
         .attr("transform", `translate(${x}, ${y})`)
-        ///.attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(totalLinesChanged)})`)
-        //.attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
         .style("opacity", 1)
         .attr("class", "singleDonut")
         .on("click", (e, d) => {
@@ -18,7 +16,7 @@ const buildPie = (node, svg) => {
         .on("mouseover", (e, d) => {
             console.log(d3.select(".clickTooltip").style("visibility"))
             if (d3.select(".clickTooltip").style("visibility") !== "visible"){
-                showTooltipOnHover(e,d,fileName,svg)
+                showTooltipOnHover(e, fileName, svg)
                 singleDonut.style("opacity", 0.5)
             }
 
@@ -62,3 +60,5 @@ const buildPie = (node, svg) => {
     window.addEventListener("resize", drawPie)
 
 }
+
+
