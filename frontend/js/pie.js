@@ -6,17 +6,32 @@ const buildPie = (node, svg) => {
 
     const singleDonut = leftAxisGroup.append("g")
         .attr("transform", `translate(${x}, ${y})`)
-        ///.attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(totalLinesChanged)})`)
-        //.attr("transform", `translate(${xScale(week) + xScale.bandwidth() / 2},${yScale(i + 1) + yScale.bandwidth() / 2})`)
         .style("opacity", 1)
         .attr("class", "singleDonut")
         .on("click", (e, d) => {
 
-            showTooltipOnClick(e, d, fileName, authorMap, svg)
+            showTooltipOnClick(e, fileName, authorMap, svg, nodeSize)
             singleDonut.style("opacity", 0.5)
+            d3.select(".hoverToolTip").style("visibility", "hidden")
 
         })
-    var pie = d3.pie().sort(null).value(([key, value]) => value[0])
+        .on("mouseover", (e, d) => {
+            console.log(d3.select(".clickTooltip").style("visibility"))
+            if (d3.select(".clickTooltip").style("visibility") !== "visible"){
+                showTooltipOnHover(e, fileName, svg)
+                singleDonut.style("opacity", 0.5)
+            }
+
+        })
+        .on("mouseout", (e, d) => {
+            if (d3.select(".clickTooltip").style("visibility") !== "visible"){
+                d3.select(".hoverToolTip").style("visibility", "hidden")
+                singleDonut.style("opacity", 1)
+            }
+            
+        });
+
+    var pie = d3.pie().sort(null).value(([key, value]) => value.get("nodeSize"))
 
     const preparedPie = pie(authorMap)
 
@@ -46,3 +61,5 @@ const buildPie = (node, svg) => {
     window.addEventListener("resize", drawPie)
 
 }
+
+
