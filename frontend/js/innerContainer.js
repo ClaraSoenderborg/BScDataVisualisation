@@ -15,8 +15,8 @@ const createContainer = (data, metadata) => {
         .attr("class","legendDiv")
 
     createTitle(data,titleDiv)
-    drawGraph(data, graphDiv, metadata)
-    createLegend(data, legendDiv)
+    drawGraph(data, graphDiv, metadata, legendDiv)
+    //createLegend(data, legendDiv)
 
 
 

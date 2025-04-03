@@ -3,28 +3,11 @@ const yScale = d3.scaleLog()
 const xScale = d3.scaleBand()
 const rScale = d3.scaleLog()
 
-//onst colorScale = d3.scaleOrdinal(d3.schemeSet2)
-
-const colorScale = d3.scaleOrdinal([
-    "#FFA69E", // Melon :)
-    "#D98B19", // Mustard :)
-    "#8DA0CB", // Blue :)
-    "#006D77", // Current :)
-    "#FDE12D", // School bus yellow :)
-    "#628B35", // Avocado :)
-    "#E96A38", // Coral
-    "#7EBDC3", // Blue :)
-    "#BA274A", // Rose Red :)
-    "#853570", // Violet Dark :)
-    "#46351D", // Shit brown :)
-    "#3DA5D9", // Blue :)
-
-]);
 const backgroundColor1 = "#FFFFFF"; // White
 const backgroundColor2 = "#D3D3D3"; // Gray
 
 
-const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors) => {
+const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin) => {
 
     const minWeek = d3.min(data.map(d => d.week))
     const maxWeek = d3.max(data.map(d => d.week))
@@ -41,10 +24,6 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
     rScale
         .domain([globalNodeMin, globalNodeMax])
         .range([graph_radius * 0.50, graph_radius]) 
-
-    colorScale
-        .domain(authors)
-
 }
 
 

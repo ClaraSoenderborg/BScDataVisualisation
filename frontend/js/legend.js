@@ -1,6 +1,10 @@
-const createLegend = (data, div) => {
+var legendColorScale 
+
+const createLegend = (data, div, cs) => {
+    legendColorScale = cs
+
     const rowHeight = 30; // Space for each row
-    const authors = colorScale.domain()
+    const authors = legendColorScale.domain()
 
     // Create the SVG legend container
     const legend = div.append("svg")
@@ -29,7 +33,7 @@ const createLegend = (data, div) => {
                     .attr("x", 15) // Space from circle
                     .attr("y", 5)
                     .text(d)
-                    .style("fill", colorScale);
+                    .style("fill", legendColorScale);
 
                 const textWidth = textElem.node().getComputedTextLength(); // Measure text width
 
@@ -53,7 +57,7 @@ const createLegend = (data, div) => {
         // Append circles for legend markers
         legendItems.append("circle")
             .attr("class", "legend-circle")
-            .attr("fill", colorScale);
+            .attr("fill", legendColorScale);
 
         // Update legend background height
         const legendHeight = usedRows * rowHeight;

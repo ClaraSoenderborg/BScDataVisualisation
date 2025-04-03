@@ -1,16 +1,29 @@
-const drawGraph = (data, div, metadata) => {
-    let globalyMin = Infinity
-    let globalyMax= -Infinity
+const colorScale = d3.scaleOrdinal([
+    "#FFA69E", // Melon :)
+    "#D98B19", // Mustard :)
+    "#8DA0CB", // Blue :)
+    "#006D77", // Current :)
+    "#FDE12D", // School bus yellow :)
+    "#628B35", // Avocado :)
+    "#E96A38", // Coral
+    "#7EBDC3", // Blue :)
+    "#BA274A", // Rose Red :)
+    "#853570", // Violet Dark :)
+    "#46351D", // Shit brown :)
+    "#3DA5D9", // Blue :)
 
-    let globalNodeMin = Infinity
-    let globalNodeMax= -Infinity
+]);
+var globalyMin = Infinity
+var globalyMax= -Infinity
+
+var globalNodeMin = Infinity
+var globalNodeMax= -Infinity
+
+const drawGraph = (data, div, metadata, legendDiv) => {
 
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")
-
-    createClickTooltip(svg, metadata)
-    createHoverTooltip(svg)
 
     const createGraph = () => {
         const primaryGroup = d3.rollup(data,
@@ -80,7 +93,11 @@ const drawGraph = (data, div, metadata) => {
 
         })
 
-        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, uniqueAuthors)
+        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin)
+        
+        colorScale
+            .domain(uniqueAuthors)
+        
 
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
@@ -167,6 +184,9 @@ const drawGraph = (data, div, metadata) => {
     }
 
     createGraph()
+    createLegend(data, legendDiv, colorScale)
+    createClickTooltip(svg, metadata, colorScale)
+    createHoverTooltip(svg)
 
 
     window.addEventListener("resize", createGraph)

@@ -1,8 +1,10 @@
 var setMetadata
+var tooltipColorScale
 
-const createClickTooltip = (svg, metadata) => {
+const createClickTooltip = (svg, metadata, cs) => {
 
     setMetadata = metadata
+    tooltipColorScale = cs
 
     // Chapter 7 i bogen
     const toolTip = svg
@@ -156,7 +158,7 @@ function buildTooltipChart(singleDonut, authorMap) {
 
     arcs.append("path")
         .attr("d", arcGen)
-        .attr("fill", d => colorScale(d.data[0]));
+        .attr("fill", d => tooltipColorScale(d.data[0]));
 
     var lastAddedEndPoint = [9999, 9999]
 
@@ -210,7 +212,7 @@ function buildTooltipChart(singleDonut, authorMap) {
             return posEnd[0] > 0 ? "start" : "end"
         })
         .style("dominant-baseline", "middle")
-        .attr("fill", d => colorScale(d.data[0]))
+        .attr("fill", d => tooltipColorScale(d.data[0]))
         .each(function (d) {
             console.log(d.data)
             if (setMetadata.nodeSize === "churn") {
