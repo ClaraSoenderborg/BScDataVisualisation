@@ -19,7 +19,5 @@ const createTitle = (data) => {
 
 }
 
-//window.addEventListener("resize", createTitle)
-
 
 

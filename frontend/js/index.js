@@ -27,7 +27,7 @@ d3.json("/metadata").then(metadata => {
 
         }
 
-        window.addEventListener("resize", onChange)
+        window.addEventListener("resize", onChange) 
         
     })
 

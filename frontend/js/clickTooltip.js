@@ -57,10 +57,6 @@ const createClickTooltip = (svg, metadata) => {
         })
 
 
-    window.addEventListener("resize", function (e) {
-        closeTooltip(e)
-    })
-
 
 }
 

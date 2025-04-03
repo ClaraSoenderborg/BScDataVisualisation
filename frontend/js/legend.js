@@ -74,6 +74,4 @@ const createLegend = (data) => {
     // Initial draw
     drawLegend();
 
-    // Redraw legend when window resizes
-    window.addEventListener("resize", drawLegend);
-};
+    }

@@ -171,8 +171,5 @@ const drawGraph = (data, metadata) => {
     createGraph()
 
 
-    window.addEventListener("resize", createGraph)
-
-
 }
 

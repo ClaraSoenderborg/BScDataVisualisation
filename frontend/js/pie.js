@@ -58,8 +58,6 @@ const buildPie = (node, svg) => {
 
     drawPie()
 
-    window.addEventListener("resize", drawPie)
-
 }
 
 

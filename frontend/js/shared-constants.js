@@ -88,8 +88,6 @@ function calculateTooltipY(y, tooltipHeight) {
     return y + tooltip_padding
 }
 
-window.addEventListener("resize", reCalculateSizes)
-
 
 function wrapText(textElement, text, maxWidth, lineHeight) {
     textElement.text("") 
