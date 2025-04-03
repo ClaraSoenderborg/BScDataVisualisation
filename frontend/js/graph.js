@@ -1,10 +1,11 @@
-const drawGraph = (data, div, metadata) => {
+const drawGraph = (data, metadata) => {
     let globalyMin = Infinity
     let globalyMax= -Infinity
 
     let globalNodeMin = Infinity
     let globalNodeMax= -Infinity
 
+    const div = d3.select("#graphDiv")
     const svg = div
         .append("svg")
         .attr("class", "graphSVG")

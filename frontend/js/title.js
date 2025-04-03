@@ -1,15 +1,14 @@
-const createTitle = (data, div) => {
-    const titles = Array.from(new Set(data.map(d => d.repoPath)))
+const createTitle = (data) => {
+    const title = data[0].repoPath
 
-    const title = div.append("svg")
-        .attr("width", "100%")
-        .attr("height", height * 0.08)
+    const div = d3.select("#titleDiv")
+    
 
-    title.append("text")
+    div.append("text")
         .attr("class", "title-text")
         .attr("x", "2%") 
         .attr("y", "50%") 
-        .text(titles); 
+        .text(title); 
 
 
 }

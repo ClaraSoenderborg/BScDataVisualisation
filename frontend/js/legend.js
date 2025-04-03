@@ -1,8 +1,10 @@
-const createLegend = (data, div) => {
+const createLegend = (data) => {
     const authors = colorScale.domain()
     const rowHeight = 30; // Space for each row
 
+
     // Create the SVG legend container
+    const div = d3.select("#legendDiv")
     const legend = div.append("svg")
         .attr("class", "legendSVG");
 

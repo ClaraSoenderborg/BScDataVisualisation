@@ -6,6 +6,12 @@
     min-width: 750px;
 }
 
+#topDiv {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 2%;
+}
+
 
 
 .xAxisLabel, .yAxisLabel{
