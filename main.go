@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"log"
@@ -82,7 +81,7 @@ Options:` + "\n" + `
 			}
 		}
 
-	} else if *repoPath == "" && *dataPath != ""{
+	} /*else if *repoPath == "" && *dataPath != ""{
 		var allData[] string = strings.Split(*dataPath, ",")
 
 		for _, item := range allData {
@@ -97,16 +96,9 @@ Options:` + "\n" + `
 			records, err := csvReader.ReadAll()
 
 			if err != nil {
-				log.Fatal("Unable to parse file as CSV for " + item, err)
+				log.Printf("Warning: Unable to parse file as CSV for " + item, err)
 			}
 
-			// Log each record to inspect the number of fields
-			for i, record := range records {
-				fmt.Printf("Record %d: %v (Fields: %d)\n", i+1, record, len(record))
-				if len(record) != 10 {  // Check if the record has the expected number of columns
-					fmt.Printf("Warning: Record %d has incorrect number of fields: %d\n", i+1, len(record))
-				}
-			}
 
 			defer f.Close()
 
@@ -117,7 +109,7 @@ Options:` + "\n" + `
 
 			}
 		}
-	}
+	}*/
 
 
 		// if data should be saved locally at specified path
@@ -128,7 +120,9 @@ Options:` + "\n" + `
 			writeToCSVFile(res, fixedPath)
 			setUpServer(fixedPath, nil, metadata)
 
-		} else { // if data should be immediately served at /data.csv
+		} else if *dataPath != ""{
+			setUpServer(*dataPath, nil, metadata)
+		}else { // if data should be immediately served at /data.csv
 			setUpServer("", res, metadata)
 		}
 
