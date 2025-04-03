@@ -1,14 +1,25 @@
 const createTitle = (data) => {
     const title = data[0].repoPath
 
-    const div = d3.select("#titleDiv")
     
+    const div = d3.select("#titleDiv")
+    const containerWidth = d3.select("#container").node().getBoundingClientRect().width * 0.75;
+    //console.log(titleWidth);
+    const svg = div.append("svg").attr("width", containerWidth)
 
-    div.append("text")
-        .attr("class", "title-text")
+    const textElement = svg.append("text")
+        .attr("class", "topTitleText")
         .attr("x", "2%") 
-        .attr("y", "50%") 
-        .text(title); 
+        .attr("y", "2%") 
+        //.text(title); 
 
+    const lineCount = wrapText(textElement, title, containerWidth, topTitleHeight)
+
+    svg.attr("height", topTitleHeight + (topTitleHeight * lineCount))
 
 }
+
+//window.addEventListener("resize", createTitle)
+
+
+

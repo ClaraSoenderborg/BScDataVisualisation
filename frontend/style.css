@@ -6,10 +6,28 @@
     min-width: 750px;
 }
 
+/* Title */
+.topTitleText{
+    font-size: 3.5vmin; 
+    dominant-baseline: middle;
+    text-anchor: left;
+    font-weight: bold;
+    text-decoration: underline;
+
+
+}
+
+.selectMenu{
+    width:20%;
+    position: absolute;
+    right: 1%;
+}
+
 #topDiv {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 2%;
+    
+    position: relative;
 }
 
 
@@ -70,13 +88,4 @@
 
 }
 
-/* Title */
-.title-text{
-    font-size: 3.5vmin; 
-    dominant-baseline: middle;
-    text-anchor: left;
-    font-weight: bold;
-    text-decoration: underline;
 
-
-}

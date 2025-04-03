@@ -3,6 +3,7 @@ d3.json("/metadata").then(metadata => {
     d3.csv("/data.csv", d3.autoType).then(data => {  
         const select = d3.select("#selectDiv")
                         .append("select")
+                        .attr("class", "selectMenu")
                         .on("change", onChange)
 
         const primaryGroup = d3.group(data, d => d.repoPath)
@@ -25,6 +26,8 @@ d3.json("/metadata").then(metadata => {
             callDiv(selectedData)
 
         }
+
+        window.addEventListener("resize", onChange)
         
     })
 
@@ -43,6 +46,8 @@ function cleanUp() {
     d3.select("#graphDiv").html(null)
     d3.select("#legendDiv").html(null)
 }
+
+
 
 
    

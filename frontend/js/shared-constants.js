@@ -6,6 +6,8 @@ var donutHole = 0.0
 var graph_height
 var graph_bandwidth_padding 
 
+var topTitleHeight
+
 const min_width = 700
 
 //Graph
@@ -43,6 +45,7 @@ const reCalculateSizes = () => {
     graph_radius = Math.min(width, graph_height) / 20
     graph_bandwidth_padding = graph_radius * 0.15
 
+    topTitleHeight = Math.min(window.innerHeight, window.innerWidth) * 0.04
 
     //Legend
     legendPadding = window.innerWidth * 0.045
