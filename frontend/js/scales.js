@@ -24,7 +24,7 @@ const backgroundColor1 = "#FFFFFF"; // White
 const backgroundColor2 = "#D3D3D3"; // Gray
 
 
-const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin) => {
+const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors) => {
 
     const minWeek = d3.min(data.map(d => d.week))
     const maxWeek = d3.max(data.map(d => d.week))
@@ -41,8 +41,6 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
     rScale
         .domain([globalNodeMin, globalNodeMax])
         .range([graph_radius * 0.50, graph_radius]) 
-
-    const authors = Array.from(d3.union(data.map(d => d.author)))
 
     colorScale
         .domain(authors)
