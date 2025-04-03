@@ -25,6 +25,8 @@ const drawGraph = (data, div, metadata) => {
             (d) => d.author)
 
         var nodes = []
+        var uniqueAuthors = new Set([])
+
         primaryGroup.forEach((fileMap, week) => {
 
             // sum changes for all files in week
@@ -63,6 +65,8 @@ const drawGraph = (data, div, metadata) => {
                 const fileName = topFiles[i].fileName
                 const authorMap = fileMap.get(fileName)
 
+                authorMap.keys().forEach(item => uniqueAuthors.add(item))
+
                 nodes.push({
                     x: week,
                     y: topFiles[i].totalyAxis,
@@ -76,7 +80,7 @@ const drawGraph = (data, div, metadata) => {
 
         })
 
-        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin)
+        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, uniqueAuthors)
 
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;

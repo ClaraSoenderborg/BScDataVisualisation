@@ -1,6 +1,6 @@
 const createLegend = (data, div) => {
-    const authors = Array.from(new Set(data.map(d => d.author))); // Use Set for unique values
     const rowHeight = 30; // Space for each row
+    const authors = colorScale.domain()
 
     // Create the SVG legend container
     const legend = div.append("svg")
