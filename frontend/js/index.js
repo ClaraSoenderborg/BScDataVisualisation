@@ -8,19 +8,28 @@ d3.json("/metadata").then(metadata => {
 
         const primaryGroup = d3.group(data, d => d.repoPath)
 
-        select.selectAll("option")
-            .data(primaryGroup.keys())
-            .enter()
-            .append("option")
-            .text(d => d)
+        select.append("option")
+            .attr("disabled", true)
+            .attr("selected", true) 
+            .attr("value", "")       
+            .text("Select repo")
+        
+        primaryGroup.keys().forEach(element => {
+            select.append("option")
+                .text(element)
+        })
 
         const firstData = primaryGroup.get(primaryGroup.keys().next().value)
         callDiv(firstData)
 
         function onChange() {
+            const value = select.property("value")
+
+            // Ignore placeholder selection
+            if (value === "") return
+
             cleanUp()
 
-            const value = select.property("value")
             const selectedData = primaryGroup.get(value)
 
             callDiv(selectedData)
