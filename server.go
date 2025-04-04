@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -45,7 +46,7 @@ func serveCSV(w http.ResponseWriter, r *http.Request, dataLocation string, data 
 		var writer = csv.NewWriter(w)
 		defer writer.Flush()
 
-		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis","nodeSize", "fileName", "repoPath"})
+		writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis", "nodeSize", "fileName", "repoPath"})
 		var err = writer.WriteAll(data)
 		if err != nil {
 			http.Error(w, "Could not write CSV data", http.StatusInternalServerError)
@@ -58,7 +59,12 @@ func startServing(dataLocation string, data [][]string, metadata map[string]stri
 	//Maybe we dont need mux?
 	var mux = http.NewServeMux()
 
-	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(frontendFiles))))
+	// source: https://hakk.dev/blog/posts/go-embed-example/
+	var htmlContent, err = fs.Sub(frontendFiles, "frontend")
+	if err != nil {
+		log.Fatal(err)
+	}
+	mux.Handle("/", http.FileServer(http.FS(htmlContent)))
 
 	mux.HandleFunc("/data.csv", func(w http.ResponseWriter, r *http.Request) {
 		serveCSV(w, r, dataLocation, data)
