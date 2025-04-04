@@ -14,16 +14,16 @@ var version = "dev"
 
 func main() {
 	// argument flags
-	var repoPath = flag.String("repoPath", "", "Mandatory: Path to repository. If more than one then seperate by comma without spacing")
-	var dataPath = flag.String("dataPath", "", "Mandatory: Path to csv file. If more than one then seperate by comma without spacing.\nThe csvfile needs the following syntax: commitSHA,date,week,author,linesAdded,linesDeleted,yAxis,nodeSize,fileName,repoPath\nExample: b55a306,2023-09-12,37,mail@itu.dk,2,6,8,1,Project/Program.cs,/Users/Desktop/")
-	var dataLocation = flag.String("dataLocation", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
+	var repoPath = flag.String("repoPath", "", "Mandatory if dataPath is empty: Path to repository. If more than one then seperate by comma without spacing")
+	var dataPath = flag.String("dataPath", "", "Mandatory if repoPath is empty: Path to csv file. \nThe csvfile needs the following syntax: repoPath,week,author,fileName,linesAdded,linesDeleted,yAxis,nodeSize\nExample: /Users/Desktop/Project,37,mail@itu.dk,Program.cs,2,6,8,1")
+	var savePath = flag.String("savePath", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
 	var versionFlag = flag.Bool("version", false, "Show version")
 	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
 	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
 	var excludeKind = flag.String("excludeKind", "", "RegExp on file kinds to exclude")
-	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis")
-	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size")
-	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week")
+	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth")
+	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth")
+	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week. Default is 10")
 
 
 
@@ -67,63 +67,32 @@ Options:` + "\n" + `
 
 
 	var res [][] string
-	if *repoPath != "" && *dataPath == ""{
+	if *repoPath != "" {
 		var allRepos[] string = strings.Split(*repoPath, ",")
 
 
 		for _, item := range allRepos{
 			var rawData = callGitLog(item)
 			parsedData := parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize, item)
-			fmt.Println("hej1")
 
 			for _, row := range parsedData {
 				res = append(res, row)
 			}
 		}
 
-	} /*else if *repoPath == "" && *dataPath != ""{
-		var allData[] string = strings.Split(*dataPath, ",")
+	} 
+	// if data should be saved locally at specified path
+	if *savePath != "" {
+		var fixedPath = strings.TrimSuffix(*savePath, "/") + "/data.csv"
+		fmt.Printf("Saving data file at: " + fixedPath + "\n")
 
-		for _, item := range allData {
-			f, err := os.Open(item)
-			if err != nil {
-				log.Fatal("Unable to read input file " + item, err)
-			}
+		writeToCSVFile(res, fixedPath)
+		setUpServer(fixedPath, nil, metadata)
 
-			fmt.Println("Reading file:", item)
-
-			csvReader := csv.NewReader(f)
-			records, err := csvReader.ReadAll()
-
-			if err != nil {
-				log.Printf("Warning: Unable to parse file as CSV for " + item, err)
-			}
-
-
-			defer f.Close()
-
-			// If valid, append the records to the result
-			for _, record := range records {
-				res = append(res, record)
-				fmt.Println(record)
-
-			}
-		}
-	}*/
-
-
-		// if data should be saved locally at specified path
-		if *dataLocation != "" {
-			var fixedPath = strings.TrimSuffix(*dataLocation, "/") + "/data.csv"
-			fmt.Printf("Saving data file at: " + fixedPath + "\n")
-
-			writeToCSVFile(res, fixedPath)
-			setUpServer(fixedPath, nil, metadata)
-
-		} else if *dataPath != ""{
-			setUpServer(*dataPath, nil, metadata)
-		}else { // if data should be immediately served at /data.csv
-			setUpServer("", res, metadata)
-		}
+	} else if *dataPath != ""{
+		setUpServer(*dataPath, nil, metadata)
+	}else { // if data should be immediately served at /data.csv
+		setUpServer("", res, metadata)
+	}
 
 }

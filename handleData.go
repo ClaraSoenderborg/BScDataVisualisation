@@ -15,7 +15,7 @@ import (
 
 func callGitLog(repoPath string) string {
 
-		var script = `git -C %s log --pretty=format:"%%h %%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
+		var script = `git -C %s log --pretty=format:"%%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
 
 		var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
 
@@ -64,7 +64,7 @@ func removeDuplicates(list []string) []string {
 }
 
 func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
-	var commitSha, timestamp, author, fileName, lineAdd, lineRemove string
+	var timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
 	var authors = []string{}
@@ -76,10 +76,10 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 		if lineContent != "" {
 			if blockLineCount == 0 {
 				var fields = strings.Fields(lineContent)
-				commitSha, timestamp, author = fields[0], fields[1], fields[2]
+				timestamp, author = fields[0], fields[1]
 				authors = append(authors, author)
 				if len(fields) > 3 {
-					var coAuthors = strings.Join(fields[3:], " ")
+					var coAuthors = strings.Join(fields[2:], " ")
 					authors = append(authors, parseCoAuthors(coAuthors)...)
 					authors = removeDuplicates(authors)
 				}
@@ -113,7 +113,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 
 					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{commitSha, timestamp, strconv.Itoa(weekNumber), au, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue), fileName, repoPath})
+						result = append(result, []string{repoPath, strconv.Itoa(weekNumber), au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
 					}
 				}
 				}
@@ -181,7 +181,7 @@ func writeToCSVFile(list [][]string, location string) {
 	defer file.Close()
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string{"commitSHA", "date", "week", "author", "linesAdded", "linesDeleted", "yAxis", "nodeSize", "fileName", "repoPath"})
+	writer.Write([]string{"repoPath", "week", "author", "fileName", "linesAdded", "linesDeleted", "yAxis", "nodeSize"})
 	writer.WriteAll(list)
 
 }
