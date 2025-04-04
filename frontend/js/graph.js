@@ -87,7 +87,7 @@ const drawGraph = (data, metadata) => {
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
 
-        svg.attr("viewBox", `0 0 ${containerWidth} ${graph_height + legendPadding}`)
+        svg.attr("viewBox", `0 0 ${containerWidth} ${graph_height + margin.bottom + line_height_two * 2}`)
         //svg.attr("width", containerWidth);
 
         svg.selectAll(".bottomAxis").remove()
@@ -142,8 +142,6 @@ const drawGraph = (data, metadata) => {
 
         svg.append("text")
             .attr("class", "yAxisLabel")
-            //.attr("x", margin.left)
-            //.attr("y", graph_height / 2)
             .attr("transform", `translate(${margin.left * 0.25}, ${graph_height * 0.5}) rotate(-90)`)
             .text(String(metadata.yAxis).charAt(0).toUpperCase() + String(metadata.yAxis).slice(1))
         

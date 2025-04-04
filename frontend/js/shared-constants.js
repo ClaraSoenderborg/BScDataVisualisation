@@ -5,8 +5,10 @@ var graph_radius
 var donutHole = 0.0
 var graph_height
 var graph_bandwidth_padding 
+var line_height_two
+var line_height_three
+var line_height_four
 
-var topTitleHeight
 
 const min_width = 700
 
@@ -23,13 +25,10 @@ var tooltip_width
 var tooltip_height
 var tooltip_max_width
 var toolTip_radius
-var click_line_height
-var label_height
 
 //HoverTooltip
 var hover_tooltip_width
 var hover_tooltip_height
-var hover_line_height
 var hover_tooltip_max_width
 var hover_tooltip_padding
 
@@ -40,19 +39,18 @@ const reCalculateSizes = () => {
     height = window.innerHeight * 0.8
     width = Math.max(min_width, window.innerWidth * 0.9)
 
-    margin = { top: window.innerWidth*0.005, right: 0, bottom: window.innerWidth*0.035, left: window.innerWidth * 0.07 }
+    margin = { top: width*0.005, right: 0, bottom: width*0.035, left: width * 0.07 }
     graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) //- margin.top - margin.bottom
     graph_radius = Math.min(width, graph_height) / 20
     graph_bandwidth_padding = graph_radius * 0.15
-
-    topTitleHeight = Math.min(window.innerHeight, window.innerWidth) * 0.04
+ 
+    line_height_four = Math.min(window.innerHeight, window.innerWidth) * 0.04
 
     //Legend
     legendPadding = window.innerWidth * 0.045
 
     //ToolTip
-    click_line_height = Math.min(window.innerHeight, window.innerWidth) * 0.03
-    label_height = Math.min(window.innerHeight, window.innerWidth) * 0.03
+    line_height_three = Math.min(window.innerHeight, window.innerWidth) * 0.03
     tooltip_width = width * 0.5
     tooltip_height = tooltip_width * 0.6
     tooltip_padding = tooltip_width * 0.02
@@ -63,8 +61,8 @@ const reCalculateSizes = () => {
     hover_tooltip_width = width * 0.25
     hover_tooltip_padding = hover_tooltip_width * 0.02
     hover_tooltip_max_width = hover_tooltip_width - hover_tooltip_padding * 2
-    hover_line_height = Math.min(window.innerHeight, window.innerWidth) * 0.02
-    hover_tooltip_height = hover_line_height + hover_tooltip_padding 
+    line_height_two = Math.min(window.innerHeight, window.innerWidth) * 0.02
+    hover_tooltip_height = line_height_two + hover_tooltip_padding 
     
 
 

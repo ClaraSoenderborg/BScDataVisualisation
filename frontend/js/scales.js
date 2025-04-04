@@ -35,8 +35,8 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
 
     yScale
         .domain([Math.max(1,globalyMin) / 1.5, globalyMax*1.5]) //
-        .range([graph_height, 0])
-        .base(2) // start y-axis at zero
+        .range([graph_height, margin.top])
+        .base(globalyMax > 100 ? 10 : 2)
 
     rScale
         .domain([globalNodeMin, globalNodeMax])

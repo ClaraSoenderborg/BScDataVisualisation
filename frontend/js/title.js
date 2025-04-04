@@ -13,9 +13,9 @@ const createTitle = (data) => {
         .attr("y", "2%") 
         //.text(title); 
 
-    const lineCount = wrapText(textElement, title, containerWidth, topTitleHeight)
+    const lineCount = wrapText(textElement, title, containerWidth, line_height_four)
 
-    svg.attr("height", topTitleHeight + (topTitleHeight * lineCount))
+    svg.attr("height", line_height_four + (line_height_four * lineCount))
 
 }
 
