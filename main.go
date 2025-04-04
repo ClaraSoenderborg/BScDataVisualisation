@@ -14,15 +14,17 @@ var version = "dev"
 
 func main() {
 	// argument flags
-	var repoPath = flag.String("repoPath", "", "Mandatory: Path to repository. If more than one then seperate by comma without spacing")
-	var dataLocation = flag.String("dataLocation", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
+	var repoPath = flag.String("repoPath", "", "Mandatory if dataPath is empty: Path to repository. If more than one then seperate by comma without spacing")
+	var dataPath = flag.String("dataPath", "", "Mandatory if repoPath is empty: Path to csv file. \nThe csvfile needs the following syntax: repoPath,week,author,fileName,linesAdded,linesDeleted,yAxis,nodeSize\nExample: /Users/Desktop/Project,37,mail@itu.dk,Program.cs,2,6,8,1")
+	var savePath = flag.String("savePath", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
 	var versionFlag = flag.Bool("version", false, "Show version")
 	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
 	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
 	var excludeKind = flag.String("excludeKind", "", "RegExp on file kinds to exclude")
-	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis")
-	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size")
-	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week")
+	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth")
+	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth")
+	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week. Default is 10")
+
 
 
 
@@ -47,6 +49,10 @@ Options:` + "\n" + `
 		os.Exit(0)
 	}
 
+	if *repoPath == "" && *dataPath == "" || *repoPath != "" && *dataPath != ""{
+		log.Fatal("Error: Either -repoPath or -dataPath must be provided.")
+	}
+
 	var metricOptions = [] string{"churn", "growth", "commit"}
 	if(!slices.Contains(metricOptions, *yAxis)){
 		log.Fatal("yAxis argument must be churn, growth or commit")
@@ -57,29 +63,36 @@ Options:` + "\n" + `
 
 	var metadata = map[string]string{"numberOfFiles":*numberOfFiles, "yAxis":*yAxis, "nodeSize":*nodeSize}
 
-	var allRepos[] string = strings.Split(*repoPath, ",")
+
 
 
 	var res [][] string
-	for _, item := range allRepos{
-	var rawData = callGitLog(item)
-	parsedData := parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize, item)
+	if *repoPath != "" {
+		var allRepos[] string = strings.Split(*repoPath, ",")
 
-	for _, row := range parsedData {
-        res = append(res, row)
-    }
 
-	}
-		// if data should be saved locally at specified path
-		if *dataLocation != "" {
-			var fixedPath = strings.TrimSuffix(*dataLocation, "/") + "/data.csv"
-			fmt.Printf("Saving data file at: " + fixedPath + "\n")
+		for _, item := range allRepos{
+			var rawData = callGitLog(item)
+			parsedData := parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize, item)
 
-			writeToCSVFile(res, fixedPath)
-			setUpServer(fixedPath, nil, metadata)
-
-		} else { // if data should be immediately served at /data.csv
-			setUpServer("", res, metadata)
+			for _, row := range parsedData {
+				res = append(res, row)
+			}
 		}
+
+	} 
+	// if data should be saved locally at specified path
+	if *savePath != "" {
+		var fixedPath = strings.TrimSuffix(*savePath, "/") + "/data.csv"
+		fmt.Printf("Saving data file at: " + fixedPath + "\n")
+
+		writeToCSVFile(res, fixedPath)
+		setUpServer(fixedPath, nil, metadata)
+
+	} else if *dataPath != ""{
+		setUpServer(*dataPath, nil, metadata)
+	}else { // if data should be immediately served at /data.csv
+		setUpServer("", res, metadata)
+	}
 
 }
