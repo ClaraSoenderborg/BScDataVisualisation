@@ -134,16 +134,24 @@ const drawGraph = (data, metadata) => {
             .attr("y", graph_height + bottomAxisGroup.node().getBBox().height + margin.bottom * 0.5)
             .text("Weeks")
 
-
+       
         // y-axis
         const leftAxis = d3.axisLeft(yScale)
-            .tickSize(0)
+            .tickValues(yScale.ticks().filter(tick => {
+                const logBase = yScale.base() === 2 ? Math.log2(tick) : Math.log10(tick) // Check if it's a power of 2
+        
+                return tick === 1 || Number.isInteger(logBase)
+            }))
+            .tickSize(-width)
+            .tickSizeOuter(0)
             .tickPadding(20)
 
         svg.append("g")
             .attr("class", "leftAxis")
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(leftAxis)
+            .selectAll(".tick line")
+            .style("stroke", "lightgrey")
 
         svg.append("text")
             .attr("class", "yAxisLabel")
