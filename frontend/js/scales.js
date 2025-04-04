@@ -24,7 +24,7 @@ const backgroundColor1 = "#FFFFFF"; // White
 const backgroundColor2 = "#D3D3D3"; // Gray
 
 
-const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors) => {
+const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors, maxNumberOfFiles) => {
 
     const minWeek = d3.min(data.map(d => d.week))
     const maxWeek = d3.max(data.map(d => d.week))
@@ -38,9 +38,12 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
         .range([graph_height, margin.top])
         .base(globalyMax > 100 ? 10 : 2)
 
+    
+    const radiusMax = maxNumberOfFiles > 10 ? d3.min([xScale.bandwidth()/4, graph_radius]) : graph_radius
+   
     rScale
         .domain([globalNodeMin, globalNodeMax])
-        .range([graph_radius * 0.50, graph_radius]) 
+        .range([radiusMax * 0.50, radiusMax]) 
 
     colorScale
         .domain(authors)

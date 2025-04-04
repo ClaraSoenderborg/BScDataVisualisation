@@ -1,9 +1,11 @@
 const drawGraph = (data, metadata) => {
-    let globalyMin = Infinity
-    let globalyMax= -Infinity
+    var globalyMin = Infinity
+    var globalyMax= -Infinity
 
-    let globalNodeMin = Infinity
-    let globalNodeMax= -Infinity
+    var globalNodeMin = Infinity
+    var globalNodeMax= -Infinity
+
+    var maxNumberOfFiles = 0
 
     const div = d3.select("#graphDiv")
     const svg = div
@@ -40,7 +42,10 @@ const drawGraph = (data, metadata) => {
 
             // find top ten changed files in week
             fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
-            const topFiles = fileArray.slice(0, metadata.numberOfFiles).reverse() // reverse to have most changed files on top
+            const topFiles = fileArray.slice(0, metadata.numberOfFiles)
+            if(maxNumberOfFiles < topFiles.length) {
+                maxNumberOfFiles = topFiles.length
+            }
 
             const yAxisMin = d3.min(topFiles, d => d.totalyAxis)
             const yAxisMax = d3.max(topFiles, d => d.totalyAxis)
@@ -82,7 +87,7 @@ const drawGraph = (data, metadata) => {
 
         })
 
-        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin,uniqueAuthors)
+        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, uniqueAuthors, maxNumberOfFiles)
 
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
