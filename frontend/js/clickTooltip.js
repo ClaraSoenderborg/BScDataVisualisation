@@ -90,7 +90,7 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
   const totalText = d3
     .select(".tooltipTotal")
-    .text(`Total ${setMetadata.nodeSize}: ${nodeSize}`)
+    .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(nodeSize)}`)
     .attr("x", tooltip_width - tooltip_padding)
     .attr("y", tooltip_padding);
 
@@ -229,14 +229,14 @@ function buildTooltipChart(singleDonut, authorMap) {
     .each(function (d) {
 
       if (setMetadata.nodeSize === "churn") {
+        const formattedAdd = d3.format(",")(d.data[1].get("linesAdded"))
+        const formattedDel = d3.format(",")(d.data[1].get("linesDeleted"))
         const textElement = d3.select(this)
-        textElement.text(`Lines added: ${d.data[1].get("linesAdded")}, deleted: ${d.data[1].get("linesDeleted")}`)
-      } else if (setMetadata.nodeSize === "growth") {
-        const textElement = d3.select(this);
-        textElement.text(`Growth: ${d.data[1].get("nodeSize")}`);
-      } else if (setMetadata.nodeSize === "commit") {
-        const textElement = d3.select(this);
-        textElement.text(`Commits: ${d.data[1].get("nodeSize")}`);
+        textElement.text(`Lines added: ${formattedAdd}, deleted: ${formattedDel}`)
+      } else {
+        const formattedNodeSize = d3.format(",")(d.data[1].get("nodeSize"))
+        const textElement = d3.select(this)
+        textElement.text(`${setMetadata.nodeSize}: ${formattedNodeSize}`);
       }
     });
 }
