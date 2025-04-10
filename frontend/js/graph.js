@@ -138,7 +138,7 @@ const drawGraph = (data, metadata) => {
         // y-axis
         const leftAxis = d3.axisLeft(yScale)
             .tickValues(yScale.ticks().filter(tick => {
-                const logBase = yScale.base() === 2 ? Math.log2(tick) : Math.log10(tick) // Check if it's a power of 2
+                const logBase = yScale.base() === 2 ? Math.log2(tick) : Math.log10(tick) 
         
                 return tick === 1 || Number.isInteger(logBase)
             }))
