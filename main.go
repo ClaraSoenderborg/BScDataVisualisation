@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func main() {
 	var excludeKind = flag.String("excludeKind", "", "RegExp on file kinds to exclude")
 	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth")
 	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth")
-	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week. Default is 10")
+	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week. Default is 10, max is 20")
 
 
 
@@ -49,22 +50,27 @@ Options:` + "\n" + `
 		os.Exit(0)
 	}
 
+	// input validation
 	if *repoPath == "" && *dataPath == "" || *repoPath != "" && *dataPath != ""{
 		log.Fatal("Error: Either -repoPath or -dataPath must be provided.")
 	}
 
 	var metricOptions = [] string{"churn", "growth", "commit"}
+	
 	if(!slices.Contains(metricOptions, *yAxis)){
 		log.Fatal("yAxis argument must be churn, growth or commit")
 	}
+	
 	if(!slices.Contains(metricOptions, *nodeSize)){
 		log.Fatal("nodeSize argument must be churn, growth or commit")
 	}
 
+	var filesCount, err = strconv.Atoi(*numberOfFiles)
+	if (filesCount > 20 || filesCount < 1 || err != nil) {
+		log.Fatal("numberOfFiles must be integer between 1 and 20")
+	}
+	
 	var metadata = map[string]string{"numberOfFiles":*numberOfFiles, "yAxis":*yAxis, "nodeSize":*nodeSize}
-
-
-
 
 	var res [][] string
 	if *repoPath != "" {
@@ -75,9 +81,11 @@ Options:` + "\n" + `
 			var rawData = callGitLog(item)
 			parsedData := parseGitLog(rawData, *excludeFile, *excludePath, *excludeKind, *yAxis, *nodeSize, item)
 
-			for _, row := range parsedData {
+			/*for _, row := range parsedData {
 				res = append(res, row)
-			}
+			}*/
+
+			res = append(res, parsedData...)
 		}
 
 	} 
