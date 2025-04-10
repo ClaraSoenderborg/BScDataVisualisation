@@ -8,11 +8,8 @@ const createHoverTooltip = (svg) => {
   toolTip
     .append("rect")
     .attr("class", "hoverTooltipBox")
-    //.attr("width", hover_tooltip_width)
-    //.attr("height", hover_tooltip_height)
     .attr("rx", 5)
     .attr("ry", 5);
-  //.style("fill", "periwinkle")
 
   toolTip
     .append("text")
@@ -21,18 +18,30 @@ const createHoverTooltip = (svg) => {
     .attr("x", hover_tooltip_padding);
 };
 
-function showTooltipOnHover(e, fileName, svg) {
+function showTooltipOnHover(e, fileName, yAxis, yAxisMetric, svg) {
   const toolTip = d3.select(".hoverToolTip");
   const [x, y] = d3.pointer(e, svg.node());
 
   const element = d3.select(".hoverTooltipText");
 
-  const lineNumber = wrapText(
+  var lineNumber = wrapText(
     element,
     fileName,
     hover_tooltip_max_width,
     line_height_two
-  );
+  )
+
+  // add y-value to last line of tooltip
+  lineNumber++
+  const startY = parseFloat(element.attr("y"))
+  const startX = parseFloat(element.attr("x"))
+  element.append("tspan")
+    .attr("x", startX)
+    .attr("y", startY + line_height_two * lineNumber) 
+    .attr("text-anchor", "start")
+    .style("dominant-baseline", "hanging")
+    .attr("class", "hoverTooltipYAxis")
+    .text(`Total ${yAxisMetric}: ${yAxis}`)
 
   d3.select(".hoverTooltipBox")
     .attr("width", hover_tooltip_width)

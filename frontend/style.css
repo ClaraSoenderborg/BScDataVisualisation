@@ -59,6 +59,11 @@
 .hoverTooltipText{
     font-size: 2vmin;
     dominant-baseline: hanging;
+    font-weight: bold;
+}
+
+.hoverTooltipYAxis{
+    font-weight: 100;
 }
 
 .hoverTooltipBox{

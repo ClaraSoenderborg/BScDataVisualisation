@@ -80,7 +80,9 @@ const drawGraph = (data, metadata) => {
                     week: week,
                     fileName: fileName,
                     authorMap: authorMap,
-                    nodeSize: topFiles[i].totalNodeSize
+                    nodeSize: topFiles[i].totalNodeSize,
+                    yAxis: topFiles[i].totalyAxis,
+                    yAxisMetric: metadata.yAxis
                 })
 
             }
