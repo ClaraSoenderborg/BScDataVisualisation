@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
+	"net/mail"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,11 +12,16 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 )
 
-func callGitLog(repoPath string) string {
+var repoPath string
 
-		var script = `git -C %s log --pretty=format:"%%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x20)" --numstat --no-merges --no-renames --diff-filter=x`
+func callGitLog(repositoryPath string) string {
+
+		repoPath = repositoryPath
+
+		var script = `git -C %s log --pretty=format:"%%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x7c)" --numstat --no-merges --no-renames --diff-filter=x`
 
 		var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
 
@@ -29,23 +35,38 @@ func callGitLog(repoPath string) string {
 
 }
 
-func parseCoAuthors(author string) []string {
+func checkMailMap(author string) string {
+	var script = `git -C %s check-mailmap "%s"`
+	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))  
+
+	var output, err = cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Could not execute git check-mailmap" + string(output))
+	}
+	
+	var trimmedOutput = strings.TrimSpace(string(output))
+
+	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
+	if emailErr != nil {
+		log.Printf("Warning email not found from " + trimmedOutput)
+		return ""
+	}
+
+	return emailAddress.Address
+}
+
+func parseCoAuthors(coAuthorString string) []string {
 	var listCoAuthor []string
 
-	if strings.Contains(author, "<") {
-		for {
-			var start = strings.Index(author, "<")
-			var end = strings.Index(author, ">")
-			if start != -1 && end != -1 {
-				listCoAuthor = append(listCoAuthor, author[start+1:end])
-				author = author[end+1:]
-			} else {
-				break
-			}
+	var splitCoAuthor = strings.Split(coAuthorString, "|")
+
+	for _, author := range splitCoAuthor {
+		var properEmail = checkMailMap(author) 
+		if properEmail != "" {
+			listCoAuthor = append(listCoAuthor, properEmail)
 		}
-	} else {
-		log.Printf("Warning: Co-author %s could not be parsed, skipping co-author \n", author)
 	}
+
 	return listCoAuthor
 
 }
@@ -64,6 +85,8 @@ func removeDuplicates(list []string) []string {
 }
 
 func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
+	//fmt.Printf(lines)
+	
 	var timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
