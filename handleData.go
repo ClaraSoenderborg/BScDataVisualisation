@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 )
 
 var repoPath string
@@ -37,13 +36,13 @@ func callGitLog(repositoryPath string) string {
 
 func checkMailMap(author string) string {
 	var script = `git -C %s check-mailmap "%s"`
-	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))  
+	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))
 
 	var output, err = cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("Could not execute git check-mailmap" + string(output))
 	}
-	
+
 	var trimmedOutput = strings.TrimSpace(string(output))
 
 	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
@@ -61,7 +60,7 @@ func parseCoAuthors(coAuthorString string) []string {
 	var splitCoAuthor = strings.Split(coAuthorString, "|")
 
 	for _, author := range splitCoAuthor {
-		var properEmail = checkMailMap(author) 
+		var properEmail = checkMailMap(author)
 		if properEmail != "" {
 			listCoAuthor = append(listCoAuthor, properEmail)
 		}
@@ -84,9 +83,9 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
+func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
 	//fmt.Printf(lines)
-	
+
 	var timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
@@ -109,7 +108,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 			} else {
 				var fields = strings.Fields(lineContent)
 				lineAdd, lineRemove, fileName = fields[0], fields[1], fields[2]
-				if addFile(fileName, excludeFile, excludePath, excludeKind) {
+				if addFile(fileName, excludeFile, excludePath, excludeKind, includeFile, includePath, includeKind) {
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
@@ -169,30 +168,71 @@ func getFileKind(filepath string) string {
 	return string(output)
 }
 
-func addFile(filePath string, excludeFile string, excludePath string, excludeKind string) bool {
-	var addFile = true
+func shouldExcludeFile(filePath string, excludeFile string, excludePath string, excludeKind string) bool {
 
-	if excludeFile != "" {
-		var fileName = filepath.Base(filePath)
-		if matchExcludeExp(excludeFile, fileName) {
-			addFile = false
-		}
-	}
+    if excludeFile != "" {
+        var fileName = filepath.Base(filePath)
+        if matchExcludeExp(excludeFile, fileName) {
+            return true
+        }
+    }
 
-	if excludePath != "" {
-		if matchExcludeExp(excludePath, filePath) {
-			addFile = false
-		}
-	}
+    // Exclude by file path
+    if excludePath != "" {
+        if matchExcludeExp(excludePath, filePath) {
+            return true // Exclude if filePath matches excludePath pattern
+        }
+    }
 
-	if excludeKind != "" {
-		if matchExcludeExp(excludeKind, getFileKind(filePath)) {
-			addFile = false
-		}
-	}
+    // Exclude by file kind
+    if excludeKind != "" {
+        if matchExcludeExp(excludeKind, getFileKind(filePath)) {
+            return true // Exclude if file kind matches excludeKind pattern
+        }
+    }
 
-	return addFile
+    return false
 }
+
+func shouldIncludeFile(filePath string, includeFile string, includePath string, includeKind string) bool {
+
+    // Include by file name
+    if includeFile != "" {
+        var fileName = filepath.Base(filePath)
+        if !matchExcludeExp(includeFile, fileName) {
+            return false // Exclude if fileName does NOT match includeFile pattern
+        }
+    }
+
+    // Include by file path
+    if includePath != "" {
+        if !matchExcludeExp(includePath, filePath) {
+            return false // Exclude if filePath does NOT match includePath pattern
+        }
+    }
+
+    // Include by file kind
+    if includeKind != "" {
+        if !matchExcludeExp(includeKind, getFileKind(filePath)) {
+            return false // Exclude if file kind does NOT match includeKind pattern
+        }
+    }
+
+    return true
+}
+
+func addFile(filePath string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string) bool {
+    if shouldExcludeFile(filePath, excludeFile, excludePath, excludeKind) {
+        return false
+    }
+
+	if !shouldIncludeFile(filePath, includeFile, includePath, includeKind) {
+		return false
+	}
+
+    return true
+}
+
 
 func writeToCSVFile(list [][]string, location string) {
 	var file, err = os.Create(location)
