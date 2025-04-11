@@ -13,7 +13,7 @@ var line_height_four
 const min_width = 700
 
 //Graph
-const max_graph_height = 500
+const max_graph_height = 550
 const min_graph_height = 300
 
 //Legend
@@ -41,7 +41,7 @@ const reCalculateSizes = () => {
 
     margin = { top: width*0.005, right: 0, bottom: width*0.035, left: width * 0.07 }
     graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) //- margin.top - margin.bottom
-    graph_radius = Math.min(width, graph_height) / 20
+    graph_radius = Math.min(width, graph_height) / 22
     graph_bandwidth_padding = graph_radius * 0.15
  
     line_height_four = Math.min(window.innerHeight, window.innerWidth) * 0.04

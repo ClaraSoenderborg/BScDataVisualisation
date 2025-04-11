@@ -43,6 +43,10 @@ func checkMailMap(author string) string {
 		log.Printf("Could not execute git check-mailmap" + string(output))
 	}
 
+		log.Printf("Warning: git check-mailmap gave error: " + string(output))
+		return ""
+	} 
+	
 	var trimmedOutput = strings.TrimSpace(string(output))
 
 	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
@@ -85,7 +89,7 @@ func removeDuplicates(list []string) []string {
 
 func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
 	//fmt.Printf(lines)
-
+	
 	var timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
@@ -112,7 +116,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
-					var _, weekNumber = parseTime.ISOWeek()
+					var date = parseTime.Format("2006-01-02")
 					var yAxisValue int
 					var nodeSizeValue int
 
@@ -135,7 +139,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 
 					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{repoPath, strconv.Itoa(weekNumber), au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
+						result = append(result, []string{repoPath, date, au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
 					}
 				}
 				}
@@ -239,7 +243,7 @@ func writeToCSVFile(list [][]string, location string) {
 	defer file.Close()
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string{"repoPath", "week", "author", "fileName", "linesAdded", "linesDeleted", "yAxis", "nodeSize"})
+	writer.Write([]string{"repoPath", "date", "author", "fileName", "linesAdded", "linesDeleted", "yAxis", "nodeSize"})
 	writer.WriteAll(list)
 
 }
