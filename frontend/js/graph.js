@@ -29,10 +29,8 @@ const drawGraph = (data, metadata) => {
 
         var nodes = []
         var uniqueAuthors = new Set([])
-        //console.log(primaryGroup)
 
         primaryGroup.forEach((fileMap, yearWeek) => {
-            //console.log("hej")
 
             // sum changes for all files in week
             const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
@@ -76,10 +74,9 @@ const drawGraph = (data, metadata) => {
                 
                 authorMap.keys().forEach(item => uniqueAuthors.add(item))
 
-                console.log(topFiles[i].totalyAxis)
                 nodes.push({
-                    x: yearWeek,
-                    y: topFiles[i].totalyAxis,
+                    x: 0,
+                    y: 0,
                     yearWeek: yearWeek,
                     fileName: fileName,
                     authorMap: authorMap,
@@ -167,16 +164,12 @@ const drawGraph = (data, metadata) => {
          
         // Chapter 12, Helge book.
         const simulation = d3.forceSimulation(nodes)
-            .force("x", d3.forceX(d => xScale(d.yearWeek) + xScale.bandwidth() / 2).strength(0.8))
-            .force("y", d3.forceY(d => {
-                //console.log("d.y: " + d.y + ", yscale(d.y): " + yScale(d.y))
-                console.log(yScale.domain())
-                return yScale(d.y)
-            }).strength(1))
+            .force("x", d3.forceX(d => xScale(d.yearWeek) + xScale.bandwidth() / 2).strength(0.5))
+            .force("y", d3.forceY(d =>  yScale(d.yAxis)).strength(1))
             .force("boundary", forceBoundary(
-                (d) => xScale(d.x) + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min X boundary
+                (d) => xScale(d.yearWeek) + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min X boundary
                 (d) => 0 + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min Y (top)
-                (d) => xScale(d.x) + xScale.bandwidth() - rScale(d.nodeSize) - graph_bandwidth_padding,  // Max X boundary
+                (d) => xScale(d.yearWeek) + xScale.bandwidth() - rScale(d.nodeSize) - graph_bandwidth_padding,  // Max X boundary
                 (d) => graph_height - rScale(d.nodeSize) - graph_bandwidth_padding))  // Max Y (bottom)
             .force("collide", d3.forceCollide().radius(d => rScale(d.nodeSize)))
          
@@ -185,7 +178,6 @@ const drawGraph = (data, metadata) => {
 
         }
 
-        console.log("xscale for 2025-01 " + xScale("2025-01"))
         nodes.forEach(d => {
             
             buildPie(d,svg)})
