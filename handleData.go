@@ -114,10 +114,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
-					//fmt.Println(parseTime)
-					//var _, weekNumber = parseTime.ISOWeek()
 					var date = parseTime.Format("2006-01-02")
-					//fmt.Println(date)
 					var yAxisValue int
 					var nodeSizeValue int
 
