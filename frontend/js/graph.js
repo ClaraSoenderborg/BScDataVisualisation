@@ -23,14 +23,16 @@ const drawGraph = (data, metadata) => {
                 ["linesAdded", d3.sum(D, d => d.linesAdded)], 
                 ["linesDeleted", d3.sum(D, d => d.linesDeleted)],
             ]),
-            (w) => w.week,
+            (w) => formatISOWeek(w.date),
             (d) => d.fileName,
             (d) => d.author)
 
         var nodes = []
         var uniqueAuthors = new Set([])
+        //console.log(primaryGroup)
 
-        primaryGroup.forEach((fileMap, week) => {
+        primaryGroup.forEach((fileMap, yearWeek) => {
+            //console.log("hej")
 
             // sum changes for all files in week
             const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
@@ -74,10 +76,11 @@ const drawGraph = (data, metadata) => {
                 
                 authorMap.keys().forEach(item => uniqueAuthors.add(item))
 
+                console.log(topFiles[i].totalyAxis)
                 nodes.push({
-                    x: week,
+                    x: yearWeek,
                     y: topFiles[i].totalyAxis,
-                    week: week,
+                    yearWeek: yearWeek,
                     fileName: fileName,
                     authorMap: authorMap,
                     nodeSize: topFiles[i].totalNodeSize,
@@ -108,6 +111,7 @@ const drawGraph = (data, metadata) => {
             .tickSize(10)
             .tickPadding(5)
             .tickSizeOuter(0)
+            .tickFormat(d => d.split("-")[1]);
 
         const xAxisBackground = svg.append("g")
             .attr("class", "xAxisBackground");
@@ -163,8 +167,12 @@ const drawGraph = (data, metadata) => {
          
         // Chapter 12, Helge book.
         const simulation = d3.forceSimulation(nodes)
-            .force("x", d3.forceX(d => xScale(d.x) + xScale.bandwidth() / 2).strength(0.8))
-            .force("y", d3.forceY(d => yScale(d.y)).strength(1))
+            .force("x", d3.forceX(d => xScale(d.yearWeek) + xScale.bandwidth() / 2).strength(0.8))
+            .force("y", d3.forceY(d => {
+                //console.log("d.y: " + d.y + ", yscale(d.y): " + yScale(d.y))
+                console.log(yScale.domain())
+                return yScale(d.y)
+            }).strength(1))
             .force("boundary", forceBoundary(
                 (d) => xScale(d.x) + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min X boundary
                 (d) => 0 + rScale(d.nodeSize) + graph_bandwidth_padding,  // Min Y (top)
@@ -177,7 +185,10 @@ const drawGraph = (data, metadata) => {
 
         }
 
-        nodes.forEach(d => buildPie(d,svg))
+        console.log("xscale for 2025-01 " + xScale("2025-01"))
+        nodes.forEach(d => {
+            
+            buildPie(d,svg)})
 
     }
 

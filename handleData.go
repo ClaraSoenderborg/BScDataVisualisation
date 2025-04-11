@@ -114,8 +114,10 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					var parseTime, _ = time.Parse(timeLayout, timestamp)
-					var _, weekNumber = parseTime.ISOWeek()
-					var year = parseTime.Year()
+					//fmt.Println(parseTime)
+					//var _, weekNumber = parseTime.ISOWeek()
+					var date = parseTime.Format("2006-01-02")
+					//fmt.Println(date)
 					var yAxisValue int
 					var nodeSizeValue int
 
@@ -138,7 +140,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 
 					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{repoPath, strconv.Itoa(year) + "-" + strconv.Itoa(weekNumber),strconv.Itoa(weekNumber), strconv.Itoa(year), au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
+						result = append(result, []string{repoPath, date, au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
 					}
 				}
 				}
@@ -206,7 +208,7 @@ func writeToCSVFile(list [][]string, location string) {
 	defer file.Close()
 
 	var writer = csv.NewWriter(file)
-	writer.Write([]string{"repoPath", "week", "year", "author", "fileName", "linesAdded", "linesDeleted", "yAxis", "nodeSize"})
+	writer.Write([]string{"repoPath", "date", "author", "fileName", "linesAdded", "linesDeleted", "yAxis", "nodeSize"})
 	writer.WriteAll(list)
 
 }
