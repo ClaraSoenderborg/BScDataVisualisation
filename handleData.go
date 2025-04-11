@@ -40,9 +40,6 @@ func checkMailMap(author string) string {
 
 	var output, err = cmd.CombinedOutput()
 	if err != nil {
-		log.Printf("Could not execute git check-mailmap" + string(output))
-	}
-
 		log.Printf("Warning: git check-mailmap gave error: " + string(output))
 		return ""
 	} 
