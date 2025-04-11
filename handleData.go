@@ -177,17 +177,15 @@ func shouldExcludeFile(filePath string, excludeFile string, excludePath string, 
         }
     }
 
-    // Exclude by file path
     if excludePath != "" {
         if matchExcludeExp(excludePath, filePath) {
-            return true // Exclude if filePath matches excludePath pattern
+            return true
         }
     }
 
-    // Exclude by file kind
     if excludeKind != "" {
         if matchExcludeExp(excludeKind, getFileKind(filePath)) {
-            return true // Exclude if file kind matches excludeKind pattern
+            return true
         }
     }
 
@@ -196,25 +194,22 @@ func shouldExcludeFile(filePath string, excludeFile string, excludePath string, 
 
 func shouldIncludeFile(filePath string, includeFile string, includePath string, includeKind string) bool {
 
-    // Include by file name
     if includeFile != "" {
         var fileName = filepath.Base(filePath)
         if !matchExcludeExp(includeFile, fileName) {
-            return false // Exclude if fileName does NOT match includeFile pattern
+            return false
         }
     }
 
-    // Include by file path
     if includePath != "" {
         if !matchExcludeExp(includePath, filePath) {
-            return false // Exclude if filePath does NOT match includePath pattern
+            return false
         }
     }
 
-    // Include by file kind
     if includeKind != "" {
         if !matchExcludeExp(includeKind, getFileKind(filePath)) {
-            return false // Exclude if file kind does NOT match includeKind pattern
+            return false
         }
     }
 
