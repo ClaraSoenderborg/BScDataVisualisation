@@ -16,7 +16,7 @@ var version = "dev"
 func main() {
 	// argument flags
 	var repoPath = flag.String("repoPath", "", "Mandatory if dataPath is empty: Path to repository. If more than one then seperate by comma without spacing")
-	var dataPath = flag.String("dataPath", "", "Mandatory if repoPath is empty: Path to csv file. \nThe csvfile needs the following syntax: repoPath,week,author,fileName,linesAdded,linesDeleted,yAxis,nodeSize\nExample: /Users/Desktop/Project,37,mail@itu.dk,Program.cs,2,6,8,1")
+	var dataPath = flag.String("dataPath", "", "Mandatory if repoPath is empty: Path to csv file. \nThe csvfile needs the following syntax: repoPath,week,year,author,fileName,linesAdded,linesDeleted,yAxis,nodeSize\nExample: /Users/Desktop/Project,37,2024,mail@itu.dk,Program.cs,2,6,8,1")
 	var savePath = flag.String("savePath", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
 	var versionFlag = flag.Bool("version", false, "Show version")
 	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")

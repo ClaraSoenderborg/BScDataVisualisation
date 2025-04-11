@@ -26,11 +26,17 @@ const backgroundColor2 = "#D3D3D3"; // Gray
 
 const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors, maxNumberOfFiles) => {
 
-    const minWeek = d3.min(data.map(d => d.week))
-    const maxWeek = d3.max(data.map(d => d.week))
+    
+    const sortByWeeks = d3.sort(data, (a,b) => a.week - b.week)
+    const sortByYear = d3.sort(sortByWeeks, (a,b) => a.year - b.year)
+    console.log(sortByYear[sortByYear.length - 1].week)
+    
+    const minWeek = sortByYear[0].week
+    const maxWeek = sortByYear[sortByYear.length - 1].week
 
     xScale
-        .domain(d3.range(minWeek, maxWeek +1)) // key is week
+        .domain(
+            d3.range(minWeek, maxWeek +1)) // key is week
         .range([0, width]) //Changes
 
     yScale
