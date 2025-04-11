@@ -1,7 +1,7 @@
 // Chapter 3, Helge book.
 const yScale = d3.scaleLog()
 const xScale = d3.scaleBand()
-const rScale = d3.scaleLog()
+const rScale = d3.scaleSqrt() // Helge bog chapter 7
 
 //onst colorScale = d3.scaleOrdinal(d3.schemeSet2)
 
@@ -28,12 +28,13 @@ const formatISOWeek = d3.utcFormat("%G-%V"); // e.g. "2025-15"
 
 const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors, maxNumberOfFiles) => {
 
-
+    // Find weeks for xScale
+    // source: ChatGPT 
     const minDate = d3.min(data, d => d.date)
     const maxDate = d3.max(data, d => d.date)
     
     const yearWeeks = []
-    let current = d3.utcMonday(minDate) // Snap to start of week (Monday)
+    var current = d3.utcMonday(minDate) // Snap to start of week (Monday)
     const end = d3.utcMonday.offset(maxDate, 0)
 
     while (current < end) {
@@ -55,8 +56,8 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
     const radiusMax = maxNumberOfFiles > 10 ? d3.min([xScale.bandwidth() / 4, graph_radius]) : graph_radius
 
     rScale
-        .domain([globalNodeMin, globalNodeMax])
-        .range([radiusMax * 0.50, radiusMax])
+        .domain([0, globalNodeMax])
+        .range([radiusMax * 0.50, radiusMax])//.base(10)
 
     colorScale
         .domain(authors)
