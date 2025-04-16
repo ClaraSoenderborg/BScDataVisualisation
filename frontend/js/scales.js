@@ -20,10 +20,10 @@ const colorScale = d3.scaleOrdinal([
     "#3DA5D9", // Blue :)
 
 ]);
-const backgroundColor1 = "#FFFFFF"; // White
-const backgroundColor2 = "#D3D3D3"; // Gray
+const backgroundColor1 = "#FFFFFF" // White
+const backgroundColor2 = "#D3D3D3" // Gray
 
-const formatISOWeek = d3.utcFormat("%G-%V"); // e.g. "2025-15"
+const formatISOWeek = d3.utcFormat("%G-%V") // e.g. "2025-15"
 
 
 const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors, maxNumberOfFiles) => {
@@ -32,23 +32,25 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
     // source: ChatGPT 
     const minDate = d3.min(data, d => d.date)
     const maxDate = d3.max(data, d => d.date)
+
     
     const yearWeeks = []
-    var current = d3.utcMonday(minDate) // Snap to start of week (Monday)
-    const end = d3.utcMonday.offset(maxDate, 0)
+    var current = d3.utcMonday(minDate) 
+    const end = d3.utcMonday(maxDate)
 
-    while (current < end) {
+
+    while (current <= end) {
         yearWeeks.push(formatISOWeek(current))
-        current = d3.utcMonday.offset(current, 1) // Move forward 1 week
+        current = d3.utcMonday.offset(current, 1) 
     }
 
 
     xScale
-        .domain(yearWeeks) // key is week
-        .range([0, width]) //Changes
+        .domain(yearWeeks) 
+        .range([0, width]) 
 
     yScale
-        .domain([Math.max(1, globalyMin) / 1.5, globalyMax * 1.5]) //
+        .domain([Math.max(1, globalyMin) / 1.5, globalyMax * 1.5]) 
         .range([graph_height, margin.top])
         .base(globalyMax > 100 ? 10 : 2)
 
@@ -57,8 +59,8 @@ const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin
 
     rScale
         .domain([0, globalNodeMax])
-        .range([radiusMax * 0.50, radiusMax])//.base(10)
-
+        .range([radiusMax * 0.50, radiusMax])//.base(10) 
+    
     colorScale
         .domain(authors)
 

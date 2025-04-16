@@ -89,7 +89,8 @@ const drawGraph = (data, metadata) => {
 
         })
 
-        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, uniqueAuthors, maxNumberOfFiles)
+        
+        defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, Array.from(uniqueAuthors).sort(d3.ascending), maxNumberOfFiles)
 
         //Sets the width of the graph to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
