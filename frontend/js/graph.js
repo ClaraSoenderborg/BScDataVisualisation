@@ -139,13 +139,15 @@ const drawGraph = (data, metadata) => {
             .text("Weeks")
 
        
+        console.log(yScale.base())
         // y-axis
         const leftAxis = d3.axisLeft(yScale)
-            .tickValues(yScale.ticks().filter(tick => {
+            /*.tickValues(yScale.ticks().filter(tick => {
                 const logBase = yScale.base() === 2 ? Math.log2(tick) : Math.log10(tick) 
         
                 return tick === 1 || Number.isInteger(logBase)
-            }))
+            }))*/
+            .tickValues(getLogTicks(globalyMin, globalyMax))
             .tickSize(-width)
             .tickSizeOuter(0)
             .tickPadding(20)
@@ -188,5 +190,19 @@ const drawGraph = (data, metadata) => {
     createGraph()
 
 
+}
+
+function getLogTicks(min, max) {
+    var ticks = []
+    const base = yScale.base()
+    ticks.push(1)
+    
+    var value = base
+    while (value <= max) {
+        ticks.push(value)
+        value *= base
+    }
+
+    return ticks
 }
 
