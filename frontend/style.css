@@ -1,7 +1,4 @@
 #container {
-    /*width: 100%;*/
-    /* Full width of the screen */
-    /*display: flex;*/
     justify-content: center;
     min-width: 750px;
 }
@@ -9,12 +6,9 @@
 /* Title */
 .topTitleText{
     font-size: 3.5vmin; 
-    dominant-baseline: middle;
     text-anchor: left;
     font-weight: bold;
     text-decoration: underline;
-
-
 }
 
 .selectMenu{
@@ -26,21 +20,41 @@
 #topDiv {
     display: flex;
     justify-content: space-between;
-    
     position: relative;
 }
 
 
+/* clickTooltip */
+.clickTooltip{
+    visibility: hidden;
+}
 
-.xAxisLabel, .yAxisLabel{
+.clickTooltip rect {
+    fill-opacity: 1;
+    fill: white;
+    stroke: grey;
+    stroke-width: 1px;
+  }
+
+.tooltipTotal{
     font-size: 2vmin;
+    text-anchor: end;
 }
 
-.leftAxis, .bottomAxis {
-    font-size: 2vmin; /* Changed */
+.labelLines{
+    fill: none;
+    stroke: dimgray;
+    stroke-width: 1px
 }
 
-/* ToolTip */
+.tooltip-donut .arc path {
+    stroke: white;
+    stroke-width: 1;
+}
+
+.tooltipTitle {
+    font-size: 3vmin;
+}
 
 .labelText {
     font-size: 1.7vmin;
@@ -48,22 +62,39 @@
     stroke: none;
 }
 
-.tooltipTitle {
-    font-size: 3vmin;
+
+/* graph */
+.xAxisBackground {
+    opacity: 0.2;
 }
-.tooltipTotal{
+
+.xAxisLabel, .yAxisLabel{
     font-size: 2vmin;
 }
 
-/* hover tooltip */
+.leftAxis, .bottomAxis {
+    font-size: 2vmin; 
+}
+
+.leftAxis .tick line {
+    stroke: lightgrey;
+}
+
+
+/* hoverTooltip */
+.hovertooltip{
+    visibility: hidden;
+    opacity: 0;
+}
+
 .hoverTooltipText{
     font-size: 2vmin;
-    dominant-baseline: hanging;
     font-weight: bold;
 }
 
 .hoverTooltipYAxis{
     font-weight: 100;
+    text-anchor: start;
 }
 
 .hoverTooltipBox{
@@ -72,25 +103,25 @@
     stroke-width: 1px;
 }
 
-
-/* Legend */
+/* legend */
 .legend-background{
     fill: #DCD0FF;
     fill-opacity: 0.2;
-    rx: 8px;
-    ry: 8px;
-}
-
-.legend-circle {
-    cx: 7px;
-    cy: 5px;
-    r: 3px;
 }
 
 .legend-text {
     font-size: 2.5vmin; 
-    dominant-baseline: middle;
-
 }
+
+/* pie */
+.singleDonut{
+    opacity: 1;
+}
+
+.pie-arc{
+    stroke: white;
+    stroke-width: 1;
+}
+
 
 

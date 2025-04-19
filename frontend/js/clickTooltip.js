@@ -7,18 +7,13 @@ const createClickTooltip = (svg, metadata) => {
   const toolTip = svg
     .append("g")
     .attr("class", "clickTooltip")
-    .style("visibility", "hidden");
 
   toolTip
     .append("rect")
     .attr("width", tooltip_width)
     .attr("height", tooltip_height)
-    .attr("rx", 10)
-    .attr("ry", 10)
-    .style("fill-opacity", 1)
-    .attr("fill", "white")
-    .attr("stroke", "grey")
-    .attr("stroke-width", "1px");
+    .attr("rx", 10) 
+    .attr("ry", 10) 
 
   toolTip
     .append("text")
@@ -26,7 +21,6 @@ const createClickTooltip = (svg, metadata) => {
     .attr("x", tooltip_padding)
     .attr("y", tooltip_padding);
 
-  // group for pie chart
   toolTip
     .append("g")
     .attr("class", "tooltip-donut")
@@ -38,13 +32,11 @@ const createClickTooltip = (svg, metadata) => {
   toolTip
     .append("text")
     .attr("class", "tooltipTotal")
-    .attr("text-anchor", "end")
-    .style("dominant-baseline", "hanging");
+    .style("dominant-baseline", "hanging"); 
 
   // Hide the tooltip when clicking anywhere on the page except on the donuts
   d3.select(document).on("click", (e, d) => {
     d3.select(".clickTooltip").style("visibility", "hidden");
-
     d3.selectAll(".singleDonut").style("opacity", 1);
   });
 
@@ -53,11 +45,10 @@ const createClickTooltip = (svg, metadata) => {
   });
 };
 
+// When closing the tooltip, remove all the tooltip content and reset the pies opacity. 
 function closeTooltip(e) {
   d3.selectAll(".singleDonut").style("opacity", 1);
-
   d3.select(".clickTooltip").style("visibility", "hidden");
-
   d3.selectAll(".details text").remove();
   d3.selectAll(".tooltip-donut path").remove();
   d3.selectAll(".labelLines").remove();
@@ -68,12 +59,10 @@ function closeTooltip(e) {
 
 // When text is wrapped, make tooltip larger
 function adjustTooltipHeight(lineNumber) {
-  // Update the tooltip background size
   d3.select(".clickTooltip rect")
     .attr("height", tooltip_height + lineNumber * line_height_two)
     .attr("width", tooltip_width);
 
-  // Ensure the donut chart remains centered within the new tooltip height
   d3.select(".tooltip-donut").attr(
     "transform",
     `translate(${tooltip_width / 2},${tooltip_height / 2 + line_height_two * lineNumber + tooltip_padding
@@ -87,86 +76,97 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
   reCalculateSizes();
 
   const [x, y] = d3.pointer(e, svg.node());
+  const totalText = updateTotalText(nodeSize);
 
-  const totalText = d3
+  const lineNumber = wrapText(d3.select(".tooltipTitle"), 
+    fileName, 
+    tooltip_max_width - totalText.node().getComputedTextLength() - tooltip_padding, 
+    line_height_three
+  );
+  
+  adjustTooltipHeight(lineNumber);
+
+  showTooltipAtPosition(x, y);
+
+  buildTooltipChart(d3.select(".tooltip-donut"), authorMap)
+
+}
+
+function updateTotalText(nodeSize) {
+  return d3
     .select(".tooltipTotal")
     .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(nodeSize)}`)
     .attr("x", tooltip_width - tooltip_padding)
     .attr("y", tooltip_padding);
+}
 
-  const totalTextLength = totalText.node().getComputedTextLength();
-
-  const element = d3.select(".tooltipTitle");
-
-  const retLineNumber = wrapText(
-    element,
-    fileName,
-    tooltip_max_width - totalTextLength - tooltip_padding,
-    line_height_three
-  );
-
-  adjustTooltipHeight(retLineNumber);
-
+function showTooltipAtPosition(x, y) {
   d3.select(".clickTooltip")
-    .attr(
-      "transform",
-      `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(
-        y,
-        tooltip_height
-      )})`
-    )
+    .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
     .style("visibility", "visible")
     .raise()
     .transition()
     .duration(200)
     .style("opacity", 1);
-
-  d3.select(".toolTip-donut").call(() =>
-    buildTooltipChart(d3.select(".tooltip-donut"), authorMap)
-  );
 }
 
 var lastAddedEndPoint = [999, 999]
 
 function calculateLinePoints(d, arcGen) {
-  var posStart = arcGen.centroid(d); // Center of segment
+  var posStart = getPosStart(d, arcGen);
+  var posMid = getPosMid(posStart);
+  var posEnd = getPosEnd(posMid);
+  adjustPosEndIfOverlap(posEnd, posMid);
+  lastAddedEndPoint = posEnd;
+  return [posStart, posMid, posEnd];
+}
 
-  var posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
+function getPosStart(d, arcGen) {
+  return arcGen.centroid(d);
+}
 
-  var posEnd = [posMid[0] + (posMid[0] > 0 ? 25 : -25), posMid[1]]; // Shift label
+function getPosMid(posStart) {
+  return [posStart[0] * 2.5, posStart[1] * 2.5];
+}
 
-  // compare with last added endpoint
-  var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])
-  if (isOnSameSide) {
-    // check if x will overlap with last added end point
-    if (Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= (line_height_two)) {
-      var isRightSide = Math.sign(lastAddedEndPoint[0]) > 0
+function getPosEnd(posMid) {
+  return [posMid[0] + (posMid[0] > 0 ? 25 : -25), posMid[1]];
+}
 
-      if (isRightSide) {
-        var isCurrentEndAbovePrevEnd = posEnd[1] < lastAddedEndPoint[1]
-        if (isCurrentEndAbovePrevEnd) {
-          posEnd[1] = lastAddedEndPoint[1] + line_height_two
-          posMid[1] = lastAddedEndPoint[1] + line_height_two
-        } else {
-          posEnd[1] = posEnd[1] + line_height_two
-          posMid[1] = posMid[1] + line_height_two
-        }
-      } else {
-        var isCurrentEndBelowPrevEnd = posEnd[1] > lastAddedEndPoint[1]
-        if (isCurrentEndBelowPrevEnd) {
-          posEnd[1] = lastAddedEndPoint[1] - line_height_two
-          posMid[1] = lastAddedEndPoint[1] - line_height_two
-        } else {
-          posEnd[1] = posEnd[1] - line_height_two
-          posMid[1] = posMid[1] - line_height_two
-        }
-      }
-    }
+function adjustPosEndIfOverlap(posEnd, posMid) {
+  var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0]);
+  if (isOnSameSide && Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= line_height_two) {
+    adjustPosEndForOverlap(posEnd, posMid);
   }
+}
 
-  lastAddedEndPoint = posEnd
+function adjustPosEndForOverlap(posEnd, posMid) {
+  var isRightSide = Math.sign(lastAddedEndPoint[0]) > 0;
+  if (isRightSide) {
+    adjustPosEndForRightSide(posEnd, posMid);
+  } else {
+    adjustPosEndForLeftSide(posEnd, posMid);
+  }
+}
 
-  return [posStart, posMid, posEnd]
+function adjustPosEndForRightSide(posEnd, posMid) {
+  if (posEnd[1] < lastAddedEndPoint[1]) {
+    posEnd[1] = lastAddedEndPoint[1] + line_height_two;
+    posMid[1] = lastAddedEndPoint[1] + line_height_two;
+  } else {
+    posEnd[1] = posEnd[1] + line_height_two;
+    posMid[1] = posMid[1] + line_height_two;
+  }
+}
+
+function adjustPosEndForLeftSide(posEnd, posMid) {
+  if (posEnd[1] > lastAddedEndPoint[1]) {
+    posEnd[1] = lastAddedEndPoint[1] - line_height_two;
+    posMid[1] = lastAddedEndPoint[1] - line_height_two;
+  } else {
+    posEnd[1] = posEnd[1] - line_height_two;
+    posMid[1] = posMid[1] - line_height_two;
+  }
 }
 
 //source: https://gist.github.com/dbuezas/9306799
@@ -184,8 +184,6 @@ function buildTooltipChart(singleDonut, authorMap) {
     .data(preparedPie)
     .join("g")
     .attr("class", "arc")
-    .attr("stroke", "white")
-    .attr("stroke-width", "1");
 
   arcs
     .append("path")
@@ -199,12 +197,8 @@ function buildTooltipChart(singleDonut, authorMap) {
     .attr("class", "labelLines")
     .attr("points", function (d) {
       d.calcPoints = calculateLinePoints(d, arcGen)
-
       return d.calcPoints.map((p) => p.join(",")).join(" ");
     })
-    .style("fill", "none")
-    .style("stroke", "dimgrey")
-    .style("stroke-width", "1px");
 
   // Add labels outside segments
   arcs

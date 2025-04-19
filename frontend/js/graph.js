@@ -122,8 +122,7 @@ const drawGraph = (data, metadata) => {
             .attr("width", xScale.bandwidth())
             .attr("height", graph_height)
             .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2)
-            .attr("opacity", 0.2)
-
+            
         // Append x-axis
         const bottomAxisGroup = svg.append("g")
             .attr("class", "bottomAxis")
@@ -154,7 +153,6 @@ const drawGraph = (data, metadata) => {
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(leftAxis)
             .selectAll(".tick line")
-            .style("stroke", "lightgrey")
 
         svg.append("text")
             .attr("class", "yAxisLabel")
