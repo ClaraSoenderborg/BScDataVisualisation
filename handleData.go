@@ -83,7 +83,7 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
+func parseGitLog(lines string, excludeFile string, excludePath string, includeFile string, includePath string, yAxis string, nodeSize string, repoPath string) [][]string {
 	//fmt.Printf(lines)
 	
 	var timestamp, author, fileName, lineAdd, lineRemove string
@@ -108,7 +108,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 			} else {
 				var fields = strings.Fields(lineContent)
 				lineAdd, lineRemove, fileName = fields[0], fields[1], fields[2]
-				if addFile(fileName, excludeFile, excludePath, excludeKind, includeFile, includePath, includeKind) {
+				if addFile(fileName, excludeFile, excludePath, includeFile, includePath) {
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
 					//var parseTime, _ = time.Parse(timeLayout, timestamp)
@@ -157,6 +157,7 @@ func matchExcludeExp(regex string, input string) bool {
 	return match
 }
 
+/*
 func getFileKind(filepath string) string {
 	var cmd = exec.Command("file", "--brief", filepath)
 
@@ -166,9 +167,9 @@ func getFileKind(filepath string) string {
 	}
 
 	return string(output)
-}
+}*/
 
-func shouldExcludeFile(filePath string, excludeFile string, excludePath string, excludeKind string) bool {
+func shouldExcludeFile(filePath string, excludeFile string, excludePath string) bool {
 
     if excludeFile != "" {
         var fileName = filepath.Base(filePath)
@@ -183,16 +184,11 @@ func shouldExcludeFile(filePath string, excludeFile string, excludePath string, 
         }
     }
 
-    if excludeKind != "" {
-        if matchExcludeExp(excludeKind, getFileKind(filePath)) {
-            return true
-        }
-    }
 
     return false
 }
 
-func shouldIncludeFile(filePath string, includeFile string, includePath string, includeKind string) bool {
+func shouldIncludeFile(filePath string, includeFile string, includePath string) bool {
 
     if includeFile != "" {
         var fileName = filepath.Base(filePath)
@@ -207,21 +203,15 @@ func shouldIncludeFile(filePath string, includeFile string, includePath string, 
         }
     }
 
-    if includeKind != "" {
-        if !matchExcludeExp(includeKind, getFileKind(filePath)) {
-            return false
-        }
-    }
-
     return true
 }
 
-func addFile(filePath string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string) bool {
-    if shouldExcludeFile(filePath, excludeFile, excludePath, excludeKind) {
+func addFile(filePath string, excludeFile string, excludePath string, includeFile string, includePath string) bool {
+    if shouldExcludeFile(filePath, excludeFile, excludePath) {
         return false
     }
 
-	if !shouldIncludeFile(filePath, includeFile, includePath, includeKind) {
+	if !shouldIncludeFile(filePath, includeFile, includePath) {
 		return false
 	}
 
