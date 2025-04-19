@@ -18,9 +18,9 @@ const drawGraph = (data, metadata) => {
     const createGraph = () => {
         const primaryGroup = d3.rollup(data,
             (D) => new Map([
-                ["yAxis", d3.sum(D, d => d.yAxis)], 
+                ["yAxis", d3.sum(D, d => d.yAxis)],
                 ["nodeSize", d3.sum(D, d => d.nodeSize)],
-                ["linesAdded", d3.sum(D, d => d.linesAdded)], 
+                ["linesAdded", d3.sum(D, d => d.linesAdded)],
                 ["linesDeleted", d3.sum(D, d => d.linesDeleted)],
             ]),
             (w) => formatISOWeek(w.date),
@@ -34,8 +34,8 @@ const drawGraph = (data, metadata) => {
 
             // sum changes for all files in week
             const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
-                const totalNodeSize = d3.sum(authorMap.values().map(x => x.get("nodeSize")))
-                const totalyAxis = d3.sum(authorMap.values().map(x => x.get("yAxis")))
+                const totalNodeSize = d3.sum([...authorMap.values()].map(x => x.get("nodeSize")))
+                const totalyAxis = d3.sum([...authorMap.values()].map(x => x.get("yAxis")))
                 return { fileName, totalyAxis, totalNodeSize };
 
             })
@@ -71,8 +71,11 @@ const drawGraph = (data, metadata) => {
                 const fileName = topFiles[i].fileName
                 const authorMap = fileMap.get(fileName)
 
-                
-                authorMap.keys().forEach(item => uniqueAuthors.add(item))
+                if (!authorMap) {
+                    console.log("No authorMap for file: ${fileName}")
+                    continue
+                }
+                [...authorMap.keys()].forEach(item => uniqueAuthors.add(item))
 
                 nodes.push({
                     x: 0,
@@ -89,7 +92,7 @@ const drawGraph = (data, metadata) => {
 
         })
 
-        
+
         defineScales(data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, Array.from(uniqueAuthors).sort(d3.ascending), maxNumberOfFiles)
 
         //Sets the width of the graph to be as wide as the container(from chat)
@@ -138,13 +141,13 @@ const drawGraph = (data, metadata) => {
             .attr("y", graph_height + bottomAxisGroup.node().getBBox().height + margin.bottom * 0.5)
             .text("Weeks")
 
-       
+
         console.log(yScale.base())
         // y-axis
         const leftAxis = d3.axisLeft(yScale)
             /*.tickValues(yScale.ticks().filter(tick => {
-                const logBase = yScale.base() === 2 ? Math.log2(tick) : Math.log10(tick) 
-        
+                const logBase = yScale.base() === 2 ? Math.log2(tick) : Math.log10(tick)
+
                 return tick === 1 || Number.isInteger(logBase)
             }))*/
             .tickValues(getLogTicks(globalyMin, globalyMax))
@@ -163,8 +166,8 @@ const drawGraph = (data, metadata) => {
             .attr("class", "yAxisLabel")
             .attr("transform", `translate(${margin.left * 0.25}, ${graph_height * 0.5}) rotate(-90)`)
             .text(String(metadata.yAxis).charAt(0).toUpperCase() + String(metadata.yAxis).slice(1))
-        
-         
+
+
         // Chapter 12, Helge book.
         const simulation = d3.forceSimulation(nodes)
             .force("x", d3.forceX(d => xScale(d.yearWeek) + xScale.bandwidth() / 2).strength(0.5))
@@ -175,14 +178,14 @@ const drawGraph = (data, metadata) => {
                 (d) => xScale(d.yearWeek) + xScale.bandwidth() - rScale(d.nodeSize) - graph_bandwidth_padding,  // Max X boundary
                 (d) => graph_height - rScale(d.nodeSize) - graph_bandwidth_padding))  // Max Y (bottom)
             .force("collide", d3.forceCollide().radius(d => rScale(d.nodeSize)))
-         
+
         for (let i = 0; i < 300; i++) {
             simulation.tick()
 
         }
 
         nodes.forEach(d => {
-            
+
             buildPie(d,svg)})
 
     }
@@ -195,8 +198,8 @@ const drawGraph = (data, metadata) => {
 function getLogTicks(min, max) {
     var ticks = []
     const base = yScale.base()
-    ticks.push(1)
-    
+    if (base == 10) { ticks.push(1) }
+
     var value = base
     while (value <= max) {
         ticks.push(value)

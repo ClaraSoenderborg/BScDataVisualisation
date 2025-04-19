@@ -1,6 +1,6 @@
 d3.json("/metadata").then(metadata => {
 
-    d3.csv("/data.csv", d3.autoType).then(data => {  
+    d3.csv("/data.csv", d3.autoType).then(data => {
         const select = d3.select("#selectDiv")
                         .append("select")
                         .attr("class", "selectMenu")
@@ -10,11 +10,12 @@ d3.json("/metadata").then(metadata => {
 
         select.append("option")
             .attr("disabled", true)
-            .attr("selected", true) 
-            .attr("value", "")       
+            .attr("selected", true)
+            .attr("value", "")
             .text("Select repo")
-        
-        primaryGroup.keys().forEach(element => {
+
+        const keys = [...primaryGroup.keys()]
+        keys.forEach(element => {
             select.append("option")
                 .text(element)
         })
@@ -36,8 +37,8 @@ d3.json("/metadata").then(metadata => {
 
         }
 
-        window.addEventListener("resize", onChange) 
-        
+        window.addEventListener("resize", onChange)
+
     })
 
     function callDiv(data) {
@@ -45,9 +46,9 @@ d3.json("/metadata").then(metadata => {
         createTitle(data)
         drawGraph(data, metadata)
         createLegend(data)
-    
+
     }
-    
+
 })
 
 function cleanUp() {
@@ -59,7 +60,7 @@ function cleanUp() {
 
 
 
-   
+
 
 
 
