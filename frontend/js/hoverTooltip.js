@@ -16,7 +16,7 @@ const createHoverTooltip = (svg) => {
     .attr("class", "hoverTooltipText")
     .attr("y", hover_tooltip_padding)
     .attr("x", hover_tooltip_padding);
-};
+}
 
 function showTooltipOnHover(e, fileName, yAxis, yAxisMetric, svg) {
   const toolTip = d3.select(".hoverToolTip");

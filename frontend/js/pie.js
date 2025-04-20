@@ -3,7 +3,6 @@ const buildPie = (node, svg) => {
     const {x, y, yearWeek, fileName, authorMap, nodeSize, yAxis, yAxisMetric} = node
 
     const leftAxisGroup = svg.select(".leftAxis")
-    //console.log(y)
 
     const singleDonut = leftAxisGroup.append("g")
         .attr("transform", `translate(${x}, ${y})`)
@@ -30,19 +29,16 @@ const buildPie = (node, svg) => {
                 singleDonut.style("opacity", 1)
             }
             
-        });
+        })
 
     var pie = d3.pie().sort(null).value(([key, value]) => value.get("nodeSize"))
 
     const preparedPie = pie(authorMap)
 
     const drawPie = () => {
-
-
         var arcGen = d3.arc()
             .innerRadius(donutHole)
             .outerRadius(rScale(nodeSize))
-
 
         var arcs = singleDonut.selectAll()
         .data(preparedPie)
