@@ -10,7 +10,14 @@ const buildPie = (node, svg) => {
         .attr("class", "singleDonut")
         .on("click", (e, d) => {
 
-            showTooltipOnClick(e, fileName, authorMap, svg, nodeSize)
+            showTooltipOnClick(
+                {e, 
+                data: {
+                    fileName: fileName, 
+                    authorMap: authorMap,
+                    nodeSize: nodeSize
+                },
+                svg})
             singleDonut.style("opacity", 0.5)
             d3.select(".hoverToolTip").style("visibility", "hidden")
 
@@ -18,7 +25,15 @@ const buildPie = (node, svg) => {
         .on("mouseover", (e, d) => {
             //console.log(d3.select(".clickTooltip").style("visibility"))
             if (d3.select(".clickTooltip").style("visibility") !== "visible"){
-                showTooltipOnHover(e, fileName, yAxis, yAxisMetric, svg)
+                showTooltipOnHover({
+                    e, 
+                    data: {
+                        fileName: fileName,
+                        yAxis: yAxis, 
+                        yAxisMetric: yAxisMetric
+                    }, 
+                    svg
+                })
                 singleDonut.style("opacity", 0.5)
             }
 

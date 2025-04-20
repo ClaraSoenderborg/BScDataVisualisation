@@ -81,7 +81,7 @@ function adjustTooltipHeight(lineNumber) {
   );
 }
 
-function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
+function showTooltipOnClick({e, data, svg}) {
   // close previous tooltip and recalculate shared variables
   closeTooltip(e);
   reCalculateSizes();
@@ -90,7 +90,7 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
   const totalText = d3
     .select(".tooltipTotal")
-    .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(nodeSize)}`)
+    .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(data.nodeSize)}`)
     .attr("x", tooltip_width - tooltip_padding)
     .attr("y", tooltip_padding);
 
@@ -100,7 +100,7 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
   const retLineNumber = wrapText(
     element,
-    fileName,
+    data.fileName,
     tooltip_max_width - totalTextLength - tooltip_padding,
     line_height_three
   );
@@ -122,8 +122,8 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
     .style("opacity", 1);
 
   d3.select(".toolTip-donut").call(() =>
-    buildTooltipChart(d3.select(".tooltip-donut"), authorMap)
-  );
+    buildTooltipChart(d3.select(".tooltip-donut"), data.authorMap)
+  )
 }
 
 var lastAddedEndPoint = [999, 999]

@@ -18,7 +18,7 @@ const createHoverTooltip = (svg) => {
     .attr("x", hover_tooltip_padding);
 }
 
-function showTooltipOnHover(e, fileName, yAxis, yAxisMetric, svg) {
+function showTooltipOnHover({e, data, svg}) {
   const toolTip = d3.select(".hoverToolTip");
   const [x, y] = d3.pointer(e, svg.node());
 
@@ -26,7 +26,7 @@ function showTooltipOnHover(e, fileName, yAxis, yAxisMetric, svg) {
 
   var lineNumber = wrapText(
     element,
-    fileName,
+    data.fileName,
     hover_tooltip_max_width,
     line_height_two
   )
@@ -35,22 +35,23 @@ function showTooltipOnHover(e, fileName, yAxis, yAxisMetric, svg) {
   lineNumber++
   const startY = parseFloat(element.attr("y"))
   const startX = parseFloat(element.attr("x"))
+
   element.append("tspan")
     .attr("x", startX)
     .attr("y", startY + line_height_two * lineNumber) 
     .attr("text-anchor", "start")
     .style("dominant-baseline", "hanging")
     .attr("class", "hoverTooltipYAxis")
-    .text(`Total ${yAxisMetric}: ${yAxis}`)
+    .text(`Total ${data.yAxisMetric}: ${data.yAxis}`)
 
   d3.select(".hoverTooltipBox")
     .attr("width", hover_tooltip_width)
-    .attr("height", hover_tooltip_height);
+    .attr("height", hover_tooltip_height)
 
-  adjustHoverTooltipSize(lineNumber, d3.select(".hoverTooltipText"));
+  adjustHoverTooltipSize(lineNumber, element)
 
-  const actualWidth = parseFloat(d3.select(".hoverTooltipBox").attr("width"));
-  const actualHeight = parseFloat(d3.select(".hoverTooltipBox").attr("height"));
+  const actualWidth = parseFloat(d3.select(".hoverTooltipBox").attr("width"))
+  const actualHeight = parseFloat(d3.select(".hoverTooltipBox").attr("height"))
 
   toolTip
     .attr(
