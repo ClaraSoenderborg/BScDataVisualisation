@@ -231,6 +231,10 @@ function getLogTicks(min, max) {
         value *= base
     }
 
+    if (ticks.length == 0){
+        ticks.push(min)
+    }
+
     return ticks
 }
 
