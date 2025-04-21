@@ -6,7 +6,6 @@ const buildPie = (node, svg) => {
 
     const singleDonut = leftAxisGroup.append("g")
         .attr("transform", `translate(${x}, ${y})`)
-        .style("opacity", 1)
         .attr("class", "singleDonut")
         .on("click", (e, d) => {
 
@@ -19,11 +18,10 @@ const buildPie = (node, svg) => {
                 },
                 svg})
             singleDonut.style("opacity", 0.5)
-            d3.select(".hoverToolTip").style("visibility", "hidden")
+            d3.select(".hoverTooltip").style("visibility", "hidden")
 
         })
         .on("mouseover", (e, d) => {
-            //console.log(d3.select(".clickTooltip").style("visibility"))
             if (d3.select(".clickTooltip").style("visibility") !== "visible"){
                 showTooltipOnHover({
                     e, 
@@ -40,7 +38,7 @@ const buildPie = (node, svg) => {
         })
         .on("mouseout", (e, d) => {
             if (d3.select(".clickTooltip").style("visibility") !== "visible"){
-                d3.select(".hoverToolTip").style("visibility", "hidden")
+                d3.select(".hoverTooltip").style("visibility", "hidden")
                 singleDonut.style("opacity", 1)
             }
             
@@ -58,8 +56,7 @@ const buildPie = (node, svg) => {
         var arcs = singleDonut.selectAll()
         .data(preparedPie)
         .join("g")
-        .attr("stroke", "white")
-        .attr("stroke-width", "1")
+        .attr("class", "pie-arc")
 
         arcs.selectAll("path").remove()
 

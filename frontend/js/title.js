@@ -4,14 +4,14 @@ const createTitle = (data) => {
     
     const div = d3.select("#titleDiv")
     const containerWidth = d3.select("#container").node().getBoundingClientRect().width * 0.75;
-    //console.log(titleWidth);
     const svg = div.append("svg").attr("width", containerWidth)
 
     const textElement = svg.append("text")
         .attr("class", "topTitleText")
         .attr("x", "2%") 
         .attr("y", "2%") 
-        //.text(title); 
+        .style("dominant-baseline", "middle"); 
+
 
     const lineCount = wrapText(textElement, title, containerWidth, line_height_four)
 

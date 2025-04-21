@@ -1,22 +1,15 @@
 const createLegend = (data) => {
     const authors = colorScale.domain()
-    const rowHeight = 30; // Space for each row
+    const rowHeight = 30; 
 
-
-    // Create the SVG legend container
     const div = d3.select("#legendDiv")
     const legend = div.append("svg")
-        .attr("class", "legendSVG");
 
-    // Background rectangle for legend
-
-    // Function to draw the legend
     const drawLegend = () => {
         let usedRows = 1;
         let xPosition = margin.left;
         let yPosition = margin.top + 5;
 
-        // Remove existing legend items before redrawing
         legend.selectAll(".legend-item").remove();
         legend.selectAll(".legend-background").remove();
 
@@ -28,34 +21,39 @@ const createLegend = (data) => {
             .each(function (d) {
                 const textElem = d3.select(this).append("text")
                     .attr("class", "legend-text")
+                    .style("dominant-baseline", "middle")
                     .attr("x", 15) // Space from circle
                     .attr("y", 5)
                     .text(d)
                     .style("fill", colorScale);
 
-                const textWidth = textElem.node().getComputedTextLength(); // Measure text width
+                const textWidth = textElem.node().getComputedTextLength(); 
 
                 // Check if the next item would exceed max width
                 if (xPosition + textWidth + 20 > width) {
-                    xPosition = margin.left; // Move to new row
+                    xPosition = margin.left; 
                     yPosition += rowHeight;
                     usedRows++;
                 }
 
                 d3.select(this).attr("transform", `translate(${xPosition}, ${yPosition})`);
-                xPosition += textWidth + 35; // Update X position for next item
+                xPosition += textWidth + 35; 
             });
 
         const background = legend.append("rect")
             .attr("class", "legend-background")
             .attr("x", margin.left)
-             //.attr("width", width)
-              //.attr("height", legendHeight)
+            .attr("rx", 8) 
+            .attr("ry", 8) 
 
-        // Append circles for legend markers
+        // Append circles 
         legendItems.append("circle")
             .attr("class", "legend-circle")
-            .attr("fill", colorScale);
+            .attr("cx", 5) 
+            .attr("cy", 5) 
+            .attr("r", 3)
+            .attr("fill", colorScale)
+            
 
         // Update legend background height
         const legendHeight = usedRows * rowHeight;
@@ -66,12 +64,10 @@ const createLegend = (data) => {
         //Sets the width of the legend to be as wide as the container(from chat)
         const containerWidth = div.node().getBoundingClientRect().width;
 
-        // Update viewBox dynamically based on window size
-        legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + legendPadding}`)
+        legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + legendPadding}`);
 
     }
 
-    // Initial draw
     drawLegend();
 
-    }
+}

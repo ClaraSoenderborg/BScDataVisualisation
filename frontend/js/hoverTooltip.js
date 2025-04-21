@@ -1,25 +1,24 @@
 const createHoverTooltip = (svg) => {
   const toolTip = svg
     .append("g")
-    .attr("class", "hoverToolTip")
-    .style("visibility", "hidden")
-    .style("opacity", 0);
+    .attr("class", "hoverTooltip")
 
   toolTip
     .append("rect")
     .attr("class", "hoverTooltipBox")
-    .attr("rx", 5)
-    .attr("ry", 5);
+    .attr("rx", 5) 
+    .attr("ry", 5)
 
   toolTip
     .append("text")
     .attr("class", "hoverTooltipText")
     .attr("y", hover_tooltip_padding)
-    .attr("x", hover_tooltip_padding);
-}
+    .attr("x", hover_tooltip_padding)
+    .style("dominant-baseline", "hanging"); 
+};
 
 function showTooltipOnHover({e, data, svg}) {
-  const toolTip = d3.select(".hoverToolTip");
+  const toolTip = d3.select(".hoverTooltip");
   const [x, y] = d3.pointer(e, svg.node());
 
   const element = d3.select(".hoverTooltipText");
@@ -39,7 +38,7 @@ function showTooltipOnHover({e, data, svg}) {
   element.append("tspan")
     .attr("x", startX)
     .attr("y", startY + line_height_two * lineNumber) 
-    .attr("text-anchor", "start")
+    .attr("class", "hoverTooltipYAxis")
     .style("dominant-baseline", "hanging")
     .attr("class", "hoverTooltipYAxis")
     .text(`Total ${data.yAxisMetric}: ${data.yAxis}`)
@@ -69,7 +68,7 @@ function showTooltipOnHover({e, data, svg}) {
 }
 
 d3.select(document).on("click", (e) => {
-  d3.select(".hoverToolTip").style("visibility", "hidden").style("opacity", 0);
+  d3.select(".hoverTooltip").style("visibility", "hidden").style("opacity", 0);
 });
 
 function adjustHoverTooltipSize(lineNumber, textElement) {

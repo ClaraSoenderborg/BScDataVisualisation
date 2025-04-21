@@ -158,22 +158,22 @@ function buildXAxis(svg) {
     const xAxisBackground = svg.append("g")
         .attr("class", "xAxisBackground");
 
-    xAxisBackground.selectAll("rect")
-        .data(xScale.domain())
-        .enter()
-        .append("rect")
-        .attr("x", d => xScale(d) + margin.left)
-        .attr("y", 0)
-        .attr("width", xScale.bandwidth())
-        .attr("height", graph_height)
-        .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2)
-        .attr("opacity", 0.2)
+        xAxisBackground.selectAll("rect")
+            .data(xScale.domain())
+            .enter()
+            .append("rect")
+            .attr("x", d => xScale(d) + margin.left)
+            .attr("y", 0)
+            .attr("width", xScale.bandwidth())
+            .attr("height", graph_height)
+            .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2)
+            
 
-    // Append x-axis
-    const bottomAxisGroup = svg.append("g")
-        .attr("class", "bottomAxis")
-        .attr("transform", `translate(${margin.left},${graph_height})`)
-        .call(bottomAxis)
+        // Append x-axis
+        const bottomAxisGroup = svg.append("g")
+            .attr("class", "bottomAxis")
+            .attr("transform", `translate(${margin.left},${graph_height})`)
+            .call(bottomAxis)
 
     // x-axis label
     svg.append("text")
@@ -201,7 +201,6 @@ function buildYAxis(svg, metadata, globalyMin, globalyMax) {
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(leftAxis)
             .selectAll(".tick line")
-            .style("stroke", "lightgrey")
 
         svg.append("text")
             .attr("class", "yAxisLabel")
