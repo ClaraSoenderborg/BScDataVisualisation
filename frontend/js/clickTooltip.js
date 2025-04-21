@@ -76,53 +76,36 @@ function showTooltipOnClick({e, data, svg}) {
   reCalculateSizes();
 
   const [x, y] = d3.pointer(e, svg.node());
-  const totalText = updateTotalText(nodeSize);
-
-  const lineNumber = wrapText(d3.select(".tooltipTitle"), 
-    fileName, 
-    tooltip_max_width - totalText.node().getComputedTextLength() - tooltip_padding, 
-    line_height_three
-  );
-  
-  adjustTooltipHeight(lineNumber);
-
-  showTooltipAtPosition(x, y);
-
-  buildTooltipChart(d3.select(".tooltip-donut"), authorMap)
-
-}
-
-function updateTotalText(nodeSize) {
-  return d3
+  const totalText = d3
     .select(".tooltipTotal")
     .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(data.nodeSize)}`)
     .attr("x", tooltip_width - tooltip_padding)
     .attr("y", tooltip_padding);
+  
+    const totalTextLength = totalText.node().getComputedTextLength();
 
-  const totalTextLength = totalText.node().getComputedTextLength();
-
-  const element = d3.select(".tooltipTitle");
-
-  const retLineNumber = wrapText(
-    element,
-    data.fileName,
-    tooltip_max_width - totalTextLength - tooltip_padding,
-    line_height_three
-  );
-
-  adjustTooltipHeight(retLineNumber);
-
-  d3.select(".clickTooltip")
-    .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
-    .style("visibility", "visible")
-    .raise()
-    .transition()
-    .duration(200)
-    .style("opacity", 1);
-
-  d3.select(".toolTip-donut").call(() =>
-    buildTooltipChart(d3.select(".tooltip-donut"), data.authorMap)
-  )
+    const element = d3.select(".tooltipTitle");
+  
+    const retLineNumber = wrapText(
+      element,
+      data.fileName,
+      tooltip_max_width - totalTextLength - tooltip_padding,
+      line_height_three
+    );
+  
+    adjustTooltipHeight(retLineNumber);
+  
+    d3.select(".clickTooltip")
+      .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
+      .style("visibility", "visible")
+      .raise()
+      .transition()
+      .duration(200)
+      .style("opacity", 1);
+  
+    d3.select(".toolTip-donut").call(() =>
+      buildTooltipChart(d3.select(".tooltip-donut"), data.authorMap)
+    )
 }
 
 var lastAddedEndPoint = [999, 999]

@@ -25,8 +25,6 @@ func callGitLog(repositoryPath string) string {
 			fmt.Printf("Could not execute command")
 		}
 
-		fmt.Print(string(output))
-
 		return string(output)
 
 
@@ -156,18 +154,6 @@ func matchExcludeExp(regex string, input string) bool {
 	var match, _ = regexp.MatchString(regex, input)
 	return match
 }
-
-/*
-func getFileKind(filepath string) string {
-	var cmd = exec.Command("file", "--brief", filepath)
-
-	var output, err = cmd.CombinedOutput()
-	if err != nil {
-		log.Printf("Could not find file kind for file: %s", filepath)
-	}
-
-	return string(output)
-}*/
 
 func shouldExcludeFile(filePath string, excludeFile string, excludePath string) bool {
 
