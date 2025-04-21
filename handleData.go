@@ -11,37 +11,36 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
-var repoPath string
 
 func callGitLog(repositoryPath string) string {
 
-		repoPath = repositoryPath
-
 		var script = `git -C %s log --pretty=format:"%%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x7c)" --numstat --no-merges --no-renames --diff-filter=x`
 
-		var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath))
+		var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repositoryPath))
 
 		var output, err = cmd.CombinedOutput()
 		if err != nil {
 			fmt.Printf("Could not execute command")
 		}
 
+		fmt.Print(string(output))
+
 		return string(output)
 
 
 }
 
-func checkMailMap(author string) string {
+func checkMailMap(author string, repoPath string) string {
 	var script = `git -C %s check-mailmap "%s"`
 	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))
 
 	var output, err = cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("Warning: git check-mailmap gave error: " + string(output))
-		return ""
+		// author was not found in mailmap, so we will attempt to parse email from original co-author string
+		output = []byte(author)
 	} 
 	
 	var trimmedOutput = strings.TrimSpace(string(output))
@@ -55,13 +54,13 @@ func checkMailMap(author string) string {
 	return emailAddress.Address
 }
 
-func parseCoAuthors(coAuthorString string) []string {
+func parseCoAuthors(coAuthorString string, repoPath string) []string {
 	var listCoAuthor []string
 
 	var splitCoAuthor = strings.Split(coAuthorString, "|")
 
 	for _, author := range splitCoAuthor {
-		var properEmail = checkMailMap(author)
+		var properEmail = checkMailMap(author, repoPath)
 		if properEmail != "" {
 			listCoAuthor = append(listCoAuthor, properEmail)
 		}
@@ -84,14 +83,14 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-func parseGitLog(lines string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string, yAxis string, nodeSize string, repoPath string) [][]string {
+func parseGitLog(lines string, excludeFile string, excludePath string, includeFile string, includePath string, yAxis string, nodeSize string, repoPath string) [][]string {
 	//fmt.Printf(lines)
 	
 	var timestamp, author, fileName, lineAdd, lineRemove string
 	var blockLineCount int
 	var result = [][]string{}
 	var authors = []string{}
-	var timeLayout = "2006-01-02"
+	//var timeLayout = "2006-01-02"
 
 	for _, l := range strings.Split(lines, "\n") {
 		var lineContent = strings.TrimSpace(l)
@@ -103,17 +102,17 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 				authors = append(authors, author)
 				if len(fields) > 3 {
 					var coAuthors = strings.Join(fields[2:], " ")
-					authors = append(authors, parseCoAuthors(coAuthors)...)
+					authors = append(authors, parseCoAuthors(coAuthors, repoPath)...)
 					authors = removeDuplicates(authors)
 				}
 			} else {
 				var fields = strings.Fields(lineContent)
 				lineAdd, lineRemove, fileName = fields[0], fields[1], fields[2]
-				if addFile(fileName, excludeFile, excludePath, excludeKind, includeFile, includePath, includeKind) {
+				if addFile(fileName, excludeFile, excludePath, includeFile, includePath) {
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
-					var parseTime, _ = time.Parse(timeLayout, timestamp)
-					var date = parseTime.Format("2006-01-02")
+					//var parseTime, _ = time.Parse(timeLayout, timestamp)
+					//var date = parseTime.Format(timeLayout)
 					var yAxisValue int
 					var nodeSizeValue int
 
@@ -136,7 +135,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, excludeKi
 
 					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{repoPath, date, au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
+						result = append(result, []string{repoPath, timestamp, au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
 					}
 				}
 				}
@@ -158,6 +157,7 @@ func matchExcludeExp(regex string, input string) bool {
 	return match
 }
 
+/*
 func getFileKind(filepath string) string {
 	var cmd = exec.Command("file", "--brief", filepath)
 
@@ -167,9 +167,9 @@ func getFileKind(filepath string) string {
 	}
 
 	return string(output)
-}
+}*/
 
-func shouldExcludeFile(filePath string, excludeFile string, excludePath string, excludeKind string) bool {
+func shouldExcludeFile(filePath string, excludeFile string, excludePath string) bool {
 
     if excludeFile != "" {
         var fileName = filepath.Base(filePath)
@@ -184,16 +184,11 @@ func shouldExcludeFile(filePath string, excludeFile string, excludePath string, 
         }
     }
 
-    if excludeKind != "" {
-        if matchExcludeExp(excludeKind, getFileKind(filePath)) {
-            return true
-        }
-    }
 
     return false
 }
 
-func shouldIncludeFile(filePath string, includeFile string, includePath string, includeKind string) bool {
+func shouldIncludeFile(filePath string, includeFile string, includePath string) bool {
 
     if includeFile != "" {
         var fileName = filepath.Base(filePath)
@@ -208,21 +203,15 @@ func shouldIncludeFile(filePath string, includeFile string, includePath string, 
         }
     }
 
-    if includeKind != "" {
-        if !matchExcludeExp(includeKind, getFileKind(filePath)) {
-            return false
-        }
-    }
-
     return true
 }
 
-func addFile(filePath string, excludeFile string, excludePath string, excludeKind string, includeFile string, includePath string, includeKind string) bool {
-    if shouldExcludeFile(filePath, excludeFile, excludePath, excludeKind) {
+func addFile(filePath string, excludeFile string, excludePath string, includeFile string, includePath string) bool {
+    if shouldExcludeFile(filePath, excludeFile, excludePath) {
         return false
     }
 
-	if !shouldIncludeFile(filePath, includeFile, includePath, includeKind) {
+	if !shouldIncludeFile(filePath, includeFile, includePath) {
 		return false
 	}
 
