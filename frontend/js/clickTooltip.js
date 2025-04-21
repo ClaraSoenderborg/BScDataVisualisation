@@ -12,8 +12,8 @@ const createClickTooltip = (svg, metadata) => {
     .append("rect")
     .attr("width", tooltip_width)
     .attr("height", tooltip_height)
-    .attr("rx", 10) 
-    .attr("ry", 10) 
+    .attr("rx", 10)
+    .attr("ry", 10)
 
   toolTip
     .append("text")
@@ -32,7 +32,7 @@ const createClickTooltip = (svg, metadata) => {
   toolTip
     .append("text")
     .attr("class", "tooltipTotal")
-    .style("dominant-baseline", "hanging"); 
+    .style("dominant-baseline", "hanging");
 
   // Hide the tooltip when clicking anywhere on the page except on the donuts
   d3.select(document).on("click", (e, d) => {
@@ -70,7 +70,7 @@ function adjustTooltipHeight(lineNumber) {
   );
 }
 
-function showTooltipOnClick({e, data, svg}) {
+function showTooltipOnClick({ e, data, svg }) {
   // close previous tooltip and recalculate shared variables
   closeTooltip(e);
   reCalculateSizes();
@@ -81,42 +81,46 @@ function showTooltipOnClick({e, data, svg}) {
     .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(data.nodeSize)}`)
     .attr("x", tooltip_width - tooltip_padding)
     .attr("y", tooltip_padding);
-  
-    const totalTextLength = totalText.node().getComputedTextLength();
 
-    const element = d3.select(".tooltipTitle");
-  
-    const retLineNumber = wrapText(
-      element,
-      data.fileName,
-      tooltip_max_width - totalTextLength - tooltip_padding,
-      line_height_three
-    );
-  
-    adjustTooltipHeight(retLineNumber);
-  
-    d3.select(".clickTooltip")
-      .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
-      .style("visibility", "visible")
-      .raise()
-      .transition()
-      .duration(200)
-      .style("opacity", 1);
-  
-    d3.select(".toolTip-donut").call(() =>
-      buildTooltipChart(d3.select(".tooltip-donut"), data.authorMap)
-    )
+  const totalTextLength = totalText.node().getComputedTextLength();
+
+  const element = d3.select(".tooltipTitle");
+
+  const retLineNumber = wrapText(
+    element,
+    data.fileName,
+    tooltip_max_width - totalTextLength - tooltip_padding,
+    line_height_three
+  );
+
+  adjustTooltipHeight(retLineNumber);
+
+  d3.select(".clickTooltip")
+    .attr("transform", `translate(${calculateTooltipX(x, tooltip_width)}, ${calculateTooltipY(y, tooltip_height)})`)
+    .style("visibility", "visible")
+    .raise()
+    .transition()
+    .duration(200)
+    .style("opacity", 1);
+
+  d3.select(".toolTip-donut").call(() =>
+    buildTooltipChart(d3.select(".tooltip-donut"), data.authorMap)
+  )
 }
 
-var lastAddedEndPoint = [999, 999]
+var lastAddedEndPoint = [-999, 999]
 
 // Optimized with CodeScene
 function calculateLinePoints(d, arcGen) {
-  var posStart = getPosStart(d, arcGen);
-  var posMid = getPosMid(posStart);
-  var posEnd = getPosEnd(posMid);
+  var posStart = getPosStart(d, arcGen)
+  var posMid = getPosMid(posStart)
+  var posEnd = getPosEnd(posMid)
 
-  adjustPosEndIfOverlap(posEnd, posMid);
+  console.log("posEnd " + posEnd)
+
+  adjustPosEndIfOverlap(posEnd, posMid)
+
+  console.log("posEnd " + posEnd)
 
   lastAddedEndPoint = posEnd;
   return [posStart, posMid, posEnd];
@@ -135,19 +139,18 @@ function getPosEnd(posMid) {
 }
 
 function adjustPosEndIfOverlap(posEnd, posMid) {
-  var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0]);
-  if (isOnSameSide && Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= line_height_two) {
-    adjustPosEndForOverlap(posEnd, posMid);
-  }
-}
+  var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])
 
-function adjustPosEndForOverlap(posEnd, posMid) {
-  var isRightSide = Math.sign(lastAddedEndPoint[0]) > 0;
-  if (isRightSide) {
-    adjustPosEndForRightSide(posEnd, posMid);
-  } else {
-    adjustPosEndForLeftSide(posEnd, posMid);
+  if (isOnSameSide) {
+    var isRightSide = Math.sign(lastAddedEndPoint[0]) > 0
+
+    if (isRightSide) {
+      adjustPosEndForRightSide(posEnd, posMid)
+    } else{ // left side
+      adjustPosEndForLeftSide(posEnd, posMid)
+    }
   }
+
 }
 
 function adjustPosEndForRightSide(posEnd, posMid) {
