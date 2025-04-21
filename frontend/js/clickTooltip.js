@@ -81,7 +81,7 @@ function adjustTooltipHeight(lineNumber) {
   );
 }
 
-function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
+function showTooltipOnClick({e, data, svg}) {
   // close previous tooltip and recalculate shared variables
   closeTooltip(e);
   reCalculateSizes();
@@ -90,7 +90,7 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
   const totalText = d3
     .select(".tooltipTotal")
-    .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(nodeSize)}`)
+    .text(`Total ${setMetadata.nodeSize}: ${d3.format(",")(data.nodeSize)}`)
     .attr("x", tooltip_width - tooltip_padding)
     .attr("y", tooltip_padding);
 
@@ -100,7 +100,7 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
 
   const retLineNumber = wrapText(
     element,
-    fileName,
+    data.fileName,
     tooltip_max_width - totalTextLength - tooltip_padding,
     line_height_three
   );
@@ -122,51 +122,70 @@ function showTooltipOnClick(e, fileName, authorMap, svg, nodeSize) {
     .style("opacity", 1);
 
   d3.select(".toolTip-donut").call(() =>
-    buildTooltipChart(d3.select(".tooltip-donut"), authorMap)
-  );
+    buildTooltipChart(d3.select(".tooltip-donut"), data.authorMap)
+  )
 }
 
 var lastAddedEndPoint = [999, 999]
 
+// Optimized with CodeScene
 function calculateLinePoints(d, arcGen) {
-  var posStart = arcGen.centroid(d); // Center of segment
+  var posStart = getPosStart(d, arcGen);
+  var posMid = getPosMid(posStart);
+  var posEnd = getPosEnd(posMid);
 
-  var posMid = [posStart[0] * 2.5, posStart[1] * 2.5]; // Extend position outward
+  adjustPosEndIfOverlap(posEnd, posMid);
 
-  var posEnd = [posMid[0] + (posMid[0] > 0 ? 25 : -25), posMid[1]]; // Shift label
+  lastAddedEndPoint = posEnd;
+  return [posStart, posMid, posEnd];
+}
 
-  // compare with last added endpoint
-  var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])
-  if (isOnSameSide) {
-    // check if x will overlap with last added end point
-    if (Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= (line_height_two)) {
-      var isRightSide = Math.sign(lastAddedEndPoint[0]) > 0
+function getPosStart(d, arcGen) {
+  return arcGen.centroid(d);
+}
 
-      if (isRightSide) {
-        var isCurrentEndAbovePrevEnd = posEnd[1] < lastAddedEndPoint[1]
-        if (isCurrentEndAbovePrevEnd) {
-          posEnd[1] = lastAddedEndPoint[1] + line_height_two
-          posMid[1] = lastAddedEndPoint[1] + line_height_two
-        } else {
-          posEnd[1] = posEnd[1] + line_height_two
-          posMid[1] = posMid[1] + line_height_two
-        }
-      } else {
-        var isCurrentEndBelowPrevEnd = posEnd[1] > lastAddedEndPoint[1]
-        if (isCurrentEndBelowPrevEnd) {
-          posEnd[1] = lastAddedEndPoint[1] - line_height_two
-          posMid[1] = lastAddedEndPoint[1] - line_height_two
-        } else {
-          posEnd[1] = posEnd[1] - line_height_two
-          posMid[1] = posMid[1] - line_height_two
-        }
-      }
-    }
+function getPosMid(posStart) {
+  return [posStart[0] * 2.5, posStart[1] * 2.5];
+}
+
+function getPosEnd(posMid) {
+  return [posMid[0] + (posMid[0] > 0 ? 25 : -25), posMid[1]];
+}
+
+function adjustPosEndIfOverlap(posEnd, posMid) {
+  var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0]);
+  if (isOnSameSide && Math.abs(lastAddedEndPoint[1] - posEnd[1]) <= line_height_two) {
+    adjustPosEndForOverlap(posEnd, posMid);
   }
+}
 
-  lastAddedEndPoint = posEnd
+function adjustPosEndForOverlap(posEnd, posMid) {
+  var isRightSide = Math.sign(lastAddedEndPoint[0]) > 0;
+  if (isRightSide) {
+    adjustPosEndForRightSide(posEnd, posMid);
+  } else {
+    adjustPosEndForLeftSide(posEnd, posMid);
+  }
+}
 
-  return [posStart, posMid, posEnd]
+function adjustPosEndForRightSide(posEnd, posMid) {
+  if (posEnd[1] < lastAddedEndPoint[1]) {
+    posEnd[1] = lastAddedEndPoint[1] + line_height_two;
+    posMid[1] = lastAddedEndPoint[1] + line_height_two;
+  } else {
+    posEnd[1] = posEnd[1] + line_height_two;
+    posMid[1] = posMid[1] + line_height_two;
+  }
+}
+
+function adjustPosEndForLeftSide(posEnd, posMid) {
+  if (posEnd[1] > lastAddedEndPoint[1]) {
+    posEnd[1] = lastAddedEndPoint[1] - line_height_two;
+    posMid[1] = lastAddedEndPoint[1] - line_height_two;
+  } else {
+    posEnd[1] = posEnd[1] - line_height_two;
+    posMid[1] = posMid[1] - line_height_two;
+  }
 }
 
 //source: https://gist.github.com/dbuezas/9306799

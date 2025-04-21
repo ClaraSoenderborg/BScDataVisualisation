@@ -26,7 +26,7 @@ const backgroundColor2 = "#D3D3D3" // Gray
 const formatISOWeek = d3.utcFormat("%G-%V") // e.g. "2025-15"
 
 
-const defineScales = (data, globalyMax, globalyMin, globalNodeMax, globalNodeMin, authors, maxNumberOfFiles) => {
+const defineScales = ({data, globalyMax, globalyMin, globalNodeMax, authors, maxNumberOfFiles}) => {
 
     // Find weeks for xScale
     // source: ChatGPT 
