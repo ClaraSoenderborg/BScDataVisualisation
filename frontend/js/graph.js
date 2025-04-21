@@ -225,9 +225,9 @@ function getLogTicks(min, max) {
     var ticks = []
     const base = yScale.base()
 
-    var value = base
+    var value = 1
     while (value <= max) {
-        ticks.push(value)
+        if (value >= min) ticks.push(value)
         value *= base
     }
 
