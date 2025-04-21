@@ -44,11 +44,8 @@ const drawGraph = (data, metadata) => {
                 const fileName = topFiles[i].fileName
                 const authorMap = fileMap.get(fileName)
 
-                if (!authorMap) {
-                    console.log("No authorMap for file: ${fileName}")
-                    continue
-                }
-                [...authorMap.keys()].forEach(item => uniqueAuthors.add(item))
+
+                var arrAuthorMap = [...authorMap.keys()].forEach(item => uniqueAuthors.add(item))
 
                 nodes.push({
                     x: 0,
@@ -64,13 +61,13 @@ const drawGraph = (data, metadata) => {
             }
 
         })
-        
+
         defineScales({
-                data, 
+                data,
                 globalyMax,
-                globalyMin, 
-                globalNodeMax, 
-                authors: Array.from(uniqueAuthors).sort(d3.ascending), 
+                globalyMin,
+                globalNodeMax,
+                authors: Array.from(uniqueAuthors).sort(d3.ascending),
                 maxNumberOfFiles
             })
 
@@ -80,13 +77,13 @@ const drawGraph = (data, metadata) => {
         svg.attr("viewBox", `0 0 ${containerWidth} ${graph_height + margin.bottom + line_height_two * 2}`)
 
         removeGraph(svg)
-        
+
         // x-axis
         buildXAxis(svg)
 
         // y-axis
         buildYAxis(svg, metadata, globalyMin, globalyMax)
-        
+
 
         // Chapter 12, Helge book.
         const simulation = createSimulation(nodes)
@@ -167,7 +164,7 @@ function buildXAxis(svg) {
             .attr("width", xScale.bandwidth())
             .attr("height", graph_height)
             .attr("fill", (d, i) => i % 2 === 0 ? backgroundColor1 : backgroundColor2)
-            
+
 
         // Append x-axis
         const bottomAxisGroup = svg.append("g")
