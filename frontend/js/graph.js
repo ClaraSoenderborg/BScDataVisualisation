@@ -224,7 +224,6 @@ function createSimulation(nodes) {
 function getLogTicks(min, max) {
     var ticks = []
     const base = yScale.base()
-    if (base == 10) { ticks.push(1) }
 
     var value = base
     while (value <= max) {
