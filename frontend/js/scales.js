@@ -4,7 +4,21 @@ const xScale = d3.scaleBand()
 const rScale = d3.scaleSqrt() // Helge bog chapter 7
 
 const colorScale = d3.scaleOrdinal([
-    "#006D77", // Current 
+
+    "#006d77", // Current
+    "#ba274a", // Rose red
+    "#AEBF89", // Yellow green
+    "#8da0cb", // Blue
+    "#e89ff0", // Light purple
+    "#d98b19", // Mustard
+    "#ffa69e", // Melon
+    "#473c85", // Dark blue
+    "#fde12d", // School bus yellow
+    "#628b35", // Avocado
+    "#e96a38", // Coral
+    
+
+    /*"#006D77", // Current 
     "#BA274A", // Rose Red 
     "#628B35", // Avocado 
     "#D98B19", // Mustard 
@@ -15,7 +29,7 @@ const colorScale = d3.scaleOrdinal([
     "#7EBDC3", // Blue 
     "#46351D", // Shit brown 
     "#3DA5D9", // Blue 
-    "#E96A38", // Coral
+    "#E96A38", // Coral*/
 ])
 
 const backgroundColor1 = "#FFFFFF" // White
