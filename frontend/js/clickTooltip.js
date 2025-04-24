@@ -71,6 +71,9 @@ function adjustTooltipHeight(lineNumber) {
 }
 
 function showTooltipOnClick({ e, data, svg }) {
+  // reset starting point
+  lastAddedEndPoint = [-999, 999]
+
   // close previous tooltip and recalculate shared variables
   closeTooltip(e);
   reCalculateSizes();
@@ -146,7 +149,7 @@ function adjustPosEndIfOverlap(posEnd, posMid) {
 
     if (isRightSide) {
       adjustPosEndForRightSide(posEnd, posMid)
-    } else{ // left side
+    } else { // left side
       adjustPosEndForLeftSide(posEnd, posMid)
     }
   }
@@ -225,16 +228,8 @@ function buildTooltipChart(singleDonut, authorMap) {
     .style("dominant-baseline", "middle")
     .attr("fill", (d) => colorScale(d.data[0]))
     .each(function (d) {
-
-      if (setMetadata.nodeSize === "churn") {
-        const formattedAdd = d3.format(",")(d.data[1].get("linesAdded"))
-        const formattedDel = d3.format(",")(d.data[1].get("linesDeleted"))
-        const textElement = d3.select(this)
-        textElement.text(`Lines added: ${formattedAdd}, deleted: ${formattedDel}`)
-      } else {
-        const formattedNodeSize = d3.format(",")(d.data[1].get("nodeSize"))
-        const textElement = d3.select(this)
-        textElement.text(`${setMetadata.nodeSize}: ${formattedNodeSize}`);
-      }
+      const formattedNodeSize = d3.format(",")(d.data[1].get("nodeSize"))
+      const textElement = d3.select(this)
+      textElement.text(`${setMetadata.nodeSize}: ${formattedNodeSize}`)
     });
 }
