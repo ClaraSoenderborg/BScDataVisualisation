@@ -27,7 +27,6 @@ func callGitLog(repositoryPath string) string {
 
 		return string(output)
 
-
 }
 
 func checkMailMap(author string, repoPath string) string {
@@ -42,10 +41,11 @@ func checkMailMap(author string, repoPath string) string {
 	} 
 	
 	var trimmedOutput = strings.TrimSpace(string(output))
-
+	
 	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
 	if emailErr != nil {
-		log.Printf("Warning email not found from " + trimmedOutput)
+		
+		log.Printf("Warning: email not parsed from " + trimmedOutput)
 		return ""
 	}
 

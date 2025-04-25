@@ -1,6 +1,6 @@
 const buildPie = (node, svg) => {
 
-    const {x, y, yearWeek, fileName, authorMap, nodeSize, yAxis, yAxisMetric} = node
+    const { x, y, yearWeek, fileName, authorMap, nodeSize, yAxis, yAxisMetric, nodeSizeMetric} = node
 
     const leftAxisGroup = svg.select(".leftAxis")
 
@@ -10,26 +10,31 @@ const buildPie = (node, svg) => {
         .on("click", (e, d) => {
 
             showTooltipOnClick(
-                {e, 
-                data: {
-                    fileName: fileName, 
-                    authorMap: authorMap,
-                    nodeSize: nodeSize
-                },
-                svg})
+                {
+                    e,
+                    data: {
+                        fileName: fileName,
+                        authorMap: authorMap,
+                        nodeSize: nodeSize
+                    },
+                    svg
+                })
             singleDonut.style("opacity", 0.5)
             d3.select(".hoverTooltip").style("visibility", "hidden")
 
         })
         .on("mouseover", (e, d) => {
-            if (d3.select(".clickTooltip").style("visibility") !== "visible"){
+            if (d3.select(".clickTooltip").style("visibility") !== "visible") {
                 showTooltipOnHover({
-                    e, 
+                    e,
                     data: {
                         fileName: fileName,
-                        yAxis: yAxis, 
-                        yAxisMetric: yAxisMetric
-                    }, 
+                        yAxis: yAxis,
+                        yAxisMetric: yAxisMetric,
+                        authorMap: authorMap,
+                        nodeSize: nodeSize,
+                        nodeSizeMetric: nodeSizeMetric,
+                    },
                     svg
                 })
                 singleDonut.style("opacity", 0.5)
@@ -37,11 +42,11 @@ const buildPie = (node, svg) => {
 
         })
         .on("mouseout", (e, d) => {
-            if (d3.select(".clickTooltip").style("visibility") !== "visible"){
+            if (d3.select(".clickTooltip").style("visibility") !== "visible") {
                 d3.select(".hoverTooltip").style("visibility", "hidden")
                 singleDonut.style("opacity", 1)
             }
-            
+
         })
 
     var pie = d3.pie().sort(null).value(([key, value]) => value.get("nodeSize"))
@@ -54,15 +59,15 @@ const buildPie = (node, svg) => {
             .outerRadius(rScale(nodeSize))
 
         var arcs = singleDonut.selectAll()
-        .data(preparedPie)
-        .join("g")
-        .attr("class", "pie-arc")
+            .data(preparedPie)
+            .join("g")
+            .attr("class", "pie-arc")
 
         arcs.selectAll("path").remove()
 
         arcs.append("path")
-        .attr("d", arcGen)
-        .attr("fill", d => colorScale(d.data[0]))
+            .attr("d", arcGen)
+            .attr("fill", d => colorScale(d.data[0]))
     }
 
     drawPie()

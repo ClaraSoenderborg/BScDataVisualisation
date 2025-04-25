@@ -30,18 +30,15 @@ function showTooltipOnHover({e, data, svg}) {
     line_height_two
   )
 
-  // add y-value to last line of tooltip
-  lineNumber++
-  const startY = parseFloat(element.attr("y"))
-  const startX = parseFloat(element.attr("x"))
+  lineNumber = addLine(`Total ${data.yAxisMetric}: ${data.yAxis}`, lineNumber, "black")
+  lineNumber = addLine(`Total ${data.nodeSizeMetric}: ${data.nodeSize}`, lineNumber, "black")
 
-  element.append("tspan")
-    .attr("x", startX)
-    .attr("y", startY + line_height_two * lineNumber) 
-    .attr("class", "hoverTooltipYAxis")
-    .style("dominant-baseline", "hanging")
-    .attr("class", "hoverTooltipYAxis")
-    .text(`Total ${data.yAxisMetric}: ${data.yAxis}`)
+  var authors = [...data.authorMap.keys()]
+  console.log(authors)
+
+  authors.forEach(author => {
+    lineNumber = addLine(`${author}: ${data.authorMap.get(author).get("nodeSize")}`,lineNumber, colorScale(author))
+  })
 
   d3.select(".hoverTooltipBox")
     .attr("width", hover_tooltip_width)
@@ -83,4 +80,24 @@ function adjustHoverTooltipSize(lineNumber, textElement) {
   d3.select(".hoverTooltipBox")
     .attr("height", hover_tooltip_height + lineNumber * line_height_two)
     .attr("width", maxTspan + hover_tooltip_padding * 2);
+}
+
+
+function addLine(text, lineNumber, color){
+  const element = d3.select(".hoverTooltipText");
+
+  // add y-value to last line of tooltip
+  lineNumber++
+  const startY = parseFloat(element.attr("y"))
+  const startX = parseFloat(element.attr("x"))
+
+  element.append("tspan")
+    .attr("x", startX)
+    .attr("y", startY + line_height_two * lineNumber) 
+    .attr("class", "hoverTooltipYAxis")
+    .style("dominant-baseline", "hanging")
+    .attr("fill", color)
+    .attr("class", "hoverTooltipYAxis")
+    .text(text)
+  return lineNumber
 }

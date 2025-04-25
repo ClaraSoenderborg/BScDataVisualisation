@@ -54,6 +54,7 @@ const drawGraph = (data, metadata) => {
                     fileName: fileName,
                     authorMap: authorMap,
                     nodeSize: topFiles[i].totalNodeSize,
+                    nodeSizeMetric: metadata.nodeSize,
                     yAxis: topFiles[i].totalyAxis,
                     yAxisMetric: metadata.yAxis
                 })
