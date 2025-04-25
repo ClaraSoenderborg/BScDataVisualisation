@@ -1,12 +1,12 @@
 const buildPie = (node, svg) => {
 
-    const { x, y, yearWeek, fileName, authorMap, nodeSize, yAxis, yAxisMetric, nodeSizeMetric} = node
+    const { x, y, yearWeek, fileName, authorMap, nodeSize, yAxis, yAxisMetric, nodeSizeMetric } = node
 
     const leftAxisGroup = svg.select(".leftAxis")
 
     const singleDonut = leftAxisGroup.append("g")
         .attr("transform", `translate(${x}, ${y})`)
-        .attr("class", "singleDonut")
+        .attr("class", `singleDonut ${sanitizeClassName(fileName)}`)
         .on("click", (e, d) => {
 
             showTooltipOnClick(
@@ -38,6 +38,20 @@ const buildPie = (node, svg) => {
                     svg
                 })
                 singleDonut.style("opacity", 0.5)
+
+                const className = sanitizeClassName(fileName);
+
+                // Select all matching single donuts
+                d3.selectAll(`.${className}`)
+                    .each(function () {
+                        const pie = d3.select(this);
+                        const bbox = this.getBBox();
+                        pie.insert("circle", ":first-child")
+                            .attr("class", "highlight-ring")
+                            .attr("r", bbox.width * 0.75) // slightly bigger than donut
+                            .attr("stroke", "magenta")
+                            .attr("stroke-width", 2)
+                    });
             }
 
         })
@@ -45,6 +59,12 @@ const buildPie = (node, svg) => {
             if (d3.select(".clickTooltip").style("visibility") !== "visible") {
                 d3.select(".hoverTooltip").style("visibility", "hidden")
                 singleDonut.style("opacity", 1)
+
+                const className = sanitizeClassName(fileName);
+
+                d3.selectAll(`.${className}`)
+                    .style("opacity", 1)
+                    .selectAll(".highlight-ring").remove();
             }
 
         })
@@ -72,6 +92,10 @@ const buildPie = (node, svg) => {
 
     drawPie()
 
+}
+
+function sanitizeClassName(str) {
+    return str.replace(/[^a-zA-Z0-9-_]/g, "_")
 }
 
 
