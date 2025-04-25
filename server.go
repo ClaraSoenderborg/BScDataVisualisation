@@ -86,7 +86,7 @@ func startServing(dataLocation string, data [][]string, metadata map[string]stri
 func setUpServer(dataLocation string, data [][]string, metadata map[string]string) {
 	var addr = "127.0.0.1"
 	var port = "8080"
-	var path = "cunt" //TODO fix this
+	var path = "RepoPie" //TODO fix this
 
 	log.Print(fmt.Sprintf("Serving %s on http://%s:%s", path, addr, port))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", addr, port), startServing(dataLocation, data, metadata)))

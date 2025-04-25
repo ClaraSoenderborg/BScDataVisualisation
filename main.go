@@ -17,15 +17,15 @@ func main() {
 	// argument flags
 	var repoPath = flag.String("repoPath", "", "Mandatory if dataPath is empty: Path to repository. If more than one then seperate by comma without spacing")
 	var dataPath = flag.String("dataPath", "", "Mandatory if repoPath is empty: Path to csv file. \nThe csvfile needs the following syntax: repoPath,date,author,fileName,linesAdded,linesDeleted,yAxis,nodeSize\nExample: /Users/Desktop/Project,2024-10-19,mail@itu.dk,Program.cs,2,6,8,1")
-	var savePath = flag.String("savePath", "", "Optional: Path to save data in csv-file.\nOtherwise serves data in memory")
+	var savePath = flag.String("savePath", "", "Optional: Path to save data in csv-file. Otherwise serves data in memory")
 	var versionFlag = flag.Bool("version", false, "Show version")
 	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
 	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
 	var includeFile = flag.String("includeFile", "", "RegExp on file names to include")
 	var includePath = flag.String("includePath", "", "RegExp on file paths to include")
-	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth")
+	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth. churn = linesAdded + linesDeleted, growth = linesAdded - linesDeleted")
 	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth")
-	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week. Default is 10, max is 20")
+	var numberOfFiles = flag.String("numberOfFiles", "10", "Optional: Number of files per week. Max is 20")
 
 
 
@@ -33,7 +33,7 @@ func main() {
 	// usage documentation for tool
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
-... [-repoPath <path_to_repository>] [-dataLocation <path_to_data>]
+... -repoPath <path_to_repository> -yAxis <churn/growth/commit> -nodeSize <churn/growth/commit>
 ... -h --help
 ... --version
 

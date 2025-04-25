@@ -146,7 +146,6 @@ func parseGitLog(lines string, excludeFile string, excludePath string, includeFi
 			authors = nil
 		}
 	}
-	fmt.Println(len(result))
 	return result
 }
 
