@@ -63,7 +63,9 @@ func main(){
 	}
 
 	var writer = csv.NewWriter(os.Stdout)
-	writer.Write([]string{"repoPath", "date", "author", "fileName", "linesAdded", "linesDeleted", "yAxis", "nodeSize"})
+	defer writer.Flush()
+	
+	writer.Write([]string{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric"})
 	writer.WriteAll(res)
 
 	
@@ -162,8 +164,6 @@ func parseGitLog(lines string, excludeFile string, excludePath string, includeFi
 				if addFile(fileName, excludeFile, excludePath, includeFile, includePath) {
 					var lineAddInt, _ = strconv.Atoi(lineAdd)
 					var lineRemoveInt, _ = strconv.Atoi(lineRemove)
-					//var parseTime, _ = time.Parse(timeLayout, timestamp)
-					//var date = parseTime.Format(timeLayout)
 					var yAxisValue int
 					var nodeSizeValue int
 
@@ -186,7 +186,7 @@ func parseGitLog(lines string, excludeFile string, excludePath string, includeFi
 
 					if(yAxisValue > 0 && nodeSizeValue > 0){
 					for _, au := range authors {
-						result = append(result, []string{repoPath, timestamp, au, fileName, lineAdd, lineRemove, strconv.Itoa(yAxisValue), strconv.Itoa(nodeSizeValue)})
+						result = append(result, []string{repoPath, timestamp, au, fileName, strconv.Itoa(yAxisValue), yAxis, strconv.Itoa(nodeSizeValue), nodeSize})
 					}
 				}
 				}
