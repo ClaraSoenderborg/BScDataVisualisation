@@ -28,13 +28,20 @@ func TestParseGitLogChurnGrowth(t *testing.T) {
 
 
 	var expected = [][]string{
-		{repoPath, "2023-10-16", "auso@itu.dk", "src/Car.cs", "5", "4", "9", "1"},
-		{repoPath, "2023-10-16", "sscv@itu.dk", "src/Car.cs", "5", "4", "9", "1"},
-		{repoPath, "2023-10-16", "astb@itu.dk", "src/Car.cs", "5", "4", "9", "1"},
-		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "5", "4", "9", "1"},
+		{repoPath, "2023-10-16", "auso@itu.dk", "src/Car.cs", "9", "churn", "1", "growth"},
+		{repoPath, "2023-10-16", "sscv@itu.dk", "src/Car.cs", "9", "churn", "1", "growth"},
+		{repoPath, "2023-10-16", "astb@itu.dk", "src/Car.cs", "9", "churn", "1", "growth"},
+		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "9", "churn", "1", "growth"},
 	}
 
-	var actual = parseGitLog(input, excludeFile, excludePath, includeFile, includePath, yAxis, nodeSize, repoPath)
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
+	var actual = parseGitLog(input, regexFilters, yAxis, nodeSize, repoPath)
 
 	if !cmp.Equal(expected, actual) {
 		t.Errorf("Expected %s,\n but got %s\n", expected, actual)
@@ -56,15 +63,22 @@ func TestParseGitLogGrowthCommit(t *testing.T) {
 	var nodeSize = "commit"
 	var repoPath = "test/repo"
 
-
-	var expected = [][]string{
-		{repoPath, "2023-10-16", "auso@itu.dk", "src/Car.cs", "5", "4", "1", "1"},
-		{repoPath, "2023-10-16", "sscv@itu.dk", "src/Car.cs", "5", "4", "1", "1"},
-		{repoPath, "2023-10-16", "astb@itu.dk", "src/Car.cs", "5", "4", "1", "1"},
-		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "5", "4", "1", "1"},
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
 	}
 
-	var actual = parseGitLog(input, excludeFile, excludePath, includeFile, includePath, yAxis, nodeSize, repoPath)
+
+	var expected = [][]string{
+		{repoPath, "2023-10-16", "auso@itu.dk", "src/Car.cs", "1", "growth", "1", "commit"},
+		{repoPath, "2023-10-16", "sscv@itu.dk", "src/Car.cs", "1", "growth", "1", "commit"},
+		{repoPath, "2023-10-16", "astb@itu.dk", "src/Car.cs", "1", "growth", "1", "commit"},
+		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "1", "growth", "1", "commit"},
+	}
+
+	var actual = parseGitLog(input, regexFilters, yAxis, nodeSize, repoPath)
 
 	if !cmp.Equal(expected, actual) {
 		t.Errorf("Expected %s,\n but got %s\n", expected, actual)
@@ -86,15 +100,22 @@ func TestParseGitLogCommitChurn(t *testing.T) {
 	var nodeSize = "churn"
 	var repoPath = "test/repo"
 
-
-	var expected = [][]string{
-		{repoPath, "2023-10-16", "auso@itu.dk", "src/Car.cs", "5", "4", "1", "9"},
-		{repoPath, "2023-10-16", "sscv@itu.dk", "src/Car.cs", "5", "4", "1", "9"},
-		{repoPath, "2023-10-16", "astb@itu.dk", "src/Car.cs", "5", "4", "1", "9"},
-		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "5", "4", "1", "9"},
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
 	}
 
-	var actual = parseGitLog(input, excludeFile, excludePath, includeFile, includePath, yAxis, nodeSize, repoPath)
+
+	var expected = [][]string{
+		{repoPath, "2023-10-16", "auso@itu.dk", "src/Car.cs", "1", "commit", "9", "churn"},
+		{repoPath, "2023-10-16", "sscv@itu.dk", "src/Car.cs", "1", "commit", "9", "churn"},
+		{repoPath, "2023-10-16", "astb@itu.dk", "src/Car.cs", "1", "commit", "9", "churn"},
+		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "1", "commit", "9", "churn"},
+	}
+
+	var actual = parseGitLog(input, regexFilters, yAxis, nodeSize, repoPath)
 
 	if !cmp.Equal(expected, actual) {
 		t.Errorf("Expected %s,\n but got %s\n", expected, actual)
@@ -115,9 +136,16 @@ func TestAddFileIncludeFileTrue(t *testing.T) {
 	var includeFile = ""
 	var includePath = `Program\.cs$`
 
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
 	var expected = true
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t, but got %t\n", expected, actual)
@@ -131,10 +159,17 @@ func TestAddFileExcludeFileFalse(t *testing.T) {
 	var excludePath = ""
 	var includeFile = ""
 	var includePath = ""
+	
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
 
 	var expected = false
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t, but got %t\n", expected, actual)
@@ -149,9 +184,16 @@ func TestAddFileIncludePathTrue(t *testing.T) {
 	var includeFile = ""
 	var includePath = `Pages\/`
 
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
 	var expected = true
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t, but got %t\n", expected, actual)
@@ -166,9 +208,16 @@ func TestAddFileIncludePathFalse(t *testing.T) {
 	var includeFile = ""
 	var includePath = `Pages\/`
 
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
 	var expected = false
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t, but got %t\n", expected, actual)
@@ -184,9 +233,16 @@ func TestAddFileExcludePathFalse(t *testing.T) {
 	var includeFile = ""
 	var includePath = ""
 
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
 	var expected = false
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t,but got %t\n", expected, actual)
@@ -201,9 +257,16 @@ func TestAddFileCombiFalse(t *testing.T) {
 	var includeFile = `\.cs$`
 	var includePath = ""
 
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
 	var expected = false
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t, but got %t\n", expected, actual)
@@ -218,9 +281,16 @@ func TestAddFileCombiTrue(t *testing.T) {
 	var includeFile = `\.cs$`
 	var includePath = ""
 
+	var regexFilters = map[string]string{
+		"excludeFile": excludeFile,
+		"excludePath": excludePath,
+		"includeFile": includeFile,
+		"includePath": includePath,
+	}
+
 	var expected = true
 
-	var actual = addFile(filePath, excludeFile, excludePath, includeFile, includePath)
+	var actual = addFile(filePath, regexFilters)
 
 	if expected != actual {
 		t.Errorf("Expected %t, but got %t\n", expected, actual)
