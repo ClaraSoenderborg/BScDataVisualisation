@@ -42,11 +42,11 @@ func parseGitLog(lines string, regexFilters map[string]string, yAxis string, nod
 				isBeginCommit = false
 			} else {
 				// following lines of commit contains lines added, lines deleted and filename
-					var rowsForFile = parseCommitFile(lineContent, yAxis, nodeSize, repoPath, date, authors, regexFilters)
-					if rowsForFile != nil {
-						result = append(result, rowsForFile...)
-					}
+				var rowsForFile = parseCommitFile(lineContent, yAxis, nodeSize, repoPath, date, authors, regexFilters)
+				if rowsForFile != nil {
+					result = append(result, rowsForFile...)
 				}
+			}
 		}
 
 		if lineContent == "" {
@@ -62,7 +62,6 @@ func parseCommitHeader(lineContent string, repoPath string) (string, []string) {
 	var date, mainAuthor = fields[0], fields[1]
 	var allAuthors = []string{mainAuthor}
 
-
 	// parse co-authors
 	if len(fields) > 3 {
 		var coAuthors = strings.Join(fields[2:], " ")
@@ -73,25 +72,24 @@ func parseCommitHeader(lineContent string, repoPath string) (string, []string) {
 	return date, allAuthors
 }
 
-
-
 func checkMailMap(author string, repoPath string) string {
 	var script = `git -C %s check-mailmap "%s"`
 	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))
 
 	var output, err = cmd.CombinedOutput()
+	var trimmedOutput = strings.TrimSpace(string(output))
+
 	if err != nil {
-		log.Printf("Warning: git check-mailmap gave error: " + string(output))
+		log.Printf("Warning: 'git check-mailmap' gave error: '" + trimmedOutput + "'")
 		// author was not found in mailmap, so we will attempt to parse email from original co-author string
-		output = []byte(author)
+		trimmedOutput = strings.TrimSpace(author)
 	}
 
-	var trimmedOutput = strings.TrimSpace(string(output))
 
 	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
 	if emailErr != nil {
 
-		log.Printf("Warning: email not parsed from " + trimmedOutput)
+		log.Printf("Warning: net/mail could not parse email from author: '" + trimmedOutput + "'")
 		return ""
 	}
 
@@ -127,13 +125,11 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
-
-
 func parseCommitFile(
-	lineContent, yAxis, nodeSize, repoPath, date string, 
-	authors []string, 
+	lineContent, yAxis, nodeSize, repoPath, date string,
+	authors []string,
 	regexFilters map[string]string) [][]string {
-	
+
 	var result = [][]string{}
 
 	var fields = strings.Fields(lineContent)
@@ -156,19 +152,19 @@ func parseCommitFile(
 
 	// add row for each author on commit for this file
 	for _, author := range authors {
-		result = append(result, 
+		result = append(result,
 			[]string{
-				repoPath, 
-				date, 
-				author, 
-				fileName, 
-				strconv.Itoa(yAxisValue), 
-				yAxis, 
-				strconv.Itoa(nodeSizeValue), 
+				repoPath,
+				date,
+				author,
+				fileName,
+				strconv.Itoa(yAxisValue),
+				yAxis,
+				strconv.Itoa(nodeSizeValue),
 				nodeSize,
 			})
 	}
-	
+
 	return result
 }
 
@@ -187,11 +183,11 @@ func addFile(filePath string, regexFilters map[string]string) bool {
 func shouldExcludeFile(filePath string, excludeFile string, excludePath string) bool {
 	if excludeFile != "" {
 		var fileName = filepath.Base(filePath)
-		return matchRegex(excludeFile, fileName) 	
+		return matchRegex(excludeFile, fileName)
 	}
 
 	if excludePath != "" {
-			return matchRegex(excludePath, filePath)
+		return matchRegex(excludePath, filePath)
 	}
 
 	return false
@@ -200,7 +196,7 @@ func shouldExcludeFile(filePath string, excludeFile string, excludePath string) 
 func shouldIncludeFile(filePath string, includeFile string, includePath string) bool {
 	if includeFile != "" {
 		var fileName = filepath.Base(filePath)
-		return matchRegex(includeFile, fileName) 
+		return matchRegex(includeFile, fileName)
 	}
 
 	if includePath != "" {
@@ -214,7 +210,6 @@ func matchRegex(regex string, input string) bool {
 	var match, _ = regexp.MatchString(regex, input)
 	return match
 }
-
 
 func getMetric(linesAdd int, linesDel int, metric string) int {
 	if metric == "churn" {
