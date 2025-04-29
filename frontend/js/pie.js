@@ -42,7 +42,7 @@ const buildPie = (node, svg) => {
                 const className = sanitizeClassName(fileName);
 
                 // Select all matching single donuts
-                d3.selectAll(`.${className}`)
+                d3.selectAll(`.${className}`).raise()
                     .each(function () {
                         const pie = d3.select(this);
                         const bbox = this.getBBox();
