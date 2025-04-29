@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+var failedCheckMailmap = map[string]bool{}
+var failedParseEmail = map[string]bool{}
+
+
 func callGitLog(repositoryPath string) string {
 
 	var script = `git -C %s log --pretty=format:"%%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x7c)" --numstat --no-merges --no-renames --diff-filter=x`
@@ -80,16 +84,22 @@ func checkMailMap(author string, repoPath string) string {
 	var trimmedOutput = strings.TrimSpace(string(output))
 
 	if err != nil {
-		log.Printf("Warning: 'git check-mailmap' gave error: '" + trimmedOutput + "'")
+		// only log warning if specific author has not failed before
+		if !failedCheckMailmap[author] {
+			log.Printf("Warning: 'git check-mailmap' gave error: '" + trimmedOutput + "'")
+			failedCheckMailmap[author] = true
+		}
 		// author was not found in mailmap, so we will attempt to parse email from original co-author string
 		trimmedOutput = strings.TrimSpace(author)
 	}
 
-
 	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
 	if emailErr != nil {
-
-		log.Printf("Warning: net/mail could not parse email from author: '" + trimmedOutput + "'")
+		// only log warning if specific author has not failed before
+		if !failedParseEmail[author] {
+			log.Printf("Warning: net/mail could not parse email from author: '" + trimmedOutput + "'")
+			failedParseEmail[author] = true
+		}
 		return ""
 	}
 
