@@ -21,6 +21,7 @@ const buildPie = (node, svg) => {
                 })
             singleDonut.style("opacity", 0.5)
             d3.select(".hoverTooltip").style("visibility", "hidden")
+            d3.selectAll(".highlight-ring").remove();
 
         })
         .on("mouseover", (e, d) => {
