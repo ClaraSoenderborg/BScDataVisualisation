@@ -20,7 +20,6 @@ func main() {
 	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
 	var includeFile = flag.String("includeFile", "", "RegExp on file names to include")
 	var includePath = flag.String("includePath", "", "RegExp on file paths to include")
-
 	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth. churn = linesAdded + linesDeleted, growth = linesAdded - linesDeleted")
 	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth")
 

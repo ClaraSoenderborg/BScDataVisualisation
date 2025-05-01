@@ -55,7 +55,7 @@ func startServing(data [][]string) http.Handler {
 func setUpServer(data [][]string) {
 	var addr = "127.0.0.1"
 	var port = "8080"
-	var path = "RepoPie" //TODO fix this
+	var path = "RepoPie" 
 
 	log.Print(fmt.Sprintf("Serving %s on http://%s:%s", path, addr, port))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", addr, port), startServing(data)))

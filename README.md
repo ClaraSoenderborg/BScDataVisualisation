@@ -1,7 +1,8 @@
 # RepoPie
-?? is a tool for visualising version control history of small, time-framed repositories. 
+RepoPie is a tool for visualising version control history of small, time-framed repositories. 
 
 ## Installation
+Download executables from build directory based on your hardware.
 
 ## Usage 
 

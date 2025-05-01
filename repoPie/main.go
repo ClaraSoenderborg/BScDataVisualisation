@@ -18,13 +18,10 @@ func main() {
 	// argument flags
 	
 	var versionFlag = flag.Bool("version", false, "Show version")
-	//var data = flag.String("data", "", "Data to be visualised, in CSV format. Headers should be: 'repoPath,date,author,fileName,yAxis,yAxisMetric,nodeSize,nodeSizeMetric'. Example row: '/repos/testrepo,2025-04-26,name@mail.com,readme.md,3,churn,1,commit")
-
 
 	// usage documentation for tool
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
-... -data <CSV-formatted data>
 ... -h --help
 ... --version
 
