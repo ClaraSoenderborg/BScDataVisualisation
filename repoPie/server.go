@@ -15,7 +15,6 @@ import (
 var frontendFiles embed.FS
 
 func serveCSV(w http.ResponseWriter, r *http.Request, data [][]string) {
-
 	// Set the correct content type for CSV
 	w.Header().Set("Content-Type", "text/csv")
 	w.Header().Set("Content-Disposition", "attachment; filename=data.csv")

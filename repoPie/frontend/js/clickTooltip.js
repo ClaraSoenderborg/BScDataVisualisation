@@ -76,7 +76,6 @@ function showTooltipOnClick({ e, data, svg }) {
 
   // close previous tooltip and recalculate shared variables
   closeTooltip(e);
-  reCalculateSizes();
 
   const [x, y] = d3.pointer(e, svg.node());
   const totalText = d3
