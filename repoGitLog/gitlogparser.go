@@ -156,7 +156,7 @@ func parseCommitFile(
 	var nodeSizeValue = getMetric(linesAdd, linesDel, nodeSize)
 
 	// no support for negative values
-	if yAxisValue <= 0 && nodeSizeValue <= 0 {
+	if yAxisValue <= 0 || nodeSizeValue <= 0 {
 		return nil
 	}
 

@@ -106,7 +106,6 @@ const drawGraph = (data, metadata) => {
         const nodeSizeMin = d3.min(topFiles, d => d.totalNodeSize)
         const nodeSizeMax = d3.max(topFiles, d => d.totalNodeSize)
 
-
         if (yAxisMin < globalyMin) {
             globalyMin = yAxisMin;
         }
