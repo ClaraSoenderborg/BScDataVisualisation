@@ -191,29 +191,35 @@ func addFile(filePath string, regexFilters map[string]string) bool {
 }
 
 func shouldExcludeFile(filePath string, excludeFile string, excludePath string) bool {
+	var excludeFileMatch = true
+	var excludePathMatch = true
+
 	if excludeFile != "" {
 		var fileName = filepath.Base(filePath)
-		return matchRegex(excludeFile, fileName)
+		excludeFileMatch = matchRegex(excludeFile, fileName)
 	}
 
 	if excludePath != "" {
-		return matchRegex(excludePath, filePath)
+		excludePathMatch = matchRegex(excludePath, filePath)
 	}
 
-	return false
+	return excludeFileMatch && excludePathMatch
 }
 
 func shouldIncludeFile(filePath string, includeFile string, includePath string) bool {
+	var includeFileMatch = true
+	var includePathMatch = true
+
 	if includeFile != "" {
 		var fileName = filepath.Base(filePath)
-		return matchRegex(includeFile, fileName)
+		includeFileMatch = matchRegex(includeFile, fileName)
 	}
 
 	if includePath != "" {
-		return matchRegex(includePath, filePath)
+		includePathMatch = matchRegex(includePath, filePath)
 	}
 
-	return true
+	return includeFileMatch && includePathMatch
 }
 
 func matchRegex(regex string, input string) bool {
