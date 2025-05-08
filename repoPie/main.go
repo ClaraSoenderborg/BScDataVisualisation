@@ -62,9 +62,9 @@ Options:` + "\n" + `
 	var result = [][]string{{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric","fileLimit"}}
 
 	// Read and discard the header
-	_, err := reader.Read()
+	h, err := reader.Read()
 	if err != nil {
-		log.Fatal(os.Stderr, "Error reading header: %v\n", err)
+		log.Fatal("Error reading header: %v\n", h)
 	}
 
 	for {
