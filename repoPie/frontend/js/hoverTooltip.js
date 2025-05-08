@@ -39,7 +39,7 @@ function showTooltipOnHover({e, data, svg}) {
 
   const element = d3.select(".hoverTooltipText") 
 
-  // Creates new line when text overflows 
+  // New line when text overflows 
   var lineNumber = wrapText(
     element,
     data.fileName,
@@ -63,7 +63,7 @@ function showTooltipOnHover({e, data, svg}) {
   const actualWidth = parseFloat(d3.select(".hoverTooltipBox").attr("width"))
   const actualHeight = parseFloat(d3.select(".hoverTooltipBox").attr("height"))
 
-  // Positions tooltip close to the mouse
+  // Positions tooltip close to the mouse and makes it visible
   toolTip
     .attr(
       "transform",

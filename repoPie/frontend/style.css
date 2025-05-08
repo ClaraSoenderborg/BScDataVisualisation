@@ -53,7 +53,7 @@ text{
     stroke-width: 1px
 }
 
-.tooltip-donut .arc path {
+.tooltip-pie .arc path {
     stroke: white;
     stroke-width: 1;
 }
@@ -120,7 +120,7 @@ text{
 }
 
 /* pie */
-.singleDonut{
+.singlePie{
     opacity: 1;
 }
 
