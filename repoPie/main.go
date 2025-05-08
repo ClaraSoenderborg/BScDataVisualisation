@@ -28,7 +28,7 @@ func main() {
 	// usage documentation for tool
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
-... <CSV-formatted data>
+... <CSV-formatted data with headers: repoPath,date,author,fileName,churn,growth,commit>
 ... -h --help
 ... --version
 

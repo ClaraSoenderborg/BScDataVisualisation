@@ -24,7 +24,7 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
-... <CSV-formatted data> [-excludeFile <regex>] [-excludePath <regex>] [-includeFile <regex>] [-includePath <regex>]
+... <CSV-formatted data with headers: repoPath,date,author,fileName,churn,growth,commit> [-excludeFile <regex>] [-excludePath <regex>] [-includeFile <regex>] [-includePath <regex>]
 ... -h --help
 ... --version
 
