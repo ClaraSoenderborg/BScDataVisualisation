@@ -40,7 +40,7 @@ func main() {
 	var writer = csv.NewWriter(os.Stdout)
 	defer writer.Flush()
 
-	writer.Write([]string{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric"})
+	writer.Write([]string{"repoPath", "date", "author", "fileName", "churn", "growth", "commit"})
 	writer.WriteAll(res)
 
 }

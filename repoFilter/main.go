@@ -54,8 +54,13 @@ Options:` + "\n" + `
 	var writer = csv.NewWriter(os.Stdout)
 	defer writer.Flush()
 
-	writer.Write([]string{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric"})
+	writer.Write([]string{"repoPath", "date", "author", "fileName", "churn", "growth", "commit"})
 	
+	 // Read and discard the header
+	 _, err := reader.Read()
+	 if err != nil {
+		 log.Fatal(os.Stderr, "Error reading header: %v\n", err)
+	 }
 	
 	for {
 		var data, err = reader.Read()
@@ -66,7 +71,7 @@ Options:` + "\n" + `
 			log.Fatalf("Error reading csv: %v", err)
 		}
 
-		if len(data) >= 8 && addFile(data[3], regexFilters) {
+		if len(data) >= 7 && addFile(data[3], regexFilters) {
 			writer.Write(data)
 		}
 	}

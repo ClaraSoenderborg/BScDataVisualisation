@@ -61,6 +61,11 @@ Options:` + "\n" + `
 
 	var result = [][]string{{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric","fileLimit"}}
 
+	// Read and discard the header
+	_, err := reader.Read()
+	if err != nil {
+		log.Fatal(os.Stderr, "Error reading header: %v\n", err)
+	}
 
 	for {
 		var data, err = reader.Read()
@@ -71,10 +76,15 @@ Options:` + "\n" + `
 			log.Fatalf("Error reading csv: %v", err)
 		}
 
-		if len(data) >= 8 {
+		if len(data) >= 7 {
 			var newData = data[0:4]
 			var churnVal, _ = strconv.Atoi(data[4])
-			var growthVal, _ = strconv.Atoi(data[4])
+			var growthVal, _ = strconv.Atoi(data[5])
+
+			if !addFile(*yAxis, *nodeSize, churnVal, growthVal) {
+				continue
+			}
+
 
 			if *yAxis == "churn" && churnVal>0{
 				newData = append(newData, data[4])
@@ -85,7 +95,7 @@ Options:` + "\n" + `
 			} else if *yAxis == "commit" {
 				newData = append(newData, data[6])
 
-			}
+			} 
 
 			newData = append(newData, *yAxis)
 
@@ -111,4 +121,17 @@ Options:` + "\n" + `
 	setUpServer(result)
 
 
+}
+
+func addFile(yAxisMetric string, nodeSizeMetric string, churnVal int, growthVal int) bool {
+	var addChurn = true
+	var addGrowth = true
+	if yAxisMetric == "churn" || nodeSizeMetric == "churn" {
+		if churnVal < 1 {addChurn = false}
+	}
+	if yAxisMetric == "growth" || nodeSizeMetric == "growth" {
+		if growthVal < 1 {addGrowth =  false}
+	}
+	
+	return addChurn && addGrowth
 }

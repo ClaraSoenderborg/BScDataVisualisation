@@ -31,17 +31,21 @@ const drawGraph = (data, metadata) => {
         var uniqueAuthors = new Set([])
 
         primaryGroup.forEach((fileMap, yearWeek) => {
+            var files = getFiles(fileMap)
 
-            const topFiles = getTopFiles(fileMap, 10)
+            if (metadata.fileLimit != null) {
+                files = files.slice(0, metadata.fileLimit)
+            }
+            
 
-            if(maxNumberOfFiles < topFiles.length) {
-                maxNumberOfFiles = topFiles.length
+            if(maxNumberOfFiles < files.length) {
+                maxNumberOfFiles = files.length
             }
 
-            updateGlobalMinMax(topFiles)
+            updateGlobalMinMax(files)
 
-            for (let i = 0; i < topFiles.length; i++) { // for loop for each file in a week
-                const fileName = topFiles[i].fileName
+            for (let i = 0; i < files.length; i++) { // for loop for each file in a week
+                const fileName = files[i].fileName
                 const authorMap = fileMap.get(fileName)
 
 
@@ -53,9 +57,9 @@ const drawGraph = (data, metadata) => {
                     yearWeek: yearWeek,
                     fileName: fileName,
                     authorMap: authorMap,
-                    nodeSize: topFiles[i].totalNodeSize,
+                    nodeSize: files[i].totalNodeSize,
                     nodeSizeMetric: metadata.nodeSize,
-                    yAxis: topFiles[i].totalyAxis,
+                    yAxis: files[i].totalyAxis,
                     yAxisMetric: metadata.yAxis
                 })
 
@@ -100,11 +104,11 @@ const drawGraph = (data, metadata) => {
 
     }
 
-    const updateGlobalMinMax = (topFiles) => {
-        const yAxisMin = d3.min(topFiles, d => d.totalyAxis)
-        const yAxisMax = d3.max(topFiles, d => d.totalyAxis)
-        const nodeSizeMin = d3.min(topFiles, d => d.totalNodeSize)
-        const nodeSizeMax = d3.max(topFiles, d => d.totalNodeSize)
+    const updateGlobalMinMax = (files) => {
+        const yAxisMin = d3.min(files, d => d.totalyAxis)
+        const yAxisMax = d3.max(files, d => d.totalyAxis)
+        const nodeSizeMin = d3.min(files, d => d.totalNodeSize)
+        const nodeSizeMax = d3.max(files, d => d.totalNodeSize)
 
         if (yAxisMin < globalyMin) {
             globalyMin = yAxisMin;
@@ -124,7 +128,7 @@ const drawGraph = (data, metadata) => {
     createGraph()
 }
 
-function getTopFiles(fileMap, numberOfFiles) {
+function getFiles(fileMap) {
     const fileArray = Array.from(fileMap, ([fileName, authorMap]) => {
         const totalNodeSize = d3.sum([...authorMap.values()].map(x => x.get("nodeSize")))
         const totalyAxis = d3.sum([...authorMap.values()].map(x => x.get("yAxis")))
@@ -132,8 +136,8 @@ function getTopFiles(fileMap, numberOfFiles) {
 
     })
 
-    fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
-    return fileArray.slice(0, numberOfFiles);
+    return fileArray.sort((a, b) => b.totalyAxis - a.totalyAxis)
+     
 }
 
 function removeGraph(svg) {

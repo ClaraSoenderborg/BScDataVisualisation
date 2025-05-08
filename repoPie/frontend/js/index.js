@@ -3,7 +3,10 @@ d3.csv("/data.csv", d3.autoType).then(data => {
     const metadata = {
         yAxis: data[0].yAxisMetric,
         nodeSize: data[0].nodeSizeMetric,
+        fileLimit: data[0].fileLimit,
     }
+
+    console.log(metadata)
 
     const select = d3.select("#selectDiv")
         .append("select")
