@@ -28,7 +28,7 @@ func callGitLog(repositoryPath string) string {
 
 }
 
-func parseGitLog(lines string, regexFilters map[string]string, yAxis string, nodeSize string, repoPath string) [][]string {
+func parseGitLog(lines string, yAxis string, nodeSize string, repoPath string) [][]string {
 	var date string
 	var isBeginCommit = true
 	var authors = []string{}
@@ -44,7 +44,7 @@ func parseGitLog(lines string, regexFilters map[string]string, yAxis string, nod
 				isBeginCommit = false
 			} else {
 				// following lines of commit contains lines added, lines deleted and filename
-				var rowsForFile = parseCommitFile(lineContent, yAxis, nodeSize, repoPath, date, authors, regexFilters)
+				var rowsForFile = parseCommitFile(lineContent, yAxis, nodeSize, repoPath, date, authors)
 				if rowsForFile != nil {
 					result = append(result, rowsForFile...)
 				}
@@ -135,8 +135,7 @@ func removeDuplicates(list []string) []string {
 
 func parseCommitFile(
 	lineContent, yAxis, nodeSize, repoPath, date string,
-	authors []string,
-	regexFilters map[string]string) [][]string {
+	authors []string) [][]string {
 
 	var result = [][]string{}
 

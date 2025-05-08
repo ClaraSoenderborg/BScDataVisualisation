@@ -1,9 +1,80 @@
 package main
 
 import (
+	"encoding/csv"
+	"flag"
+	"fmt"
+	"io"
+	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 )
+
+// default version. Overridden at build time
+var version = "dev"
+
+func main() {
+	var versionFlag = flag.Bool("version", false, "Show version")
+	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
+	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
+	var includeFile = flag.String("includeFile", "", "RegExp on file names to include")
+	var includePath = flag.String("includePath", "", "RegExp on file paths to include")
+
+
+	flag.Usage = func() {
+		fmt.Printf(`Usage:
+... <CSV-formatted data>
+... -h --help
+... --version
+
+Options:` + "\n" + `
+  -h --help
+        Show this screen.` + "\n")
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
+	// in case of -version
+	if *versionFlag {
+		fmt.Println("Version:", version)
+		os.Exit(0)
+	}
+
+	var regexFilters = map[string]string{
+		"excludeFile": *excludeFile,
+		"excludePath": *excludePath,
+		"includeFile": *includeFile,
+		"includePath": *includePath,
+	}
+
+	var reader = csv.NewReader(os.Stdin)
+
+	var writer = csv.NewWriter(os.Stdout)
+	defer writer.Flush()
+
+	writer.Write([]string{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric"})
+	
+	
+	for {
+		var data, err = reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil{
+			log.Fatalf("Error reading csv: %v", err)
+		}
+
+		if len(data) >= 8 && addFile(data[3], regexFilters) {
+			writer.Write(data)
+		}
+	}
+
+	
+
+
+}
 
 func addFile(filePath string, regexFilters map[string]string) bool {
 	if shouldExcludeFile(filePath, regexFilters["excludeFile"], regexFilters["excludePath"]) {
