@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/mail"
 	"os/exec"
-	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -145,10 +143,6 @@ func parseCommitFile(
 	var fields = strings.Fields(lineContent)
 	var linesAddStr, linesDelStr, fileName = fields[0], fields[1], fields[2]
 
-	if !addFile(fileName, regexFilters) {
-		return nil
-	}
-
 	var linesAdd, _ = strconv.Atoi(linesAddStr)
 	var linesDel, _ = strconv.Atoi(linesDelStr)
 
@@ -178,50 +172,7 @@ func parseCommitFile(
 	return result
 }
 
-func addFile(filePath string, regexFilters map[string]string) bool {
-	if shouldExcludeFile(filePath, regexFilters["excludeFile"], regexFilters["excludePath"]) {
-		return false
-	}
 
-	if !shouldIncludeFile(filePath, regexFilters["includeFile"], regexFilters["includePath"]) {
-		return false
-	}
-
-	return true
-}
-
-func shouldExcludeFile(filePath string, excludeFile string, excludePath string) bool {
-	if excludeFile != "" &&  matchRegex(excludeFile, filepath.Base(filePath)) {
-		return true
-	}
-
-	if excludePath != "" && matchRegex(excludePath, filePath){
-		return true
-	}
-
-	return false
-}
-
-func shouldIncludeFile(filePath string, includeFile string, includePath string) bool {
-	var includeFileMatch = true
-	var includePathMatch = true
-
-	if includeFile != "" {
-		var fileName = filepath.Base(filePath)
-		includeFileMatch = matchRegex(includeFile, fileName)
-	}
-
-	if includePath != "" {
-		includePathMatch = matchRegex(includePath, filePath)
-	}
-
-	return includeFileMatch && includePathMatch
-}
-
-func matchRegex(regex string, input string) bool {
-	var match, _ = regexp.MatchString(regex, input)
-	return match
-}
 
 func getMetric(linesAdd int, linesDel int, metric string) int {
 	if metric == "churn" {
