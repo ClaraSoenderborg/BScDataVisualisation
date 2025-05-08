@@ -1,3 +1,4 @@
+
 package main
 
 import (
@@ -18,7 +19,6 @@ var version = "dev"
 
 func main() {
 	// argument flags
-
 	var versionFlag = flag.Bool("version", false, "Show version")
 	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth.\nChurn = linesAdded + linesDeleted\nGrowth = linesAdded - linesDeleted")
 	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth.\nChurn = linesAdded + linesDeleted\nGrowth = linesAdded - linesDeleted")
@@ -58,8 +58,14 @@ Options:` + "\n" + `
 	}
 
 
-	var reader = csv.NewReader(os.Stdin)
+	setUpServer(reformatCSV(*yAxis, *nodeSize, *fileLimit))
 
+
+}
+
+func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
+	var reader = csv.NewReader(os.Stdin)
+	
 	var result = [][]string{{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric","fileLimit"}}
 
 	// Read and discard the header
@@ -82,46 +88,43 @@ Options:` + "\n" + `
 			var churnVal, _ = strconv.Atoi(data[4])
 			var growthVal, _ = strconv.Atoi(data[5])
 
-			if !addFile(*yAxis, *nodeSize, churnVal, growthVal) {
+			if !addFile(yAxis, nodeSize, churnVal, growthVal) {
 				continue
 			}
 
-
-			if *yAxis == "churn" && churnVal>0{
+			// y-axis
+			if yAxis == "churn" && churnVal>0{
 				newData = append(newData, data[4])
 
-			} else if *yAxis == "growth" && growthVal > 0{
+			} else if yAxis == "growth" && growthVal > 0{
 				newData = append(newData, data[5])
 
-			} else if *yAxis == "commit" {
+			} else if yAxis == "commit" {
 				newData = append(newData, data[6])
 
 			} 
+			newData = append(newData, yAxis)
 
-			newData = append(newData, *yAxis)
-
-			if *nodeSize == "churn" && churnVal>0{
+			// node-size
+			if nodeSize == "churn" && churnVal>0{
 				newData = append(newData, data[4])
 
-			} else if *nodeSize == "growth" && growthVal > 0 {
+			} else if nodeSize == "growth" && growthVal > 0 {
 				newData = append(newData, data[5])
 
-			} else if *nodeSize == "commit" {
+			} else if nodeSize == "commit" {
 				newData = append(newData, data[6])
 
 			}
-
-			newData = append(newData, *nodeSize)
-			newData = append(newData, *fileLimit)
+			newData = append(newData, nodeSize)
+			
+			newData = append(newData, fileLimit)
 
 			result = append(result, newData)
+			
 		}
 	}
-
-
-	setUpServer(result)
-
-
+	return result
 }
 
 func addFile(yAxisMetric string, nodeSizeMetric string, churnVal int, growthVal int) bool {
