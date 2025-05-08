@@ -12,9 +12,21 @@ import (
 var version = "dev"
 
 func main() {
-	var repoPath = flag.String("repoPath", "", "Mandatory if dataPath is empty: Path to repository. If more than one then seperate by comma without spacing")
+	var repoPath = flag.String("repoPath", "", "Mandatory: Path to repository. If more than one then seperate by comma without spacing")
 	var versionFlag = flag.Bool("version", false, "Show version")
 
+	flag.Usage = func() {
+		fmt.Printf(`Usage:
+... -repoPath <path to one or more repositories>
+... -h --help
+... --version
+
+Options:` + "\n" + `
+  -h --help
+        Show this screen.` + "\n")
+		flag.PrintDefaults()
+		fmt.Printf("\nFor more documentation, see readme at https://github.com/ClaraSoenderborg/BScDataVisualisation/")
+	}
 
 	flag.Parse()
 

@@ -20,9 +20,9 @@ func main() {
 	// argument flags
 
 	var versionFlag = flag.Bool("version", false, "Show version")
-	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth. churn = linesAdded + linesDeleted, growth = linesAdded - linesDeleted")
-	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth")
-	var fileLimit = flag.String("fileLimit", "", "Optinal: Limit for number of files per week")
+	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth.\nChurn = linesAdded + linesDeleted\nGrowth = linesAdded - linesDeleted")
+	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth.\nChurn = linesAdded + linesDeleted\nGrowth = linesAdded - linesDeleted")
+	var fileLimit = flag.String("fileLimit", "", "Optional: Limit for number of files per week")
 
 
 	// usage documentation for tool
@@ -36,6 +36,7 @@ Options:` + "\n" + `
   -h --help
         Show this screen.` + "\n")
 		flag.PrintDefaults()
+		fmt.Printf("\nFor more documentation, see readme at https://github.com/ClaraSoenderborg/BScDataVisualisation/")
 	}
 
 	flag.Parse()

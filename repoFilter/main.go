@@ -16,15 +16,15 @@ var version = "dev"
 
 func main() {
 	var versionFlag = flag.Bool("version", false, "Show version")
-	var excludeFile = flag.String("excludeFile", "", "RegExp on file names to exclude")
-	var excludePath = flag.String("excludePath", "", "RegExp on file paths to exclude")
-	var includeFile = flag.String("includeFile", "", "RegExp on file names to include")
-	var includePath = flag.String("includePath", "", "RegExp on file paths to include")
+	var excludeFile = flag.String("excludeFile", "", "Optional: RegExp on file names to exclude")
+	var excludePath = flag.String("excludePath", "", "Optional: RegExp on file paths to exclude")
+	var includeFile = flag.String("includeFile", "", "Optional: RegExp on file names to include")
+	var includePath = flag.String("includePath", "", "Optional: RegExp on file paths to include")
 
 
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
-... <CSV-formatted data>
+... <CSV-formatted data> [-excludeFile <regex>] [-excludePath <regex>] [-includeFile <regex>] [-includePath <regex>]
 ... -h --help
 ... --version
 
@@ -32,6 +32,7 @@ Options:` + "\n" + `
   -h --help
         Show this screen.` + "\n")
 		flag.PrintDefaults()
+		fmt.Printf("\nFor more documentation, see readme at https://github.com/ClaraSoenderborg/BScDataVisualisation/")
 	}
 
 	flag.Parse()
