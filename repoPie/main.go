@@ -65,7 +65,7 @@ Options:` + "\n" + `
 	// Read and discard the header
 	h, err := reader.Read()
 	if err != nil {
-		log.Fatal("Error reading header: %v\n", h)
+		log.Fatalf("Error reading header: %v\n", h)
 	}
 
 	for {

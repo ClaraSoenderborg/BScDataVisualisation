@@ -60,7 +60,7 @@ Options:` + "\n" + `
 	 // Read and discard the header
 	 _, err := reader.Read()
 	 if err != nil {
-		 log.Fatal(os.Stderr, "Error reading header: %v\n", err)
+		 log.Fatalf("Error reading header: %v\n", err)
 	 }
 	
 	for {
