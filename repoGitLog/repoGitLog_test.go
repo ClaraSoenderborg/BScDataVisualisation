@@ -16,9 +16,7 @@ func TestParseGitLogChurnGrowth(t *testing.T) {
 
 	var input = `2023-10-16 auso@itu.dk Sarah <sscv@itu.dk>|Astrid <astb@itu.dk>|Julia <jukl@itu.dk>
 5       4       src/Car.cs`
-	
-	var yAxis = "churn"
-	var nodeSize = "growth"
+
 	var repoPath = "test/repo"
 
 
@@ -30,7 +28,7 @@ func TestParseGitLogChurnGrowth(t *testing.T) {
 	}
 
 
-	var actual = parseGitLog(input, yAxis, nodeSize, repoPath)
+	var actual = parseGitLog(input, repoPath)
 
 	if !cmp.Equal(expected, actual) {
 		t.Errorf("Expected %s,\n but got %s\n", expected, actual)
@@ -43,10 +41,9 @@ func TestParseGitLogGrowthCommit(t *testing.T) {
 
 	var input = `2023-10-16 auso@itu.dk Sarah <sscv@itu.dk>|Astrid <astb@itu.dk>|Julia <jukl@itu.dk>
 5       4       src/Car.cs`
-	
 
-	var yAxis = "growth"
-	var nodeSize = "commit"
+
+
 	var repoPath = "test/repo"
 
 
@@ -59,7 +56,7 @@ func TestParseGitLogGrowthCommit(t *testing.T) {
 		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "1", "growth", "1", "commit"},
 	}
 
-	var actual = parseGitLog(input, yAxis, nodeSize, repoPath)
+	var actual = parseGitLog(input, repoPath)
 
 	if !cmp.Equal(expected, actual) {
 		t.Errorf("Expected %s,\n but got %s\n", expected, actual)
@@ -73,8 +70,7 @@ func TestParseGitLogCommitChurn(t *testing.T) {
 	var input = `2023-10-16 auso@itu.dk Sarah <sscv@itu.dk>|Astrid <astb@itu.dk>|Julia <jukl@itu.dk>
 5       4       src/Car.cs`
 
-	var yAxis = "commit"
-	var nodeSize = "churn"
+
 	var repoPath = "test/repo"
 
 
@@ -87,7 +83,7 @@ func TestParseGitLogCommitChurn(t *testing.T) {
 		{repoPath, "2023-10-16", "jukl@itu.dk", "src/Car.cs", "1", "commit", "9", "churn"},
 	}
 
-	var actual = parseGitLog(input, yAxis, nodeSize, repoPath)
+	var actual = parseGitLog(input, repoPath)
 
 	if !cmp.Equal(expected, actual) {
 		t.Errorf("Expected %s,\n but got %s\n", expected, actual)

@@ -28,7 +28,7 @@ func callGitLog(repositoryPath string) string {
 
 }
 
-func parseGitLog(lines string, yAxis string, nodeSize string, repoPath string) [][]string {
+func parseGitLog(lines string, repoPath string) [][]string {
 	var date string
 	var isBeginCommit = true
 	var authors = []string{}
@@ -44,7 +44,7 @@ func parseGitLog(lines string, yAxis string, nodeSize string, repoPath string) [
 				isBeginCommit = false
 			} else {
 				// following lines of commit contains lines added, lines deleted and filename
-				var rowsForFile = parseCommitFile(lineContent, yAxis, nodeSize, repoPath, date, authors)
+				var rowsForFile = parseCommitFile(lineContent, repoPath, date, authors)
 				if rowsForFile != nil {
 					result = append(result, rowsForFile...)
 				}
@@ -134,7 +134,7 @@ func removeDuplicates(list []string) []string {
 }
 
 func parseCommitFile(
-	lineContent, yAxis, nodeSize, repoPath, date string,
+	lineContent, repoPath, date string,
 	authors []string) [][]string {
 
 	var result = [][]string{}
@@ -145,13 +145,12 @@ func parseCommitFile(
 	var linesAdd, _ = strconv.Atoi(linesAddStr)
 	var linesDel, _ = strconv.Atoi(linesDelStr)
 
-	var yAxisValue = getMetric(linesAdd, linesDel, yAxis)
-	var nodeSizeValue = getMetric(linesAdd, linesDel, nodeSize)
+	var churnValue = getMetric(linesAdd, linesDel, "churn")
+	var commitValue = getMetric(linesAdd, linesDel, "commit")
+	var growthValue = getMetric(linesAdd, linesDel, "growth")
 
-	// no support for negative values
-	if yAxisValue <= 0 || nodeSizeValue <= 0 {
-		return nil
-	}
+
+	
 
 	// add row for each author on commit for this file
 	for _, author := range authors {
@@ -161,10 +160,9 @@ func parseCommitFile(
 				date,
 				author,
 				fileName,
-				strconv.Itoa(yAxisValue),
-				yAxis,
-				strconv.Itoa(nodeSizeValue),
-				nodeSize,
+				strconv.Itoa(churnValue),
+				strconv.Itoa(growthValue),
+				strconv.Itoa(commitValue),
 			})
 	}
 
