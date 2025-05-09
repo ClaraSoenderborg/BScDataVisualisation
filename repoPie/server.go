@@ -1,3 +1,5 @@
+// server.go in RepoPie is responsible for setting up local server, and serving data and static files 
+// Source for embedding and serving static files: https://hakk.dev/blog/posts/go-embed-example/
 package main
 
 import (
@@ -9,11 +11,11 @@ import (
 	"net/http"
 )
 
-//https://medium.com/@viktordev/socket-programming-in-go-write-a-simple-tcp-client-server-c9609edf3671
 
 //go:embed frontend/*
 var frontendFiles embed.FS
 
+// serveCSV serves provided csv-data
 func serveCSV(w http.ResponseWriter, r *http.Request, data [][]string) {
 	// Set the correct content type for CSV
 	w.Header().Set("Content-Type", "text/csv")
@@ -31,9 +33,11 @@ func serveCSV(w http.ResponseWriter, r *http.Request, data [][]string) {
 	if err != nil {
 		http.Error(w, "Could not write CSV data", http.StatusInternalServerError)
 	}
-
 }
 
+// startServing sets up endpoints:
+// - "/" for serving static html files
+// - "/data.csv" for serving csv-data in memory 
 func startServing(data [][]string) http.Handler {
 	var mux = http.NewServeMux()
 
@@ -51,6 +55,7 @@ func startServing(data [][]string) http.Handler {
 	return mux
 }
 
+// setUpServer starts the local http server
 func setUpServer(data [][]string) {
 	var addr = "127.0.0.1"
 	var port = "8080"

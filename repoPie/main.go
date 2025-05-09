@@ -1,4 +1,7 @@
-
+// RepoPie
+// - takes CSV-formatted data in stdin, along with argument flags yAxis and nodeSize. 
+// - reformats input data according to flags yAxis and nodeSize. 
+// - starts local http server to serve static files with data visualisation.
 package main
 
 import (
@@ -14,8 +17,6 @@ import (
 
 // default version. Overridden at build time
 var version = "dev"
-
-
 
 func main() {
 	// argument flags
@@ -47,6 +48,7 @@ Options:` + "\n" + `
 		os.Exit(0)
 	}
 
+	// Validate yAxis and nodeSize are given correct metric strings
 	var metricOptions = []string{"churn", "growth", "commit"}
 
 	if !slices.Contains(metricOptions, *yAxis) {
@@ -63,17 +65,22 @@ Options:` + "\n" + `
 
 }
 
+// reformatCSV builds a new CSV based on input CSV and y-axis and node size metrics given in user arguments. 
+// input will be format: repoPath, date, author, fileName, churn, growth, commit
+// output will be format: repoPath, date, author, fileName, yAxis, yAxisMetric, nodeSize, nodeSizeMetric, fileLimit. 
 func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
 	var reader = csv.NewReader(os.Stdin)
 	
-	var result = [][]string{{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric","fileLimit"}}
+	// Add headers to output csv
+	var result = [][]string{{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric", "fileLimit"}}
 
 	// Read and discard the header
-	h, err := reader.Read()
+	_, err := reader.Read()
 	if err != nil {
-		log.Fatalf("Error reading header: %v\n", h)
+		log.Fatalf("Error reading header: %v\n", err)
 	}
 
+	// Iterate over each row in input csv
 	for {
 		var data, err = reader.Read()
 		if err == io.EOF {
@@ -83,18 +90,20 @@ func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
 			log.Fatalf("Error reading csv: %v", err)
 		}
 
-		if len(data) >= 7 {
+		// row in input csv should have 7 fields 
+		if len(data) == 7 {
 			var newData = data[0:4]
 			var churnVal, _ = strconv.Atoi(data[4])
 			var growthVal, _ = strconv.Atoi(data[5])
 
-			if !addFile(yAxis, nodeSize, churnVal, growthVal) {
+			// if yAxisValue or nodeSizeValue is less than 1, skip row
+			if !addRow(yAxis, nodeSize, churnVal, growthVal) {
 				continue
 			}
 
-			// y-axis
+			// append yAxis value
 			if yAxis == "churn" && churnVal>0{
-				newData = append(newData, data[4])
+				newData = append(newData, data[4]) 
 
 			} else if yAxis == "growth" && growthVal > 0{
 				newData = append(newData, data[5])
@@ -103,9 +112,10 @@ func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
 				newData = append(newData, data[6])
 
 			} 
+			// append yAxisMetric
 			newData = append(newData, yAxis)
 
-			// node-size
+			// append nodeSize value
 			if nodeSize == "churn" && churnVal>0{
 				newData = append(newData, data[4])
 
@@ -116,10 +126,14 @@ func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
 				newData = append(newData, data[6])
 
 			}
+
+			// append nodeSizeMetric
 			newData = append(newData, nodeSize)
 			
+			// lastly, append fileLimit
 			newData = append(newData, fileLimit)
 
+			// add row to result csv
 			result = append(result, newData)
 			
 		}
@@ -127,9 +141,11 @@ func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
 	return result
 }
 
-func addFile(yAxisMetric string, nodeSizeMetric string, churnVal int, growthVal int) bool {
+// addRow checks if row should be added based on the value of y-axis and node size
+func addRow(yAxisMetric string, nodeSizeMetric string, churnVal int, growthVal int) bool {
 	var addChurn = true
 	var addGrowth = true
+	
 	if yAxisMetric == "churn" || nodeSizeMetric == "churn" {
 		if churnVal < 1 {addChurn = false}
 	}
