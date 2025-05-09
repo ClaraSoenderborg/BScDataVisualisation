@@ -85,6 +85,7 @@ function calculateTooltipY(y, tooltipHeight) {
     return y + tooltip_padding
 }
 
+const formatISOWeek = d3.utcFormat("%G-%V") // e.g. "2025-15"
 
 function wrapText(textElement, text, maxWidth, lineHeight) {
     textElement.text("") 

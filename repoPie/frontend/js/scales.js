@@ -35,7 +35,6 @@ const colorScale = d3.scaleOrdinal([
 const backgroundColor1 = "#FFFFFF" // White
 const backgroundColor2 = "#D3D3D3" // Gray
 
-const formatISOWeek = d3.utcFormat("%G-%V") // e.g. "2025-15"
 
 
 const defineScales = ({data, globalyMax, globalyMin, globalNodeMax, authors, maxNumberOfFiles}) => {
