@@ -8,7 +8,7 @@ With RepoPie, you can:
 - Hover on file to see activity for same file in other weeks, along with specific activity data on this file
 - Click on file to go more in depth with author contributions and activity data
 
-<img width="800" alt="Screenshot 2025-05-08 at 14 44 11" src="https://github.com/user-attachments/assets/a9ad2279-5999-4dfd-8c92-a481de64a2f4" />
+![ScreenRecording2025-05-08at14 44 53-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/020ffb4f-beea-474e-aced-deb924deac51)
 
 ## Installation
 Download executables from build directory based on your hardware.
@@ -89,9 +89,9 @@ Only with RepoGitLog and RepoPie:
 2. Run the following command to execute repoPie and helper tools:
 ```./repoGitLog -repoPath <path to example repo>/Chirp | ./repoFilter -includeFile "Program\.cs$" | ./repoPie -yAxis commit -nodeSize churn```
 
-3. Open link in browser to see following visualisation: 
+3. Open link in browser to see following visualisation:
 
-![ScreenRecording2025-05-08at14 44 53-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/020ffb4f-beea-474e-aced-deb924deac51)
+<img width="800" alt="Screenshot 2025-05-08 at 14 44 11" src="https://github.com/user-attachments/assets/a9ad2279-5999-4dfd-8c92-a481de64a2f4" />
 
 
 ## License
