@@ -7,9 +7,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-/*
------------------- parseGitLog tests -----------------------
-*/
 func TestParseGitLog(t *testing.T) {
 	// discard log messages for testing
 	log.SetOutput(io.Discard)

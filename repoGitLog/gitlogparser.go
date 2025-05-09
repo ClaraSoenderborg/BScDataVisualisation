@@ -1,3 +1,5 @@
+// gitlogparser.go is responsible for calling and parsing git log.
+
 package main
 
 import (
@@ -9,12 +11,19 @@ import (
 	"strings"
 )
 
+// maps to keep track of which unparsed co-authors have been warned about
 var failedCheckMailmap = map[string]bool{}
 var failedParseEmail = map[string]bool{}
 
-
+// callGitLog uses `git log` command
 func callGitLog(repositoryPath string) string {
 
+	// Documentation for pretty format: https://git-scm.com/docs/git-log#_pretty_formats 
+	// co-authors will be separated by "|"
+	// --numstat flag gives numerical values for added and deleted lines
+	// --no-merges excludes merges
+	// --no-renames excludes renames in commits
+	// --diff-filter=x excludes unknown files
 	var script = `git -C %s log --pretty=format:"%%as %%aE %%(trailers:key=Co-authored-by,valueonly,separator=%%x7c)" --numstat --no-merges --no-renames --diff-filter=x`
 
 	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repositoryPath))
@@ -28,6 +37,7 @@ func callGitLog(repositoryPath string) string {
 
 }
 
+// parseGitLog parses the output from 'git log' command and transforms it to csv-formatted data. 
 func parseGitLog(lines string, repoPath string) [][]string {
 	var date string
 	var isBeginCommit = true
@@ -35,15 +45,18 @@ func parseGitLog(lines string, repoPath string) [][]string {
 
 	var result = [][]string{}
 
+	// iterate over each line of git log 
 	for _, l := range strings.Split(lines, "\n") {
 		var lineContent = strings.TrimSpace(l)
 
+		// parse commit header
 		if lineContent != "" {
 			if isBeginCommit {
 				date, authors = parseCommitHeader(lineContent, repoPath)
 				isBeginCommit = false
-			} else {
-				// following lines of commit contains lines added, lines deleted and filename
+			} else { 
+				// parse file row under commit header
+				// each file row contains: lines added, lines deleted and filename
 				var rowsForFile = parseCommitFile(lineContent, repoPath, date, authors)
 				if rowsForFile != nil {
 					result = append(result, rowsForFile...)
@@ -51,6 +64,7 @@ func parseGitLog(lines string, repoPath string) [][]string {
 			}
 		}
 
+		// empty line, new commit begins next line
 		if lineContent == "" {
 			isBeginCommit = true
 			authors = nil
@@ -59,6 +73,7 @@ func parseGitLog(lines string, repoPath string) [][]string {
 	return result
 }
 
+// parseCommitHeader parses the header row of a commit from git log. 
 func parseCommitHeader(lineContent string, repoPath string) (string, []string) {
 	var fields = strings.Fields(lineContent)
 	var date, mainAuthor = fields[0], fields[1]
@@ -74,44 +89,17 @@ func parseCommitHeader(lineContent string, repoPath string) (string, []string) {
 	return date, allAuthors
 }
 
-func checkMailMap(author string, repoPath string) string {
-	var script = `git -C %s check-mailmap "%s"`
-	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))
-
-	var output, err = cmd.CombinedOutput()
-	var trimmedOutput = strings.TrimSpace(string(output))
-
-	if err != nil {
-		// only log warning if specific author has not failed before
-		if !failedCheckMailmap[author] {
-			log.Printf("Warning: 'git check-mailmap' gave error: '" + trimmedOutput + "'")
-			failedCheckMailmap[author] = true
-		}
-		// author was not found in mailmap, so we will attempt to parse email from original co-author string
-		trimmedOutput = strings.TrimSpace(author)
-	}
-
-	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
-	if emailErr != nil {
-		// only log warning if specific author has not failed before
-		if !failedParseEmail[author] {
-			log.Printf("Warning: net/mail could not parse email from author: '" + trimmedOutput + "'")
-			failedParseEmail[author] = true
-		}
-		return ""
-	}
-
-	return emailAddress.Address
-}
-
+// parseCoAuthors parses the raw list of co-authors and returns a slice of parsed emails
 func parseCoAuthors(coAuthorString string, repoPath string) []string {
 	var listCoAuthor []string
 
 	var splitCoAuthor = strings.Split(coAuthorString, "|")
 
 	for _, author := range splitCoAuthor {
-		var properEmail = checkMailMap(author, repoPath)
+		var properEmail = parseEmail(author, repoPath)
+		
 		if properEmail != "" {
+			// if parseEmail could find email-address, append it to parsed co-authors
 			listCoAuthor = append(listCoAuthor, properEmail)
 		}
 	}
@@ -120,6 +108,42 @@ func parseCoAuthors(coAuthorString string, repoPath string) []string {
 
 }
 
+// parseEmail takes a raw author string and returns the proper email, by doing following:
+// - calling 'git check-mailmap' to find a proper e-mail, if possible
+// - then parsing the email-address using Go net/mail package
+func parseEmail(author string, repoPath string) string {
+	var script = `git -C %s check-mailmap "%s"`
+	var cmd = exec.Command("bash", "-c", fmt.Sprintf(script, repoPath, author))
+
+	var output, err = cmd.CombinedOutput()
+	var trimmedOutput = strings.TrimSpace(string(output))
+
+	// check-mailmap 
+	if err != nil {
+		// only log warning if specific author has not failed before
+		if !failedCheckMailmap[author] {
+			log.Printf("\nWarning: 'git check-mailmap' in repository " + repoPath + " gave error: '" + trimmedOutput + "'\n")
+			failedCheckMailmap[author] = true
+		}
+		// author was not found in mailmap, so we will attempt to parse email from original co-author string
+		trimmedOutput = strings.TrimSpace(author)
+	}
+
+	// parse for email
+	var emailAddress, emailErr = mail.ParseAddress(trimmedOutput)
+	if emailErr != nil {
+		// only log warning if specific author has not failed before
+		if !failedParseEmail[author] {
+			log.Printf("\nWarning: net/mail could not parse email from author: '" + trimmedOutput + "' in repository " + repoPath + "\n")
+			failedParseEmail[author] = true
+		}
+		return ""
+	}
+
+	return emailAddress.Address
+}
+
+// removeDuplicates removes duplicates from a slice, and returns the clean slice
 func removeDuplicates(list []string) []string {
 	var keyMap = make(map[string]bool)
 	var result = []string{}
@@ -133,6 +157,8 @@ func removeDuplicates(list []string) []string {
 	return result
 }
 
+// parseCommitFile parses a row for a file in a commit,
+// and returns [][]string, with a new row for each author on the commit. 
 func parseCommitFile(
 	lineContent, repoPath, date string,
 	authors []string) [][]string {
@@ -149,8 +175,6 @@ func parseCommitFile(
 	var commitValue = getMetric(linesAdd, linesDel, "commit")
 	var growthValue = getMetric(linesAdd, linesDel, "growth")
 
-
-	
 
 	// add row for each author on commit for this file
 	for _, author := range authors {
@@ -170,7 +194,7 @@ func parseCommitFile(
 }
 
 
-
+// getMetric returns metric value based on specific metric, lines added and lines deleted
 func getMetric(linesAdd int, linesDel int, metric string) int {
 	if metric == "churn" {
 		return linesAdd + linesDel
