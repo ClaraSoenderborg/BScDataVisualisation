@@ -5,9 +5,8 @@
  * In the tooltip information about filename, y-axis value, nodeSize value and each author's contribution to 
  * said file based on nodeSize metric is shown.
  * 
- * Sources for code: 
- * https://d3-graph-gallery.com/graph/interactivity_tooltip.html
- * E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 15.4, May 2025.
+ * Source: https://d3-graph-gallery.com/graph/interactivity_tooltip.html
+ * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 15.4, May 2025.
  */
 
 const createHoverTooltip = (svg) => {

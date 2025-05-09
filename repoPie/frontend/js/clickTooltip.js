@@ -9,12 +9,14 @@ var setMetadata
 var lastAddedEndPoint = [-999, 999]
 
 /**
+ * Creates initial tooltip when clicking on a piechart and handles logic for closing the tooltip
  * 
+ * Source: https://github.com/d3js-in-action-third-edition/code-files/tree/main/chapter_07/7.3.1-Simple_tooltip
+ * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 7.3.1, April 2025.
  */
 const createClickTooltip = (svg, metadata) => {
   setMetadata = metadata  
 
-  // Chapter 7 i bogen
   const toolTip = svg
     .append("g")
     .attr("class", "clickTooltip")
@@ -138,9 +140,10 @@ function showTooltipOnClick({ e, data, svg }) {
 
 /**
  * Function to build piechart, polylines and labels in tooltip. 
- * 
  */
 function buildTooltipChart(singlePie, authorMap) {
+  lastAddedEndPoint = [-999, 999]
+
   var pie = d3
     .pie()
     .sort(null)
@@ -203,22 +206,18 @@ function buildTooltipChart(singlePie, authorMap) {
 }
 
 /**
- * Calculates points for lines from piece of piechart to label of author name
+ * Calculate polylines from each slice. Adjusts if overlap occurs.
  * Source: https://gist.github.com/dbuezas/9306799
  * 
  * Optimized with CodeScene
  */
 function calculateLinePoints(d, arcGen) {
-  lastAddedEndPoint = [-999, 999]
+  
   var posStart = getPosStart(d, arcGen)
   var posMid = getPosMid(posStart)
   var posEnd = getPosEnd(posMid)
 
-  console.log("posEnd " + posEnd)
-
-  adjustPosEndIfOverlap(posEnd, posMid)
-
-  console.log("posEnd " + posEnd)
+  adjustPosEndIfSameSide(posEnd, posMid)
 
   lastAddedEndPoint = posEnd  
   return [posStart, posMid, posEnd]  
@@ -237,9 +236,9 @@ function getPosEnd(posMid) {
 }
 
 /**
- * If the labels overlap 
+ * Checks if there is any overlap 
  */
-function adjustPosEndIfOverlap(posEnd, posMid) {
+function adjustPosEndIfSameSide(posEnd, posMid) {
   var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])
 
   if (isOnSameSide) {
@@ -254,21 +253,31 @@ function adjustPosEndIfOverlap(posEnd, posMid) {
 
 }
 
+/**
+ * On right side of the piechart. 
+ * If y-value of lastAddedEndPoint is greater than current end point the function recalculates position of y-value 
+ * to correct position so no overlap occurs and correct order. 
+ */
 function adjustPosEndForRightSide(posEnd, posMid) {
   if (posEnd[1] < lastAddedEndPoint[1]) {
     posEnd[1] = lastAddedEndPoint[1] + line_height_two  
     posMid[1] = lastAddedEndPoint[1] + line_height_two  
-  } else {
+  } else { // Add space to avoid overlap 
     posEnd[1] = posEnd[1] + line_height_two  
     posMid[1] = posMid[1] + line_height_two  
   }
 }
 
+/**
+ * On right side of the piechart. 
+ * If y-value of lastAddedEndPoint is smaller than current end point the function recalculates position of y-value 
+ * to correct position so no overlap occurs and correct order. 
+ */
 function adjustPosEndForLeftSide(posEnd, posMid) {
   if (posEnd[1] > lastAddedEndPoint[1]) {
     posEnd[1] = lastAddedEndPoint[1] - line_height_two  
     posMid[1] = lastAddedEndPoint[1] - line_height_two  
-  } else {
+  } else { // Add space to avoid overlap
     posEnd[1] = posEnd[1] - line_height_two  
     posMid[1] = posMid[1] - line_height_two  
   }
