@@ -1,6 +1,6 @@
 /**
  * Creates and shows the tooltip on hover. 
- * When the user mouses over a piechart this tooltip will be visible and disappear when mousing out. 
+ * When the user mouses over a pie chart this tooltip will be visible and disappear when mousing out. 
  * 
  * In the tooltip information about filename, y-axis value, nodeSize value and each author's contribution to 
  * said file based on nodeSize metric is shown.
@@ -78,7 +78,7 @@ function showTooltipOnHover({e, data, svg}) {
     .style("opacity", 1) 
 }
 
-// When clicking on a piechart the hover tooltip disappears
+// When clicking on a pie chart the hover tooltip disappears
 d3.select(document).on("click", (e) => {
   d3.select(".hoverTooltip").style("visibility", "hidden").style("opacity", 0) 
 }) 

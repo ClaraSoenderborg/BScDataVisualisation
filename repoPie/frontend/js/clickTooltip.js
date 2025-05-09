@@ -1,7 +1,7 @@
 /**
  * Creates and shows the tooltip on click. 
- * When the user clicks on a piechart the tooltip becomes visible with information on filename, nodeSize value 
- * and each author's contribution shown with labels and a piece of the piechart.
+ * When the user clicks on a pie chart the tooltip becomes visible with information on filename, nodeSize value 
+ * and each author's contribution shown with labels and a piece of the pie chart.
  * 
  */
 
@@ -9,7 +9,7 @@ var setMetadata
 var lastAddedEndPoint = [-999, 999]
 
 /**
- * Creates initial tooltip when clicking on a piechart and handles logic for closing the tooltip
+ * Creates initial tooltip when clicking on a pie chart and handles logic for closing the tooltip
  * 
  * Source: https://github.com/d3js-in-action-third-edition/code-files/tree/main/chapter_07/7.3.1-Simple_tooltip
  * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 7.3.1, April 2025.
@@ -36,7 +36,7 @@ const createClickTooltip = (svg, metadata) => {
     .attr("x", tooltip_padding)
     .attr("y", tooltip_padding)  
 
-  // Append piechart in tooltip
+  // Append pie chart in tooltip
   toolTip
     .append("g")
     .attr("class", "tooltip-pie")
@@ -51,7 +51,7 @@ const createClickTooltip = (svg, metadata) => {
     .attr("class", "tooltipTotal")
     .style("dominant-baseline", "hanging")  
 
-  // Hide the tooltip when clicking anywhere on the page except on the piecharts
+  // Hide the tooltip when clicking anywhere on the page except on the pie charts
   d3.select(document).on("click", (e, d) => {
     d3.select(".clickTooltip").style("visibility", "hidden")  
     d3.selectAll(".singlePie").style("opacity", 1)  
@@ -64,7 +64,7 @@ const createClickTooltip = (svg, metadata) => {
 }  
 
 /**
- * When closing the tooltip, remove all the tooltip content and reset the piechart's opacity
+ * When closing the tooltip, remove all the tooltip content and reset the pie chart's opacity
  */
 function closeTooltip(e) {
   d3.selectAll(".singlePie").style("opacity", 1)  
@@ -93,7 +93,7 @@ function adjustTooltipHeight(lineNumber) {
 }
 
 /**
- * Takes a parameter object and displays the tooltip when clicking on a piechart
+ * Takes a parameter object and displays the tooltip when clicking on a pie chart
  */
 function showTooltipOnClick({ e, data, svg }) {
 
@@ -132,14 +132,14 @@ function showTooltipOnClick({ e, data, svg }) {
     .duration(200)
     .style("opacity", 1)  
 
-  // Builds piechart inside tooltip
+  // Builds pie chart inside tooltip
   d3.select(".tooltip-pie").call(() =>
     buildTooltipChart(d3.select(".tooltip-pie"), data.authorMap)
   )
 }
 
 /**
- * Function to build piechart, polylines and labels in tooltip. 
+ * Function to build pie chart, polylines and labels in tooltip. 
  */
 function buildTooltipChart(singlePie, authorMap) {
   lastAddedEndPoint = [-999, 999]
@@ -150,7 +150,7 @@ function buildTooltipChart(singlePie, authorMap) {
     .value(([key, value]) => value.get("nodeSize"))  
   const preparedPie = pie(authorMap)  
 
-  // Piechart size to fit in tooltip
+  // pie chart size to fit in tooltip
   var arcGen = d3.arc()
   .innerRadius(0)
   .outerRadius(toolTip_radius)  
@@ -254,7 +254,7 @@ function adjustPosEndIfSameSide(posEnd, posMid) {
 }
 
 /**
- * On right side of the piechart. 
+ * On right side of the pie chart. 
  * If y-value of lastAddedEndPoint is greater than current end point the function recalculates position of y-value 
  * to correct position so no overlap occurs and correct order. 
  */
@@ -269,7 +269,7 @@ function adjustPosEndForRightSide(posEnd, posMid) {
 }
 
 /**
- * On right side of the piechart. 
+ * On right side of the pie chart. 
  * If y-value of lastAddedEndPoint is smaller than current end point the function recalculates position of y-value 
  * to correct position so no overlap occurs and correct order. 
  */
