@@ -6,8 +6,6 @@ d3.csv("/data.csv", d3.autoType).then(data => {
         fileLimit: data[0].fileLimit,
     }
 
-    console.log(metadata)
-
     const select = d3.select("#selectDiv")
         .append("select")
         .attr("class", "selectMenu")
@@ -49,7 +47,7 @@ d3.csv("/data.csv", d3.autoType).then(data => {
         reCalculateSizes()
         createTitle(data)
         drawGraph(data, metadata)
-        createLegend(data)
+        createLegend()
     
     }
     

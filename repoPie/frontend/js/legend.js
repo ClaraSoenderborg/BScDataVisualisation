@@ -1,4 +1,4 @@
-const createLegend = (data) => {
+const createLegend = () => {
     const authors = colorScale.domain()
     const rowHeight = 30 
 

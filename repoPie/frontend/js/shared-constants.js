@@ -33,13 +33,12 @@ var hover_tooltip_padding
 
 
 const reCalculateSizes = () => {
-
     //Graph
     height = window.innerHeight * 0.8
     width = Math.max(min_width, window.innerWidth * 0.9)
 
     margin = { top: width*0.005, right: 0, bottom: width*0.035, left: width * 0.07 }
-    graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) //- margin.top - margin.bottom
+    graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) 
     graph_radius = Math.min(width, graph_height) / 22
     graph_bandwidth_padding = graph_radius * 0.15
  

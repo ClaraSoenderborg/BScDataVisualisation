@@ -17,7 +17,7 @@ const createHoverTooltip = (svg) => {
   toolTip
     .append("rect")
     .attr("class", "hoverTooltipBox")
-    .attr("rx", 5) 
+    .attr("rx", 5)
     .attr("ry", 5)
 
   toolTip
@@ -25,18 +25,18 @@ const createHoverTooltip = (svg) => {
     .attr("class", "hoverTooltipText")
     .attr("y", hover_tooltip_padding)
     .attr("x", hover_tooltip_padding)
-    .style("dominant-baseline", "hanging")  
-} 
+    .style("dominant-baseline", "hanging")
+}
 
 /**
  * This function takes a paramater object and displays the tooltip with the data that corresponds to the hovered
  * pie. 
  */
-function showTooltipOnHover({e, data, svg}) {
-  const toolTip = d3.select(".hoverTooltip") 
-  const [x, y] = d3.pointer(e, svg.node()) 
+function showTooltipOnHover({ e, data, svg }) {
+  const toolTip = d3.select(".hoverTooltip")
+  const [x, y] = d3.pointer(e, svg.node())
 
-  const element = d3.select(".hoverTooltipText") 
+  const element = d3.select(".hoverTooltipText")
 
   // New line when text overflows 
   var lineNumber = wrapText(
@@ -54,7 +54,7 @@ function showTooltipOnHover({e, data, svg}) {
   console.log(authors)
 
   authors.forEach(author => {
-    lineNumber = addLine(`${author}: ${data.authorMap.get(author).get("nodeSize")}`,lineNumber, colorScale(author))
+    lineNumber = addLine(`${author}: ${data.authorMap.get(author).get("nodeSize")}`, lineNumber, colorScale(author))
   })
 
   adjustHoverTooltipSize(lineNumber, element)
@@ -66,41 +66,37 @@ function showTooltipOnHover({e, data, svg}) {
   toolTip
     .attr(
       "transform",
-      `translate(${calculateTooltipX(x, actualWidth)}, ${calculateTooltipY(
-        y,
-        actualHeight
-      )})`
-    )
+      `translate(${calculateTooltipX(x, actualWidth)}, ${calculateTooltipY(y,actualHeight)})`)
     .style("visibility", "visible")
     .raise()
     .transition()
     .duration(200)
-    .style("opacity", 1) 
+    .style("opacity", 1)
 }
 
 // When clicking on a pie chart the hover tooltip disappears
 d3.select(document).on("click", (e) => {
-  d3.select(".hoverTooltip").style("visibility", "hidden").style("opacity", 0) 
-}) 
+  d3.select(".hoverTooltip").style("visibility", "hidden").style("opacity", 0)
+})
 
 
 /**
  * Dynamically adjusts tooltip size according to content 
  */
 function adjustHoverTooltipSize(lineNumber, textElement) {
-  var maxTspan = 0 
+  var maxTspan = 0
 
   // Finds the widest line to set width
   textElement.selectAll("tspan").each(function () {
-    const length = this.getComputedTextLength() 
+    const length = this.getComputedTextLength()
     if (length > maxTspan) {
-      maxTspan = length 
+      maxTspan = length
     }
-  }) 
+  })
 
   d3.select(".hoverTooltipBox")
     .attr("height", hover_tooltip_height + lineNumber * line_height_two)
-    .attr("width", maxTspan + hover_tooltip_padding * 2) 
+    .attr("width", maxTspan + hover_tooltip_padding * 2)
 }
 
 
@@ -108,8 +104,8 @@ function adjustHoverTooltipSize(lineNumber, textElement) {
  * Function to add lines for total y-axis metric, total nodeSize metric and each author's contributions 
  * Returns lineNumber to set height accordingly 
  */
-function addLine(text, lineNumber, color){
-  const element = d3.select(".hoverTooltipText") 
+function addLine(text, lineNumber, color) {
+  const element = d3.select(".hoverTooltipText")
 
   lineNumber++
   const startY = parseFloat(element.attr("y"))
@@ -117,7 +113,7 @@ function addLine(text, lineNumber, color){
 
   element.append("tspan")
     .attr("x", startX)
-    .attr("y", startY + line_height_two * lineNumber) 
+    .attr("y", startY + line_height_two * lineNumber)
     .attr("class", "hoverTooltipYAxis")
     .style("dominant-baseline", "hanging")
     .attr("fill", color)
