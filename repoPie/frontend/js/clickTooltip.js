@@ -236,7 +236,7 @@ function getPosEnd(posMid) {
 }
 
 /**
- * Checks if there is any overlap 
+ * Checks if the polylines are on same side and if true enacts function to handle this
  */
 function adjustPosEndIfSameSide(posEnd, posMid) {
   var isOnSameSide = Math.sign(lastAddedEndPoint[0]) === Math.sign(posEnd[0])
