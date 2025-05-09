@@ -60,7 +60,7 @@ Options:` + "\n" + `
 	}
 
 
-	setUpServer(reformatCSV(*yAxis, *nodeSize, *fileLimit))
+	setUpServer(reformatCSVWithMetrics(*yAxis, *nodeSize, *fileLimit))
 
 
 }
@@ -68,7 +68,7 @@ Options:` + "\n" + `
 // reformatCSV builds a new CSV based on input CSV and y-axis and node size metrics given in user arguments. 
 // input will be format: repoPath, date, author, fileName, churn, growth, commit
 // output will be format: repoPath, date, author, fileName, yAxis, yAxisMetric, nodeSize, nodeSizeMetric, fileLimit. 
-func reformatCSV(yAxis, nodeSize, fileLimit string) [][]string {
+func reformatCSVWithMetrics(yAxis, nodeSize, fileLimit string) [][]string {
 	var reader = csv.NewReader(os.Stdin)
 	
 	// Add headers to output csv
