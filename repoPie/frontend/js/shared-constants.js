@@ -2,7 +2,6 @@ var width
 var height
 var margin
 var graph_radius
-var donutHole = 0.0
 var graph_height
 var graph_bandwidth_padding 
 var line_height_two

@@ -4,9 +4,9 @@ const buildPie = (node, svg) => {
 
     const leftAxisGroup = svg.select(".leftAxis")
 
-    const singleDonut = leftAxisGroup.append("g")
+    const singlePie = leftAxisGroup.append("g")
         .attr("transform", `translate(${x}, ${y})`)
-        .attr("class", `singleDonut ${sanitizeClassName(fileName)}`)
+        .attr("class", `singlePie ${sanitizeClassName(fileName)}`)
         .on("click", (e, d) => {
 
             showTooltipOnClick(
@@ -19,7 +19,7 @@ const buildPie = (node, svg) => {
                     },
                     svg
                 })
-            singleDonut.style("opacity", 0.5)
+            singlePie.style("opacity", 0.5)
             d3.select(".hoverTooltip").style("visibility", "hidden")
             d3.selectAll(".highlight-ring").remove();
 
@@ -38,7 +38,7 @@ const buildPie = (node, svg) => {
                     },
                     svg
                 })
-                singleDonut.style("opacity", 0.5)
+                singlePie.style("opacity", 0.5)
 
                 const className = sanitizeClassName(fileName);
 
@@ -59,7 +59,7 @@ const buildPie = (node, svg) => {
         .on("mouseout", (e, d) => {
             if (d3.select(".clickTooltip").style("visibility") !== "visible") {
                 d3.select(".hoverTooltip").style("visibility", "hidden")
-                singleDonut.style("opacity", 1)
+                singlePie.style("opacity", 1)
 
                 const className = sanitizeClassName(fileName);
 
@@ -76,10 +76,10 @@ const buildPie = (node, svg) => {
 
     const drawPie = () => {
         var arcGen = d3.arc()
-            .innerRadius(donutHole)
+            .innerRadius(0)
             .outerRadius(rScale(nodeSize))
 
-        var arcs = singleDonut.selectAll()
+        var arcs = singlePie.selectAll()
             .data(preparedPie)
             .join("g")
             .attr("class", "pie-arc")

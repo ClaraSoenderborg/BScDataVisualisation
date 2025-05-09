@@ -7,9 +7,10 @@ text{
     font-family:Arial, Helvetica, sans-serif
 }
 
-/* Title */
+/* Title font-size: https://www.geeksforgeeks.org/css-clamp-method/ */
+/* Text font-size: https://www.wix.com/wixel/resources/font-size    */ 
 .topTitleText{
-    font-size: 3vmin; 
+    font-size: clamp(1.1em, 2.5vmin, 1.8em); 
     text-anchor: left;
     font-weight:bold
     
@@ -40,8 +41,9 @@ text{
     stroke-width: 1px;
   }
 
+
 .tooltipTotal{
-    font-size: 2vmin;
+    font-size: 0.875em;
     text-anchor: end;
 }
 
@@ -51,17 +53,17 @@ text{
     stroke-width: 1px
 }
 
-.tooltip-donut .arc path {
+.tooltip-pie .arc path {
     stroke: white;
     stroke-width: 1;
 }
 
 .tooltipTitle {
-    font-size: 2.5vmin;
+    font-size: 1.25em;
 }
 
 .labelText {
-    font-size: 1.7vmin;
+    font-size: 0.875em;
     font-weight: bold;
     stroke: none;
 }
@@ -73,11 +75,11 @@ text{
 }
 
 .xAxisLabel, .yAxisLabel{
-    font-size: 2vmin;
+    font-size: 0.875em;
 }
 
 .leftAxis, .bottomAxis {
-    font-size: 2vmin; 
+    font-size: 0.75em; 
 }
 
 .leftAxis .tick line {
@@ -92,7 +94,7 @@ text{
 }
 
 .hoverTooltipText{
-    font-size: 2vmin;
+    font-size: 0.875em;
     font-weight: bold;
 }
 
@@ -114,11 +116,11 @@ text{
 }
 
 .legend-text {
-    font-size: 2.5vmin; 
+    font-size: 0.875em;
 }
 
 /* pie */
-.singleDonut{
+.singlePie{
     opacity: 1;
 }
 
