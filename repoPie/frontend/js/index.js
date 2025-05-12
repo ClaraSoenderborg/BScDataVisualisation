@@ -1,7 +1,12 @@
 /**
  * Loads CVS data converting strings in the CSV to appropriate datatypes. 
- * Builds dropdown menu to select different repositories to render a corresponding title, 
+ * 
+ * Starting point for RepoPie that calls on all related functions to create visualization. 
+ * 
+ * Builds selction menu to view different repositories with corresponding title, 
  * graph and legend.  
+ * 
+ * Listens for resizing of window to make design responsive
  */
 d3.csv("/data.csv", d3.autoType).then(data => {
 
@@ -12,7 +17,7 @@ d3.csv("/data.csv", d3.autoType).then(data => {
         fileLimit: data[0].fileLimit,
     }
 
-    // Create a dropdown element 
+    // Create a selection menu 
     const select = d3.select("#selectDiv")
         .append("select")
        .attr("class", "selectMenu")
