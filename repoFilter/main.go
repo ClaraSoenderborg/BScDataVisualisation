@@ -38,7 +38,7 @@ Options:` + "\n" + `
   -h --help
         Show this screen.` + "\n")
 		flag.PrintDefaults()
-		fmt.Printf("\nFor more documentation, see readme at https://github.com/ClaraSoenderborg/BScDataVisualisation/")
+		fmt.Printf("\nFor more documentation, see README at https://github.com/ClaraSoenderborg/BScDataVisualisation/")
 	}
 
 	flag.Parse()
