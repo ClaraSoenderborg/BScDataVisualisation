@@ -92,7 +92,8 @@ func reformatCSVWithMetrics(yAxis, nodeSize, fileLimit string) [][]string {
 
 		// row in input csv should have 7 fields 
 		if len(data) == 7 {
-			var newData = data[0:4]
+			var newData = make([]string,4)
+			copy(newData, data[0:4])
 			var churnVal, _ = strconv.Atoi(data[4])
 			var growthVal, _ = strconv.Atoi(data[5])
 
@@ -100,20 +101,22 @@ func reformatCSVWithMetrics(yAxis, nodeSize, fileLimit string) [][]string {
 			if !addRow(yAxis, nodeSize, churnVal, growthVal) {
 				continue
 			}
-
+			
 			// append yAxis value
 			if yAxis == "churn" && churnVal>0{
 				newData = append(newData, data[4]) 
-
+			
 			} else if yAxis == "growth" && growthVal > 0{
 				newData = append(newData, data[5])
-
+			
 			} else if yAxis == "commit" {
 				newData = append(newData, data[6])
 
 			} 
-			// append yAxisMetric
+			
 			newData = append(newData, yAxis)
+
+			
 
 			// append nodeSize value
 			if nodeSize == "churn" && churnVal>0{
