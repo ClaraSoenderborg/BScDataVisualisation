@@ -14,6 +14,10 @@ const min_width = 700
 //Graph
 const max_graph_height = 550
 const min_graph_height = 300
+var globalyMin 
+var globalyMax
+var globalNodeMin 
+var globalNodeMax
 
 //Legend
 var legendPadding
@@ -41,6 +45,11 @@ const reCalculateSizes = () => {
     graph_height = Math.max(min_graph_height, Math.min(max_graph_height, height)) 
     graph_radius = Math.min(width, graph_height) / 22
     graph_bandwidth_padding = graph_radius * 0.15
+
+    globalyMin = Infinity
+    globalyMax= -Infinity
+    globalNodeMin = Infinity
+    globalNodeMax= -Infinity
  
     line_height_four = Math.min(window.innerHeight, window.innerWidth) * 0.04
 
