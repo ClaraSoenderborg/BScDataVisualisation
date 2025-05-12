@@ -12,7 +12,7 @@ var lastAddedEndPoint = [-999, 999]
  * Creates initial tooltip when clicking on a pie chart and handles logic for closing the tooltip
  * 
  * Source: https://github.com/d3js-in-action-third-edition/code-files/tree/main/chapter_07/7.3.1-Simple_tooltip
- * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 7.3.1, April 2025.
+ * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 7.3.1, 2024.
  */
 const createClickTooltip = (svg, metadata) => {
   setMetadata = metadata  

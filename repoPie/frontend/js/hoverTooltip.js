@@ -6,7 +6,7 @@
  * said file based on nodeSize metric is shown.
  * 
  * Source: https://d3-graph-gallery.com/graph/interactivity_tooltip.html
- * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 15.4, May 2025.
+ * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 15.4, 2024.
  */
 
 const createHoverTooltip = (svg) => {

@@ -1,3 +1,7 @@
+/**
+ * Creates and displays a legend, showing each unique author and their corresponding color.
+ * Source: E. Meeks, and A. Dafour, “D3.js in action”, Third edition, chapter 5.3., 2024.
+ */
 const createLegend = () => {
     const authors = colorScale.domain()
     const rowHeight = 30 
@@ -5,6 +9,9 @@ const createLegend = () => {
     const div = d3.select("#legendDiv")
     const legend = div.append("svg")
 
+    /**
+     * Draws the legend dynamically based on authors
+     */
     const drawLegend = () => {
         let usedRows = 1
         let xPosition = margin.left * 1.25
@@ -13,7 +20,7 @@ const createLegend = () => {
         legend.selectAll(".legend-item").remove()
         legend.selectAll(".legend-background").remove()
 
-        // Bind data and create groups for each author
+        // Bind data to legend items (authors) and create groups for each
         const legendItems = legend.selectAll(".legend-item")
             .data(authors)
             .join("g")
@@ -33,9 +40,10 @@ const createLegend = () => {
                 if (xPosition + textWidth + 20 > width) {
                     xPosition = margin.left * 1.25 
                     yPosition += rowHeight
-                    usedRows++
+                    usedRows++ // Wrap to new line
                 }
 
+                // Position the legend
                 d3.select(this).attr("transform", `translate(${xPosition}, ${yPosition})`)
                 xPosition += textWidth + 55 
             })
@@ -55,15 +63,15 @@ const createLegend = () => {
             .attr("fill", colorScale)
             
 
-        // Update legend background height
+        // Update legend background height according to used rows
         const legendHeight = usedRows * rowHeight
         background
             .attr("height", legendHeight + 5)
             .attr("width", width)
 
-        //Sets the width of the legend to be as wide as the container(from chat)
+        // Sets the width of the legend to be as wide as the container
+        // Source: https://medium.com/@belloquadriolawale/the-getboundingclientrect-method-5cd13e206bcf
         const containerWidth = div.node().getBoundingClientRect().width
-
         legend.attr("viewBox", `0 0 ${containerWidth} ${legendHeight + legendPadding}`)
 
     }
