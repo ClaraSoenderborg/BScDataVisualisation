@@ -5,7 +5,7 @@ With RepoPie, you can:
 - See which files have been worked on for each week throughout the entire history of the repository
 - See author contributions for each file in each week
 - Compare activities in files by multiple metrics
-- Hover on file to see activity for same file in other weeks, along with specific activity data on this file
+- Hover on file to see activity data and highlight matching files across other weeks
 - Click on file to go more in depth with author contributions and activity data
 
 ![ScreenRecording2025-05-08at14 44 53-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/020ffb4f-beea-474e-aced-deb924deac51)
@@ -29,7 +29,7 @@ Mandatory arguments:
 The metrics are:
 1. Churn, which is lines added + lines deleted per file in each commit
 2. Growth, which is lined added - lines deleted per file in each commit
-3. Commit, which is 1 per file in each commit.
+3. Commit, which is one per file in each commit.
 
 Optional argument:
 1. fileLimit, integer used to limit amount of files per week, where files are sorted descending by y-axis metric.
@@ -43,7 +43,7 @@ The data visualisation will be served in a local HTTP server, with a link in ter
 ### RepoGitLog
 Helper tool to generate data for RepoPie, based on Git log for one or more local repositories. 
 
-Input is a absolute path to one or more repositories, given through the `-repoPath` argument. If providing multiple repositories, separate each path with a comma without spacing. 
+Input is an absolute path to one or more repositories, given through the `-repoPath` argument. If providing multiple repositories, separate each path with a comma without spacing. 
 Output is CSV-formatted data with the headers: repoPath,date,author,fileName,churn,growth,commit.
 
 To run RepoGitLog, run the following command
