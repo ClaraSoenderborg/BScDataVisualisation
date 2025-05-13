@@ -1,7 +1,7 @@
 # RepoPie 🥧
-RepoPie is a tool for visualising version control histories of time-framed repositories. 
+RepoPie is a tool for visualising version control histories of time-framed repositories.
 
-With RepoPie, you can: 
+With RepoPie, you can:
 - See which files have been worked on for each week throughout the entire history of the repository
 - See author contributions for each file in each week
 - Compare activities in files by multiple metrics
@@ -13,7 +13,7 @@ With RepoPie, you can:
 ## Installation
 Download executables from build directory based on your hardware.
 
-## Usage 
+## Usage
 RepoPie takes 2 mandatory arguments and 1 optional, along with CSV-formatted data.
 
 Input data example:
@@ -28,22 +28,22 @@ Mandatory arguments:
 
 The metrics are:
 1. Churn, which is lines added + lines deleted per file in each commit
-2. Growth, which is lined added - lines deleted per file in each commit
+2. Growth, which is lines added - lines deleted per file in each commit
 3. Commit, which is one per file in each commit.
 
 Optional argument:
 1. fileLimit, integer used to limit amount of files per week, where files are sorted descending by y-axis metric.
 
-To execute RepoPie, pipeline CSV-formatted data into the executable file. 
+To execute RepoPie, pipeline CSV-formatted data into the executable file.
 ```
 cat <path to csv> | ./repoPie -yAxis <metric> -nodeSize <metric>
 ```
-The data visualisation will be served in a local HTTP server, with a link in terminal to open in browser. 
+The data visualisation will be served in a local HTTP server, with a link in terminal to open in browser.
 
 ### RepoGitLog
-Helper tool to generate data for RepoPie, based on Git log for one or more local repositories. 
+Helper tool to generate data for RepoPie, based on Git log for one or more local repositories.
 
-Input is an absolute path to one or more repositories, given through the `-repoPath` argument. If providing multiple repositories, separate each path with a comma without spacing. 
+Input is an absolute path to one or more repositories, given through the `-repoPath` argument. If providing multiple repositories, separate each path with a comma without spacing.
 Output is CSV-formatted data with the headers: repoPath,date,author,fileName,churn,growth,commit.
 
 To run RepoGitLog, run the following command
@@ -52,21 +52,21 @@ To run RepoGitLog, run the following command
 ```
 
 Parsing co-authors:
-When parsing co-authors, the process is to first check for a .mailmap file in the repository. Each co-author is checked for a corresponding proper name and email address with a `git check-mailmap` command. The output is given to Go package [net/mail](https://pkg.go.dev/net/mail), which checks for an email address in the permitted syntax of the package. 
+When parsing co-authors, the process is to first check for a .mailmap file in the repository. Each co-author is checked for a corresponding proper name and email address with a `git check-mailmap` command. The output is given to Go package [net/mail](https://pkg.go.dev/net/mail), which checks for an email address in the permitted syntax of the package.
 
 ### RepoFilter
-Helper tool to filter rows based on file path. 
+Helper tool to filter rows based on file path.
 
 Input and output are both CSV-formatted data with headers: repoPath,date,author,fileName,churn,growth,commit.
 
 To filter certain file paths and names, provide RepoFilter with regular expressions in the following optional arguments: `-includePath`, `-includeFile`, `-excludePath`, `-excludeFile`
 
-To run RepoFilter, pipeline CSV-formatted data into the executable file. 
+To run RepoFilter, pipeline CSV-formatted data into the executable file.
 ```
 cat <path to csv> | ./repoFilter -includePath <regex> -includeFile <regex> -excludePath <regex> -excludeFile <regex>
 ```
 ### Pipelining all tools
-Both RepoGitLog and RepoFilter are optional helper tools, to easily pipeline filtered data from Git log into RepoPie. 
+Both RepoGitLog and RepoFilter are optional helper tools, to easily pipeline filtered data from Git log into RepoPie.
 
 With all tools:
 ```
@@ -83,7 +83,7 @@ Only with RepoGitLog and RepoPie:
 ./repoGitLog -repoPath <path to repositories> | ./repoPie -yAxis <metric> -nodeSize <metric>
 ```
 
-## Example 
+## Example
 1. Clone the following repository
 ```git clone https://github.com/ITU-BDSA23-GROUP8/Chirp.git```
 2. Run the following command to execute repoPie and helper tools:
