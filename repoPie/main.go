@@ -21,15 +21,15 @@ var version = "dev"
 func main() {
 	// argument flags
 	var versionFlag = flag.Bool("version", false, "Show version")
-	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis either churn, commit or growth.\nChurn = linesAdded + linesDeleted\nGrowth = linesAdded - linesDeleted")
-	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size either churn, commit or growth.\nChurn = linesAdded + linesDeleted\nGrowth = linesAdded - linesDeleted")
+	var yAxis = flag.String("yAxis", "", "Mandatory: Metric for y-axis, must match with header in input CSV")
+	var nodeSize = flag.String("nodeSize", "", "Mandatory: Metric for node size, must match with header in input CSV")
 	var fileLimit = flag.String("fileLimit", "", "Optional: Limit for number of files per week")
 
 
 	// usage documentation for tool
 	flag.Usage = func() {
 		fmt.Printf(`Usage:
-... <CSV-formatted data with headers: repoPath,date,author,fileName,churn,growth,commit>
+... <CSV-formatted data with headers: repoPath,date,author,fileName,[at least 1 metric header]>
 ... -h --help
 ... --version
 
@@ -48,18 +48,6 @@ Options:` + "\n" + `
 		os.Exit(0)
 	}
 
-	// Validate yAxis and nodeSize are given correct metric strings
-	var metricOptions = []string{"churn", "growth", "commit"}
-
-	if !slices.Contains(metricOptions, *yAxis) {
-		log.Fatal("yAxis argument must be churn, growth or commit")
-	}
-
-	if !slices.Contains(metricOptions, *nodeSize) {
-		log.Fatal("nodeSize argument must be churn, growth or commit")
-	}
-
-
 	setUpServer(reformatCSVWithMetrics(*yAxis, *nodeSize, *fileLimit))
 
 
@@ -74,11 +62,20 @@ func reformatCSVWithMetrics(yAxis, nodeSize, fileLimit string) [][]string {
 	// Add headers to output csv
 	var result = [][]string{{"repoPath", "date", "author", "fileName", "yAxis", "yAxisMetric", "nodeSize", "nodeSizeMetric", "fileLimit"}}
 
-	// Read and discard the header
-	_, err := reader.Read()
+	// Read header
+	var header, err = reader.Read()
 	if err != nil {
 		log.Fatalf("Error reading header: %v\n", err)
 	}
+
+	// validate argument y-axis and node size metric matches a header
+	if !slices.Contains(header, yAxis) || !slices.Contains(header, nodeSize){
+		log.Fatal("yAxis and nodeSize arguments must correlate to headers in input data")
+	}
+
+	// find column with y-axis and node size metric
+	var yAxisIndex = slices.Index(header, yAxis)
+	var nodeSizeIndex = slices.Index(header, nodeSize)
 
 	// Iterate over each row in input csv
 	for {
@@ -90,48 +87,32 @@ func reformatCSVWithMetrics(yAxis, nodeSize, fileLimit string) [][]string {
 			log.Fatalf("Error reading csv: %v", err)
 		}
 
-		// row in input csv should have 7 fields 
-		if len(data) == 7 {
+		// row in input csv should have at least 5 fields 
+		if len(data) >= 5 {
+			// first 4 fields contain repoPath,date,author,fileName
 			var newData = make([]string,4)
 			copy(newData, data[0:4])
-			var churnVal, _ = strconv.Atoi(data[4])
-			var growthVal, _ = strconv.Atoi(data[5])
+			
+			// convert strings to integers
+			var yAxisValue, _ = strconv.Atoi(data[yAxisIndex])
+			var nodeSizeValue, _ = strconv.Atoi(data[nodeSizeIndex])
 
-			// if yAxisValue or nodeSizeValue is less than 1, skip row
-			if !addRow(yAxis, nodeSize, churnVal, growthVal) {
+			// exclude rows with negative or 0 metrics
+			if yAxisValue < 1 || nodeSizeValue < 1 {
 				continue
 			}
 			
-			// append yAxis value
-			if yAxis == "churn" && churnVal>0{
-				newData = append(newData, data[4]) 
-			
-			} else if yAxis == "growth" && growthVal > 0{
-				newData = append(newData, data[5])
-			
-			} else if yAxis == "commit" {
-				newData = append(newData, data[6])
-
-			} 
-			
+			// append y-axis data
+			newData = append(newData, data[yAxisIndex])
+			// append y-axis metric
 			newData = append(newData, yAxis)
 
-			
-
-			// append nodeSize value
-			if nodeSize == "churn" && churnVal>0{
-				newData = append(newData, data[4])
-
-			} else if nodeSize == "growth" && growthVal > 0 {
-				newData = append(newData, data[5])
-
-			} else if nodeSize == "commit" {
-				newData = append(newData, data[6])
-
-			}
-
-			// append nodeSizeMetric
+		
+			// append node size data
+			newData = append(newData, data[nodeSizeIndex])
+			// append node size metric
 			newData = append(newData, nodeSize)
+			
 			
 			// lastly, append fileLimit
 			newData = append(newData, fileLimit)
@@ -142,19 +123,4 @@ func reformatCSVWithMetrics(yAxis, nodeSize, fileLimit string) [][]string {
 		}
 	}
 	return result
-}
-
-// addRow checks if row should be added based on the value of y-axis and node size
-func addRow(yAxisMetric string, nodeSizeMetric string, churnVal int, growthVal int) bool {
-	var addChurn = true
-	var addGrowth = true
-	
-	if yAxisMetric == "churn" || nodeSizeMetric == "churn" {
-		if churnVal < 1 {addChurn = false}
-	}
-	if yAxisMetric == "growth" || nodeSizeMetric == "growth" {
-		if growthVal < 1 {addGrowth =  false}
-	}
-	
-	return addChurn && addGrowth
 }

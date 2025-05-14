@@ -14,22 +14,18 @@ With RepoPie, you can:
 Download executables from build directory based on your hardware.
 
 ## Usage
-RepoPie takes 2 mandatory arguments and 1 optional, along with CSV-formatted data.
+RepoPie takes 2 mandatory arguments and 1 optional, along with mandatory CSV-formatted data.
 
 Input data example:
 ```
 repoPath,date,author,fileName,churn,growth,commit
 home/repo,2025-05-09,jane@doe.com,test.md,5,1,1
 ```
+CSV data must contain headers: repoPath,date,author,fileName,[at least 1 metric header]
 
 Mandatory arguments:
-1. yAxis, metric used to place pie charts on the y-axis
-2. nodeSize, metric used to calculate author-contributions for each pie chart, and to calculate size of the pie charts.
-
-The metrics are:
-1. Churn, which is lines added + lines deleted per file in each commit
-2. Growth, which is lines added - lines deleted per file in each commit
-3. Commit, which is one per file in each commit.
+1. yAxis, metric used to place pie charts on the y-axis. Metric must match with metric header in input data. 
+2. nodeSize, metric used to calculate author-contributions for each pie chart, and to calculate size of the pie charts. Metric must match with metric header in input data. 
 
 Optional argument:
 1. fileLimit, integer used to limit amount of files per week, where files are sorted descending by y-axis metric.
@@ -45,6 +41,11 @@ Helper tool to generate data for RepoPie, based on Git log for one or more local
 
 Input is an absolute path to one or more repositories, given through the `-repoPath` argument. If providing multiple repositories, separate each path with a comma without spacing.
 Output is CSV-formatted data with the headers: repoPath,date,author,fileName,churn,growth,commit.
+
+The metric headers are:
+1. Churn, which is lines added + lines deleted per file in each commit
+2. Growth, which is lines added - lines deleted per file in each commit
+3. Commit, which is one per file in each commit.
 
 To run RepoGitLog, run the following command
 ```
